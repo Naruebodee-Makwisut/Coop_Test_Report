@@ -1,0 +1,39 @@
+{
+  "id": "b475e8ea-5854-4d04-94f7-120a11686f4d",
+  "name": "Coop_Test_Report",
+  "publisher": "Tiwter",
+  "version": "1.0.0.0",
+  "brief": "",
+  "description": "",
+  "privacyStatement": "",
+  "EULA": "",
+  "help": "",
+  "url": "",
+  "logo": "",
+  "dependencies": [
+    {
+      "id": "5ecfc871-5d82-43f1-9c54-59685e82318d",
+      "publisher": "LS Retail",
+      "name": "LS Central",
+      "version": "26.1.0.955"
+    }
+  ],
+  "screenshots": [],
+  "platform": "1.0.0.0",
+  "application": "26.0.0.0",
+  "idRanges": [
+    {
+      "from": 50100,
+      "to": 50149
+    }
+  ],
+  "resourceExposurePolicy": {
+    "allowDebugging": true,
+    "allowDownloadingSource": true,
+    "includeSourceInSymbolFile": true
+  },
+  "runtime": "15.0",
+  "features": [
+    "NoImplicitWith"
+  ]
+}

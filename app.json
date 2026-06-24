@@ -34,6 +34,12 @@
       "publisher": "AVISIONLS",
       "name": "Avision TH POS Localization",
       "version": "26.0.0.0"
+    },
+    {
+      "id": "d76824a1-216a-4f13-b9cd-87a4fb5415fc",
+      "publisher": "AVISIONLS",
+      "name": "Avision LSVIP Report Module",
+      "version": "26.1.0.0"
     }
   ],
   "screenshots": [],

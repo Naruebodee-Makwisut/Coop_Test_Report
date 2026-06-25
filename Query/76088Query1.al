@@ -1,4 +1,4 @@
-query 50050 "PLSR_TransDiscount Q"
+query 50050 "TransDiscount Q"
 {
     Caption = 'Trans Discount Query';
     QueryType = Normal;

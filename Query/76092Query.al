@@ -1,6 +1,6 @@
-query 50044 "PLSR_MemberSalesHistory Q"
+query 50044 "MemberSalesHistory Q"
 {
-   
+
     Caption = 'MemberSalesHistory';
     QueryType = Normal;
     OrderBy = ascending(Member_Account_No_, Store_No_, Date, Entry_No_, Line_No_);

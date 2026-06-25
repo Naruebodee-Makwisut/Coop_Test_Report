@@ -68,7 +68,7 @@ report 50104 "Member Sales History"
                     end;
                 end else
                     if Choose2 then begin
-                        DateHeader := 'ประจำงวดวันที่ ' + Format(FDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
+                        DateHeader := 'ประจำงวดวันที่ ' + Format(FDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + ' ถึง ' + Format(FDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                         MemberSalesHistoryQ.SetFilter(DateFilter, '%1', FDate);
                     end;
 

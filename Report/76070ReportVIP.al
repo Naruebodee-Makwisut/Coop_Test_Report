@@ -2,7 +2,7 @@ report 50106 "PLSR_Sales Report By Division2"
 {
     Caption = 'POS Sales Report By Division';
     DefaultLayout = RDLC;
-    RDLCLayout = './ReportLayouts/Rep50106_POSSalesReportByDivision.rdl';
+    RDLCLayout = './ReportLayouts/NewRep50106_POSSalesReportByDivision.rdl';
     PreviewMode = PrintLayout;
 
     dataset

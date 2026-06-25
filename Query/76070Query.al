@@ -2,7 +2,7 @@ query 50048 "PLSR_Sales Report By DivisionQ"
 {
     QueryType = Normal;
     Caption = 'POS Sales By Division Query';
-    OrderBy = ascending(Store_No, Date, Receipt_No, Line_No);
+     OrderBy = ascending(Store_No, LSC_Division_Code, Item_No, POS_Terminal_No, Transaction_No, Line_No);
 
     elements
     {

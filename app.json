@@ -2,7 +2,7 @@
   "id": "b475e8ea-5854-4d04-94f7-120a11686f4d",
   "name": "Coop_Test_Report",
   "publisher": "Tiwter",
-  "version": "1.0.0.0",
+  "version": "26.0.0.0",
   "brief": "",
   "description": "",
   "privacyStatement": "",
@@ -16,15 +16,39 @@
       "publisher": "LS Retail",
       "name": "LS Central",
       "version": "26.1.0.955"
+    },
+    {
+      "id": "8cadb916-7929-4640-a39f-87c2b0c09815",
+      "publisher": "AVISIONLS",
+      "name": "Avision LSVIP POS Module",
+      "version": "26.0.0.0"
+    },
+    {
+      "id": "c89ddcf8-12e8-4477-b40a-eab0c9c97bd5",
+      "publisher": "AVISIONLS",
+      "name": "Avision LSVIP Web Service",
+      "version": "26.0.0.0"
+    },
+    {
+      "id": "1c3c742a-f096-4826-ab9a-77fc32845ae1",
+      "publisher": "AVISIONLS",
+      "name": "Avision TH POS Localization",
+      "version": "26.0.0.0"
+    },
+    {
+      "id": "d76824a1-216a-4f13-b9cd-87a4fb5415fc",
+      "publisher": "AVISIONLS",
+      "name": "Avision LSVIP Report Module",
+      "version": "26.1.0.0"
     }
   ],
   "screenshots": [],
-  "platform": "1.0.0.0",
+  "platform": "26.0.0.0",
   "application": "26.0.0.0",
   "idRanges": [
     {
-      "from": 50100,
-      "to": 50149
+      "from": 50000,
+      "to": 99999
     }
   ],
   "resourceExposurePolicy": {

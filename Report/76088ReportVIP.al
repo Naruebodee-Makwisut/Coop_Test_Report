@@ -463,8 +463,8 @@ report 50108 "Tot Offer Sales Item Pro"
         RettailSetup: Record "LSC Retail Setup";
         TransDiscChk: Record "LSC Trans. Discount Entry";
 
-        DiscQ: Query "PLSR_TransDiscount Q";
-        BenefitQ: Query "PLSR_TransBenefit Q";
+        DiscQ: Query "TransDiscount Q";
+        BenefitQ: Query "TransBenefit Q";
 
         // Cache
         LastCouponNo: Code[20];

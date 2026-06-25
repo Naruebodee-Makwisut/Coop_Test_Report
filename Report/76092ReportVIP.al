@@ -209,7 +209,7 @@ report 50104 "Member Sales History"
     var
         CompanyInfo: Record "Company Information";
         RetailSetup: Record "LSC Retail Setup";
-        MemberSalesHistoryQ: Query "PLSR_MemberSalesHistory Q";  // Query ใหม่ที่ join ทุกตาราง
+        MemberSalesHistoryQ: Query "MemberSalesHistory Q";  // Query ใหม่ที่ join ทุกตาราง
 
         // Request Page variables
         FromDate: Date;

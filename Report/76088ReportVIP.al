@@ -2,10 +2,10 @@ report 50108 "Tot Offer Sales Item Pro"
 {
     Caption = 'Total Offer Sales Item By Promotion';
     DefaultLayout = RDLC;
-    RDLCLayout = './ReportLayouts/Rep50108_TotalOfferSalesItemByPromotion.rdl';
+    RDLCLayout = './03 - Report Layout/Rep50403_TotalOfferSalesItemByPromotion.rdl';
     PreviewMode = PrintLayout;
 
-     dataset
+    dataset
     {
         dataitem("Transaction Header"; "LSC Transaction Header")
         {
@@ -136,7 +136,7 @@ report 50108 "Tot Offer Sales Item Pro"
                         TempTransSalesEntry."Barcode No." := DiscQ.Barcode_No_;
                         TempTransSalesEntry."Item No." := DiscQ.Item_No_;
                         TempTransSalesEntry."Item Number Scanned" := false;
-                        TempTransSalesEntry."Item Description" := DiscQ.Item_Description;
+                        TempTransSalesEntry."POS Line Description" := DiscQ.Item_Description;
                         TempTransSalesEntry."Deal Header Line No." := CountBill;
                         TempTransSalesEntry."Net Amount" := 0;
                         TempTransSalesEntry."Discount Amount" := DiscQ.Discount_Amount_;
@@ -198,7 +198,7 @@ report 50108 "Tot Offer Sales Item Pro"
                         TempTransSalesEntry."Barcode No." := BenefitQ.Barcode_No_;
                         TempTransSalesEntry."Item No." := BenefitQ.No_;
                         TempTransSalesEntry."Item Number Scanned" := true;
-                        TempTransSalesEntry."Item Description" := BenefitQ.Item_Description;
+                        TempTransSalesEntry."POS Line Description" := BenefitQ.Item_Description;
                         TempTransSalesEntry."Deal Header Line No." := CountBill;
                         TempTransSalesEntry."Net Amount" := BenefitQ.Quantity_ * BenefitQ.Value_;
                         TempTransSalesEntry."Discount Amount" := 0;
@@ -339,7 +339,7 @@ report 50108 "Tot Offer Sales Item Pro"
             column(Description_PeriodicDiscount; TempGroupStoreTransSalesEntry."Posting Exception Key") { }
             column(ItemNo_TransSalesEntry; TempGroupStoreTransSalesEntry."Item No.") { }
             column(BarcodeNo_TransSaleEntry; TempGroupStoreTransSalesEntry."Barcode No.") { }
-            column(ItemDescription_TransSalesEntry; TempGroupStoreTransSalesEntry."Item Description") { }
+            column(ItemDescription_TransSalesEntry; TempGroupStoreTransSalesEntry."POS Line Description") { }
             column(Price_TransSalesEntry; TempGroupStoreTransSalesEntry.Price) { }
             column(LineQty; TempGroupStoreTransSalesEntry.Quantity) { }
             column(LineAmount; TempGroupStoreTransSalesEntry."Net Amount") { }

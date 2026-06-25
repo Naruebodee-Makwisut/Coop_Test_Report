@@ -2,7 +2,7 @@ report 50108 "Tot Offer Sales Item Pro"
 {
     Caption = 'Total Offer Sales Item By Promotion';
     DefaultLayout = RDLC;
-    RDLCLayout = './03 - Report Layout/Rep50403_TotalOfferSalesItemByPromotion.rdl';
+    RDLCLayout = './ReportLayouts/Rep50108_TotalOfferSalesItemByPromotion.rdl';
     PreviewMode = PrintLayout;
 
     dataset

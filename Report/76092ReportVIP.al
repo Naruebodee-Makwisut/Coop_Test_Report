@@ -62,13 +62,13 @@ report 50104 "Member Sales History"
                 Clear(DateFilter);
                 Clear(DateHeader);
 
-                if Choose1 then begin
+                if ChoosePeriod then begin
                     if (FromDate <> 0D) and (ToDate <> 0D) then begin
                         DateHeader := 'ประจำงวดวันที่ ' + Format(FromDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + ' ถึง ' + Format(ToDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                         MemberSalesHistoryQ.SetFilter(DateFilter, '%1..%2', FromDate, ToDate);
                     end;
                 end else
-                    if Choose2 then begin
+                    if ChooseAtDate then begin
                         DateHeader := 'ประจำงวดวันที่ ' + Format(FDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + ' ถึง ' + Format(FDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                         MemberSalesHistoryQ.SetFilter(DateFilter, '%1', FDate);
                     end;
@@ -141,7 +141,7 @@ report 50104 "Member Sales History"
             {
                 group("Filter")
                 {
-                    field("Period"; Choose1)
+                    field("Period"; ChoosePeriod)
                     {
                         Caption = 'Period';
                         Style = Strong;
@@ -150,23 +150,23 @@ report 50104 "Member Sales History"
 
                         trigger OnValidate()
                         begin
-                            if Choose1 then
-                                Choose2 := false
+                            if ChoosePeriod then
+                                ChooseAtDate := false
                             else
-                                Choose2 := true;
+                                ChooseAtDate := true;
                         end;
                     }
                     field("Start Date"; FromDate)
                     {
                         Caption = 'Start Date';
                         ApplicationArea = All;
-                        Enabled = Choose1;
+                        Enabled = ChoosePeriod;
                     }
                     field("End Date"; ToDate)
                     {
                         Caption = 'End Date';
                         ApplicationArea = All;
-                        Enabled = Choose1;
+                        Enabled = ChoosePeriod;
 
                         trigger OnValidate()
                         begin
@@ -174,7 +174,7 @@ report 50104 "Member Sales History"
                                 Error('End Date < Start Date');
                         end;
                     }
-                    field("At Date"; Choose2)
+                    field("At Date"; ChooseAtDate)
                     {
                         Caption = 'At Date';
                         Style = Strong;
@@ -183,17 +183,17 @@ report 50104 "Member Sales History"
 
                         trigger OnValidate()
                         begin
-                            if Choose2 then
-                                Choose1 := false
+                            if ChooseAtDate then
+                                ChoosePeriod := false
                             else
-                                Choose1 := true;
+                                ChoosePeriod := true;
                         end;
                     }
                     field("Date"; FDate)
                     {
                         Caption = 'Date';
                         ApplicationArea = All;
-                        Enabled = Choose2;
+                        Enabled = ChooseAtDate;
                     }
                 }
             }
@@ -202,8 +202,8 @@ report 50104 "Member Sales History"
         trigger OnOpenPage()
         begin
             FDate := Today;
-            Choose1 := false;
-            Choose2 := true;
+            ChoosePeriod := false;
+            ChooseAtDate := true;
         end;
     }
 
@@ -216,8 +216,8 @@ report 50104 "Member Sales History"
         FromDate: Date;
         ToDate: Date;
         FDate: Date;
-        Choose1: Boolean;
-        Choose2: Boolean;
+        ChoosePeriod: Boolean;
+        ChooseAtDate: Boolean;
 
         // Header display variables
         DateHeader: Text[50];

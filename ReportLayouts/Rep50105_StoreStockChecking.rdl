@@ -1,16 +1,90 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:am="http://schemas.microsoft.com/sqlserver/reporting/authoringmetadata">
+  <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <am:AuthoringMetadata>
+    <am:CreatedBy>
+      <am:Name>MSRB</am:Name>
+      <am:Version>15.1.30001.02</am:Version>
+    </am:CreatedBy>
+    <am:UpdatedBy>
+      <am:Name>MSRB</am:Name>
+      <am:Version>15.1.30001.02</am:Version>
+    </am:UpdatedBy>
+    <am:LastModifiedTimestamp>2026-06-26T04:48:04.3720998Z</am:LastModifiedTimestamp>
+  </am:AuthoringMetadata>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
     <DataSource Name="DataSource">
+      <rd:SecurityType>None</rd:SecurityType>
       <ConnectionProperties>
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
-      <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>9f751b5c-8b4a-4357-8329-9233435bb779</rd:DataSourceID>
     </DataSource>
   </DataSources>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+      <Fields>
+        <Field Name="StoreNo_Name_StoreTB">
+          <DataField>StoreNo_Name_StoreTB</DataField>
+        </Field>
+        <Field Name="ReportFilterText">
+          <DataField>ReportFilterText</DataField>
+        </Field>
+        <Field Name="ShowDate">
+          <DataField>ShowDate</DataField>
+        </Field>
+        <Field Name="ShowTime">
+          <DataField>ShowTime</DataField>
+        </Field>
+        <Field Name="ItemNo">
+          <DataField>ItemNo</DataField>
+        </Field>
+        <Field Name="Description_Item">
+          <DataField>Description_Item</DataField>
+        </Field>
+        <Field Name="BaseUOM_Item">
+          <DataField>BaseUOM_Item</DataField>
+        </Field>
+        <Field Name="ItemInventoryQty">
+          <DataField>ItemInventoryQty</DataField>
+        </Field>
+        <Field Name="ItemSoldNotPostedQty">
+          <DataField>ItemSoldNotPostedQty</DataField>
+        </Field>
+        <Field Name="ItemSoldTodayQty">
+          <DataField>ItemSoldTodayQty</DataField>
+        </Field>
+        <Field Name="NetInventoryQty">
+          <DataField>NetInventoryQty</DataField>
+        </Field>
+        <Field Name="ItemWaitedTransferQty">
+          <DataField>ItemWaitedTransferQty</DataField>
+        </Field>
+        <Field Name="ItemWaitedTransferQtyFormat">
+          <DataField>ItemWaitedTransferQtyFormat</DataField>
+        </Field>
+        <Field Name="SkipLine">
+          <DataField>SkipLine</DataField>
+        </Field>
+        <Field Name="ShowLot">
+          <DataField>ShowLot</DataField>
+        </Field>
+        <Field Name="ShowVariant">
+          <DataField>ShowVariant</DataField>
+        </Field>
+        <Field Name="Variant_Code">
+          <DataField>Variant_Code</DataField>
+        </Field>
+      </Fields>
+    </DataSet>
+  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -50,6 +124,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox7">
+                          <rd:DefaultName>Textbox1</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -68,7 +143,6 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox1</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -106,6 +180,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox8">
+                          <rd:DefaultName>Textbox3</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -124,7 +199,6 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox3</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -157,6 +231,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox1">
+                          <rd:DefaultName>Textbox1</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -175,7 +250,6 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox1</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -208,6 +282,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox9">
+                          <rd:DefaultName>Textbox5</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -226,7 +301,6 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox5</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -259,6 +333,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox10">
+                          <rd:DefaultName>Textbox7</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -278,7 +353,6 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox7</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -311,6 +385,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox14">
+                          <rd:DefaultName>Textbox14</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -345,7 +420,6 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox14</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -378,6 +452,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox16">
+                          <rd:DefaultName>Textbox16</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -398,7 +473,6 @@ Today</Value>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox16</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -431,6 +505,7 @@ Today</Value>
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox18">
+                          <rd:DefaultName>Textbox18</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -450,7 +525,6 @@ Today</Value>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox18</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -487,7 +561,9 @@ Today</Value>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
+                        <rd:Selected>true</rd:Selected>
                         <Textbox Name="Textbox12">
+                          <rd:DefaultName>Textbox2</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -505,7 +581,6 @@ Today</Value>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox2</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -537,6 +612,7 @@ Today</Value>
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox13">
+                          <rd:DefaultName>Textbox4</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -554,7 +630,6 @@ Today</Value>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox4</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -624,6 +699,7 @@ Today</Value>
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox22">
+                          <rd:DefaultName>Textbox6</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -641,7 +717,6 @@ Today</Value>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox6</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -668,6 +743,7 @@ Today</Value>
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox23">
+                          <rd:DefaultName>Textbox10</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -687,7 +763,6 @@ Today</Value>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox10</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -714,6 +789,7 @@ Today</Value>
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox25">
+                          <rd:DefaultName>Textbox15</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -733,7 +809,6 @@ Today</Value>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox15</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -760,6 +835,7 @@ Today</Value>
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox27">
+                          <rd:DefaultName>Textbox17</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -779,7 +855,6 @@ Today</Value>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox17</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -806,6 +881,7 @@ Today</Value>
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox29">
+                          <rd:DefaultName>Textbox19</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -825,7 +901,6 @@ Today</Value>
                               </Style>
                             </Paragraph>
                           </Paragraphs>
-                          <rd:DefaultName>Textbox19</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -876,29 +951,11 @@ Today</Value>
                   <RepeatOnNewPage>true</RepeatOnNewPage>
                 </TablixMember>
                 <TablixMember>
-                  <Group Name="Item_No">
-                    <GroupExpressions>
-                      <GroupExpression>=Fields!ItemNo.Value</GroupExpression>
-                      <GroupExpression>=Fields!Variant_Code.Value</GroupExpression>
-                    </GroupExpressions>
-                  </Group>
-                  <SortExpressions>
-                    <SortExpression>
-                      <Value>=Fields!ItemNo.Value</Value>
-                    </SortExpression>
-                    <SortExpression>
-                      <Value>=Fields!Variant_Code.Value</Value>
-                    </SortExpression>
-                  </SortExpressions>
-                  <Visibility>
-                    <Hidden>=IIF(Fields!SkipLine.Value,TRUE,FALSE)</Hidden>
-                  </Visibility>
+                  <Group Name="Item_No" />
                 </TablixMember>
               </TablixMembers>
             </TablixRowHierarchy>
             <DataSetName>DataSet_Result</DataSetName>
-            <Top>0cm</Top>
-            <Left>0cm</Left>
             <Height>1.82562cm</Height>
             <Width>19.99996cm</Width>
             <Style>
@@ -919,6 +976,7 @@ Today</Value>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
             <Textbox Name="Textbox11">
+              <rd:DefaultName>Textbox8</rd:DefaultName>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
@@ -935,7 +993,6 @@ Today</Value>
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <rd:DefaultName>Textbox8</rd:DefaultName>
               <Height>0.26921in</Height>
               <Width>19.99996cm</Width>
               <Style>
@@ -945,6 +1002,7 @@ Today</Value>
               </Style>
             </Textbox>
             <Textbox Name="Textbox15">
+              <rd:DefaultName>Textbox8</rd:DefaultName>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
@@ -960,7 +1018,6 @@ Today</Value>
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <rd:DefaultName>Textbox8</rd:DefaultName>
               <Top>0.26921in</Top>
               <Height>0.20298in</Height>
               <Width>7.87401in</Width>
@@ -972,6 +1029,7 @@ Today</Value>
               </Style>
             </Textbox>
             <Textbox Name="Textbox17">
+              <rd:DefaultName>Textbox8</rd:DefaultName>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
@@ -987,7 +1045,6 @@ Today</Value>
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <rd:DefaultName>Textbox8</rd:DefaultName>
               <Top>0.67517in</Top>
               <Height>0.20298in</Height>
               <Width>12.92192cm</Width>
@@ -999,6 +1056,7 @@ Today</Value>
               </Style>
             </Textbox>
             <Textbox Name="Textbox19">
+              <rd:DefaultName>Textbox8</rd:DefaultName>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
@@ -1037,7 +1095,6 @@ Today</Value>
                   </Style>
                 </Paragraph>
               </Paragraphs>
-              <rd:DefaultName>Textbox8</rd:DefaultName>
               <Top>0.67517in</Top>
               <Left>5.08737in</Left>
               <Height>0.20298in</Height>
@@ -1050,6 +1107,7 @@ Today</Value>
               </Style>
             </Textbox>
             <Textbox Name="Textbox21">
+              <rd:DefaultName>Textbox8</rd:DefaultName>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
@@ -1065,7 +1123,6 @@ Today</Value>
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <rd:DefaultName>Textbox8</rd:DefaultName>
               <Top>0.47219in</Top>
               <Height>0.20298in</Height>
               <Width>7.87402in</Width>
@@ -1094,6 +1151,12 @@ Today</Value>
       </Page>
     </ReportSection>
   </ReportSections>
+  <ReportParametersLayout>
+    <GridLayoutDefinition>
+      <NumberOfColumns>4</NumberOfColumns>
+      <NumberOfRows>2</NumberOfRows>
+    </GridLayoutDefinition>
+  </ReportParametersLayout>
   <Code>Public Function BlankZero(ByVal Value As Decimal)
     if Value = 0 then
         Return ""
@@ -1131,67 +1194,4 @@ End Function
 </Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
-  <rd:ReportUnitType>Cm</rd:ReportUnitType>
-  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Fields>
-        <Field Name="StoreNo_Name_StoreTB">
-          <DataField>StoreNo_Name_StoreTB</DataField>
-        </Field>
-        <Field Name="ReportFilterText">
-          <DataField>ReportFilterText</DataField>
-        </Field>
-        <Field Name="ShowDate">
-          <DataField>ShowDate</DataField>
-        </Field>
-        <Field Name="ShowTime">
-          <DataField>ShowTime</DataField>
-        </Field>
-        <Field Name="ItemNo">
-          <DataField>ItemNo</DataField>
-        </Field>
-        <Field Name="Description_Item">
-          <DataField>Description_Item</DataField>
-        </Field>
-        <Field Name="BaseUOM_Item">
-          <DataField>BaseUOM_Item</DataField>
-        </Field>
-        <Field Name="ShowLot">
-          <DataField>ShowLot</DataField>
-        </Field>
-        <Field Name="ShowVariant">
-          <DataField>ShowVariant</DataField>
-        </Field>
-        <Field Name="Variant_Code">
-          <DataField>Variant_Code</DataField>
-        </Field>
-        <Field Name="ItemInventoryQty">
-          <DataField>ItemInventoryQty</DataField>
-        </Field>
-        <Field Name="ItemSoldNotPostedQty">
-          <DataField>ItemSoldNotPostedQty</DataField>
-        </Field>
-        <Field Name="ItemSoldTodayQty">
-          <DataField>ItemSoldTodayQty</DataField>
-        </Field>
-        <Field Name="NetInventoryQty">
-          <DataField>NetInventoryQty</DataField>
-        </Field>
-        <Field Name="ItemWaitedTransferQty">
-          <DataField>ItemWaitedTransferQty</DataField>
-        </Field>
-        <Field Name="ItemWaitedTransferQtyFormat">
-          <DataField>ItemWaitedTransferQtyFormat</DataField>
-        </Field>
-        <Field Name="SkipLine">
-          <DataField>SkipLine</DataField>
-        </Field>
-      </Fields>
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-    </DataSet>
-  </DataSets>
 </Report>

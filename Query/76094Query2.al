@@ -1,4 +1,4 @@
-query 50043 "PLSR_Member Point Period Q"
+query 50043 "Member Point Period Q"
 {
     // ดึง Point ในช่วง Period แยกตาม Entry Type เพื่อให้ Report แยก
     // PointEarned / PointRedeemed / PointAdjust / PointExpire
@@ -8,28 +8,17 @@ query 50043 "PLSR_Member Point Period Q"
 
     elements
     {
-        dataitem(MemberPointEntry; "LSC Member Point Entry")
+        dataitem(Member_Point_Entry; "LSC Member Point Entry")
         {
-            filter(DateFilter; Date) { }
-            filter(AccountNoFilter; "Account No.") { }
+            filter(Account_No; "Account No.") { }
+            filter(Date; Date) { }
 
-            // group by Account No. + Entry Type → ได้ Points SUM ต่อ type ต่อ member
-            column(Account_No_; "Account No.")
-            {
-                ColumnFilter = Account_No_ = filter(<> '');
-            }
-            column(Date; Date) { }
-
+            column(Account_No_; "Account No.") { }
             column(Entry_Type; "Entry Type") { }
-
-            column(Total_Points; Points)
+            column(Points; Points)
             {
                 Method = Sum;
             }
         }
     }
-
-    trigger OnBeforeOpen()
-    begin
-    end;
 }

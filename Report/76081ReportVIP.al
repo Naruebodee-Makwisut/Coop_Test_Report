@@ -4,7 +4,7 @@ report 50105 "Store Stock Checking"
     DefaultLayout = RDLC;
     RDLCLayout = './ReportLayouts/Rep50105_StoreStockChecking.rdl';
     PreviewMode = PrintLayout;
-
+    // AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76081) น้องอิง
     dataset
     {
         dataitem(Integer; Integer)
@@ -303,4 +303,5 @@ report 50105 "Store Stock Checking"
     begin
         ShowNegativeFilter := refShowNegativeFilter;
     end;
+    // C-AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76081) น้องอิง
 }

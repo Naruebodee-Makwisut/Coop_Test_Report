@@ -1,9 +1,10 @@
-query 50051 "PLSR_TransBenefit Q"
+query 50051 "TransBenefit Q"
 {
     Caption = 'Trans Benefit Query';
     QueryType = Normal;
     OrderBy = ascending(Store_No_, POS_Terminal_No_, Transaction_No_, Line_No_);
 
+    // AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76088) - น้องปอ
     elements
     {
         dataitem(TransBenefitEntry; "LSC Trans. Disc. Benefit Entry")
@@ -57,4 +58,6 @@ query 50051 "PLSR_TransBenefit Q"
     trigger OnBeforeOpen()
     begin
     end;
+
+    // C-AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76088) - น้องปอ
 }

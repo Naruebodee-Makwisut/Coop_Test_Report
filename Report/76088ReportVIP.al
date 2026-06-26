@@ -5,6 +5,7 @@ report 50108 "Tot Offer Sales Item Pro"
     RDLCLayout = './ReportLayouts/Rep50108_TotalOfferSalesItemByPromotion.rdl';
     PreviewMode = PrintLayout;
 
+    // AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76088) - น้องปอ
     dataset
     {
         dataitem("Transaction Header"; "LSC Transaction Header")
@@ -463,8 +464,8 @@ report 50108 "Tot Offer Sales Item Pro"
         RettailSetup: Record "LSC Retail Setup";
         TransDiscChk: Record "LSC Trans. Discount Entry";
 
-        DiscQ: Query "PLSR_TransDiscount Q";
-        BenefitQ: Query "PLSR_TransBenefit Q";
+        DiscQ: Query "TransDiscount Q";
+        BenefitQ: Query "TransBenefit Q";
 
         // Cache
         LastCouponNo: Code[20];
@@ -508,4 +509,6 @@ report 50108 "Tot Offer Sales Item Pro"
         NewGrLineDiscAmount: Decimal;
         NewBenefitAmt: Decimal;
         NewGrBenefitAmt: Decimal;
+
+    // C-AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76088) - น้องปอ
 }

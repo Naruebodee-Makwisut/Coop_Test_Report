@@ -1,9 +1,10 @@
-query 50050 "PLSR_TransDiscount Q"
+query 50050 "TransDiscount Q"
 {
     Caption = 'Trans Discount Query';
     QueryType = Normal;
     OrderBy = ascending(Store_No_, POS_Terminal_No_, Transaction_No_, Line_No_);
 
+    // AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76088) - น้องปอ
     elements
     {
         dataitem(TransDiscEntry; "LSC Trans. Discount Entry")
@@ -68,4 +69,7 @@ query 50050 "PLSR_TransDiscount Q"
     trigger OnBeforeOpen()
     begin
     end;
+
+
+    // C-AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76088) - น้องปอ
 }

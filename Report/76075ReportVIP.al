@@ -5,6 +5,7 @@ report 50109 "Sales_Report_By_Terminal"
     RDLCLayout = './ReportLayouts/Rep50109_POSSalesReportByTerminal.rdl';
     PreviewMode = PrintLayout;
 
+    // AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76075) - น้องปอ
     dataset
     {
         dataitem(TransSale; "LSC Trans. Sales Entry")
@@ -351,4 +352,5 @@ report 50109 "Sales_Report_By_Terminal"
         Choose1Filter: Boolean;
         Choose2Filter: Boolean;
         RefundFilter: Option " ","Yes","No";
+    // C-AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76075) - น้องปอ
 }

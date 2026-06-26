@@ -5,6 +5,7 @@ report 50104 "Member Sales History"
     RDLCLayout = './ReportLayouts/Rep50104_MemberSalesHistory.rdl';
     PreviewMode = PrintLayout;
 
+    // AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76092) - น้องปอ
     dataset
     {
         // ── Dummy dataitem 1: รับ RequestFilterFields สำหรับ Member Contact ──
@@ -238,4 +239,5 @@ report 50104 "Member Sales History"
         CurrentUOM: Text[50];
         CurrentQty: Decimal;
         CurrentPrice: Decimal;
+    // C-AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76092) - น้องปอ
 }

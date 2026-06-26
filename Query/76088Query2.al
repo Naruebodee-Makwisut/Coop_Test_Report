@@ -4,6 +4,7 @@ query 50051 "TransBenefit Q"
     QueryType = Normal;
     OrderBy = ascending(Store_No_, POS_Terminal_No_, Transaction_No_, Line_No_);
 
+    // AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76088) - น้องปอ
     elements
     {
         dataitem(TransBenefitEntry; "LSC Trans. Disc. Benefit Entry")
@@ -57,4 +58,6 @@ query 50051 "TransBenefit Q"
     trigger OnBeforeOpen()
     begin
     end;
+
+    // C-AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76088) - น้องปอ
 }

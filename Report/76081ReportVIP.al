@@ -186,6 +186,9 @@ report 50105 "Store Stock Checking"
                 SetLoadFields("No.", Description, "Base Unit of Measure",
                               Blocked, Type, "LSC Division Code",
                               "Item Category Code", "LSC Retail Product Code");
+
+                if not ShowZeroFilter then
+                    SetFilter("No.", GetActiveItemFilter());
             end;
 
             trigger OnAfterGetRecord()
@@ -402,6 +405,62 @@ report 50105 "Store Stock Checking"
         TransSalesEntryStatus.CalcSums(Quantity);
         QuantityPosted := TransSalesEntryStatus.Quantity;
         QtySoldNotPosted := QuantitySold - QuantityPosted;
+    end;
+
+    local procedure GetActiveItemFilter(): Text
+    var
+        ILE: Record "Item Ledger Entry";
+        TSE: Record "LSC Trans. Sales Entry";
+        ActiveItems: Dictionary of [Code[20], Boolean];
+        ItemNo: Code[20];
+        FilterText: Text;
+        StoreFilter: Text;
+    begin
+        StoreFilter := BuildStoreFilterText();
+
+        ILE.SetCurrentKey("Item No.", "Posting Date", "Location Code");
+        ILE.SetRange("Posting Date", 0D, AsOfDateFilter);
+        ILE.SetFilter("Location Code", LocationFilter);
+        ILE.SetLoadFields("Item No.", "Remaining Quantity");
+        if ILE.FindSet() then
+            repeat
+                if ILE."Remaining Quantity" <> 0 then
+                    if not ActiveItems.ContainsKey(ILE."Item No.") then
+                        ActiveItems.Add(ILE."Item No.", true);
+            until ILE.Next() = 0;
+
+        TSE.SetCurrentKey("Item No.", "Variant Code", Date);
+        TSE.SetRange(Date, 0D, Today);
+        if StoreFilter <> '' then
+            TSE.SetFilter("Store No.", StoreFilter);
+        TSE.SetLoadFields("Item No.", Quantity);
+        if TSE.FindSet() then
+            repeat
+                if TSE.Quantity <> 0 then
+                    if not ActiveItems.ContainsKey(TSE."Item No.") then
+                        ActiveItems.Add(TSE."Item No.", true);
+            until TSE.Next() = 0;
+
+        foreach ItemNo in ActiveItems.Keys() do begin
+            if FilterText <> '' then
+                FilterText += '|';
+            FilterText += ItemNo;
+        end;
+        exit(FilterText);
+    end;
+
+    local procedure BuildStoreFilterText(): Text
+    var
+        FilterText: Text;
+    begin
+        TempStoreTB.Reset();
+        if TempStoreTB.FindSet() then
+            repeat
+                if FilterText <> '' then
+                    FilterText += '|';
+                FilterText += TempStoreTB."No.";
+            until TempStoreTB.Next() = 0;
+        exit(FilterText);
     end;
 
     procedure SetLocationFilter(refLocationFilter: Code[20])

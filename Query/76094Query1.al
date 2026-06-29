@@ -1,4 +1,4 @@
-query 50042 "PLSR_Member Point BF Q"
+query 50042 "Member Point BF Q"
 {
 
      // ดึง Point ก่อนช่วง (B/F) โดย SUM Points และ Remaining Points
@@ -9,34 +9,16 @@ query 50042 "PLSR_Member Point BF Q"
 
     elements
     {
-        dataitem(MemberPointEntry; "LSC Member Point Entry")
+        dataitem(Member_Point_Entry; "LSC Member Point Entry")
         {
-            // filter วันที่จะถูก set จาก Report ก่อน Open() เสมอ
-            filter(DateFilter; Date) { }
-            filter(AccountNoFilter; "Account No.") { }
+            filter(Account_No; "Account No.") { }
+            filter(Date; Date) { }
 
-            // group by Account No. เพื่อ SUM per member
-            column(Account_No_; "Account No.")
-            {
-                ColumnFilter = Account_No_ = filter(<> '');
-            }
-            column(Date;Date){}
-
-            // SUM Points (ใช้คำนวณ PointBF)
-            column(Total_Points; Points)
-            {
-                Method = Sum;
-            }
-
-            // SUM Remaining Points (เก็บไว้ใช้อ้างอิงถ้าต้องการในอนาคต)
-            column(Total_Remaining_Points; "Remaining Points")
+            column(Account_No_; "Account No.") { }
+            column(Points; Points)
             {
                 Method = Sum;
             }
         }
     }
-
-    trigger OnBeforeOpen()
-    begin
-    end;
 }

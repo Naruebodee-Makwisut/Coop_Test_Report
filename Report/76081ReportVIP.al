@@ -11,22 +11,37 @@ report 50105 "Store Stock Checking"
         {
             DataItemTableView = sorting("No.");
             PrintOnlyIfDetail = true;
+            column(StoreNo_Name_StoreTB; StoreFilterText)
+            { }
+            column(ReportFilterText; ReportFilterText)
+            { }
+            column(ShowDate; ShowDate)
+            { }
+            column(ShowTime; ShowTime)
+            { }
+            column(ItemNo; Item."No.")
+            { }
+            column(Description_Item; Item.Description)
+            { }
+            column(BaseUOM_Item; Item."Base Unit of Measure")
+            { }
+            column(ItemInventoryQty; format(ItemInventoryQty, 0, '<Sign><Integer Thousand><Decimals>'))
+            { }
+            column(ItemSoldNotPostedQty; format(ItemSoldNotPostedQty, 0, '<Sign><Integer Thousand><Decimals>'))
+            { }
+            column(ItemSoldTodayQty; format(ItemSoldTodayQty, 0, '<Sign><Integer Thousand><Decimals>'))
+            { }
+            column(NetInventoryQty; format(NetInventoryQty, 0, '<Sign><Integer Thousand><Decimals>'))
+            { }
+            column(ItemWaitedTransferQty; ItemWaitedTransferQty)
+            { }
+            column(SkipLine; SkipLine)
+            { }
+            column(ShowLot; ShowLot)
+            { }
+            column(ShowVariant; RetailSetup."PLSPOS_Show Var for Report VIP")
+            { }
 
-            column(StoreNo_Name_StoreTB; StoreFilterText) { }
-            column(ReportFilterText; ReportFilterText) { }
-            column(ShowDate; ShowDate) { }
-            column(ShowTime; ShowTime) { }
-            column(ItemNo; Item."No.") { }
-            column(Description_Item; Item.Description) { }
-            column(BaseUOM_Item; Item."Base Unit of Measure") { }
-            column(ItemInventoryQty; format(ItemInventoryQty, 0, '<Sign><Integer Thousand><Decimals>')) { }
-            column(ItemSoldNotPostedQty; format(ItemSoldNotPostedQty, 0, '<Sign><Integer Thousand><Decimals>')) { }
-            column(ItemSoldTodayQty; format(ItemSoldTodayQty, 0, '<Sign><Integer Thousand><Decimals>')) { }
-            column(NetInventoryQty; format(NetInventoryQty, 0, '<Sign><Integer Thousand><Decimals>')) { }
-            column(ItemWaitedTransferQty; ItemWaitedTransferQty) { }
-            column(SkipLine; SkipLine) { }
-            column(ShowLot; ShowLot) { }
-            column(ShowVariant; RetailSetup."PLSPOS_Show Var for Report VIP") { }
 
             dataitem(TempItemVariant; "Item Variant")
             {
@@ -34,7 +49,10 @@ report 50105 "Store Stock Checking"
                 DataItemLink = "Item No." = field("No.");
                 UseTemporary = true;
 
-                column(Variant_Code; Code) { }
+                // column(Lot_No; "Item Ledger Entry"."Lot No.")
+                // { }
+                column(Variant_Code; Code)
+                { }
 
                 trigger OnPreDataItem()
                 begin
@@ -50,25 +68,25 @@ report 50105 "Store Stock Checking"
                     Clear(ItemWaitedTransferQty);
                     Clear(NetInventoryQty);
 
-                    // ── Item Inventory Qty จาก Item Ledger Entry ──
-                    // ใช้ CalcSums — BC ทำเป็น SQL SUM ให้แล้ว
+                    //find Item Inventory Qty.
                     Clear(ItemLedgerEntryTB);
                     ItemLedgerEntryTB.SetCurrentKey("Item No.", "Posting date", "Location Code");
                     ItemLedgerEntryTB.SetRange("Item No.", Item."No.");
                     ItemLedgerEntryTB.SetRange("Posting Date", 0D, AsOfDateFilter);
                     ItemLedgerEntryTB.SetFilter("Location Code", LocationFilter);
                     ItemLedgerEntryTB.SetLoadFields("Item No.", "Posting Date", "Location Code",
-                                                    "Variant Code", "Remaining Quantity");
-                    if RetailSetup."PLSPOS_Show Var for Report VIP" then
+                                                     "Variant Code", "Remaining Quantity");
+
+                    if RetailSetup."PLSPOS_Show Var for Report VIP" then //table RetailSetupเช็ค varcode เพราะถ้าเปิด ture จะแสดงด้วย
                         ItemLedgerEntryTB.SetRange("Variant Code", Code);
                     ItemLedgerEntryTB.CalcSums("Remaining Quantity");
                     ItemInventoryQty := ItemLedgerEntryTB."Remaining Quantity";
 
-                    // ── Sold Qty — ใช้ Store list ที่ Cache ไว้จาก OnPreDataItem ──
-                    // ไม่ต้อง FindSet() ซ้ำทุก Variant ทุก Item
+                    // ── ใช้ store list ที่ cache ไว้จาก OnPreDataItem ──
+                    // เดิม FindSet() ตาราง Store ใหม่ทุก Item x Variant (148,508 ครั้ง!)
+                    // ตอนนี้ loop ผ่าน temp table ที่ build ไว้ครั้งเดียว
                     if LocationFilter <> '' then begin
                         if CachedStoreListReady then begin
-                            // อ่านจาก Temp Store list ที่ build ไว้แล้ว
                             TempStoreTB.Reset();
                             if TempStoreTB.FindSet() then
                                 repeat
@@ -80,53 +98,59 @@ report 50105 "Store Stock Checking"
                         ItemSoldTodayQty := QtySoldNotPosted(Item."No.", '', Code, Today, true, '');
                         ItemSoldNotPostedQty := QtySoldNotPosted(Item."No.", '', Code, Today - 1, false, '');
                     end;
-
                     NetInventoryQty := ItemInventoryQty + ItemSoldTodayQty + ItemSoldNotPostedQty;
 
+                    //filter negative quantity only
                     if NetInventoryQty < 0 then
                         if not ShowNegativeFilter then
                             SkipLine := true;
+                    //filter negative quantity only - end
 
+                    //case show zero
+                    //if NetInventoryQty + ItemWaitedTransferQty = 0 then
                     if NetInventoryQty = 0 then
                         if not ShowZeroFilter then
                             SkipLine := true;
+                    //case show zero - end
                 end;
             }
 
+
+
+
             trigger OnPreDataItem()
             begin
-                AsOfDateFilter := Today;
 
+                AsOfDateFilter := Today;
+                //check filter by location
                 if LocationFilter = '' then
                     Error('Please input Location filter!');
-
+                //check filter by location - end
                 Clear(ReportFilterText);
-                if ItemNoFilter <> '' then begin
+                if (ItemNoFilter <> '') then begin
                     ReportFilterText += 'Item No. : ' + FORMAT(ItemNoFilter + ' ');
                     Item.SetFilter("No.", ItemNoFilter);
                 end;
-                if LocationFilter <> '' then
+                if (LocationFilter <> '') then
                     ReportFilterText += ' Location : ' + FORMAT(LocationFilter + ' ');
                 if DivisionFilter <> '' then begin
                     ReportFilterText += ' Division : ' + DivisionFilter;
                     SetFilter("LSC Division Code", DivisionFilter);
+                    //AVTNK	28/11/2024	add in trigger 
                     if ItemCategoryFilter <> '' then
                         ReportFilterText += ' ItemCategoryFilter :' + ItemCategoryFilter;
                     SetFilter("Item Category Code", ItemCategoryFilter);
                     if ProductGroupFilter <> '' then
                         ReportFilterText += 'ProductGroupFilter :' + ProductGroupFilter;
                     SetFilter("LSC Retail Product Code", ProductGroupFilter);
+                    //C-AVTNK	28/11/2024	add in trigger 
                 end;
-                if ShowItemBlock then
+                if (ShowItemBlock) then
                     ReportFilterText += ' Show Item Blocked';
-                if ShowZeroFilter then
+                if (ShowZeroFilter) then
                     ReportFilterText += ' Show Item Quantity Zero';
                 if ShowNegativeFilter then
                     ReportFilterText += ' Show Negative Quantity';
-
-                // ── Store filter text ──
-                // StoreTB.Get() ใช้ "No." เป็น PK ไม่ใช่ Location Code
-                // ต้อง SetFilter "Location Code" แล้ว FindFirst() แทน
                 Clear(StoreTB);
                 StoreTB.SetLoadFields("No.", Name, "Location Code");
                 StoreTB.SetFilter("Location Code", LocationFilter);
@@ -137,8 +161,7 @@ report 50105 "Store Stock Checking"
                     SetRange(Item.Blocked, false);
                 SetFilter(Item.Type, '%1', Type::Inventory);
 
-                // ── Build Temp Store list ครั้งเดียว ──
-                // แทนที่จะ FindSet() ซ้ำทุก Variant ทุก Item
+                // ── Build store list ครั้งเดียว (เดิม FindSet() ใหม่ทุก Item x Variant) ──
                 TempStoreTB.Reset();
                 TempStoreTB.DeleteAll();
                 CachedStoreListReady := false;
@@ -157,30 +180,10 @@ report 50105 "Store Stock Checking"
                     end;
                 end;
 
-                // ── Prefilter Item เฉพาะที่มีใน ILE ของ Location ที่เลือก ──
-                if LocationFilter <> '' then begin
-                    Clear(PreFilterILE);
-                    PreFilterILE.SetCurrentKey("Item No.", "Location Code");
-                    PreFilterILE.SetFilter("Location Code", LocationFilter);
-                    PreFilterILE.SetLoadFields("Item No.", "Location Code");
-                    Clear(PreFilterItemList);
-                    Clear(PreFilterLastItemNo);
-                    if PreFilterILE.FindSet() then begin
-                        repeat
-                            if PreFilterILE."Item No." <> PreFilterLastItemNo then begin
-                                if PreFilterItemList = '' then
-                                    PreFilterItemList := PreFilterILE."Item No."
-                                else
-                                    PreFilterItemList += '|' + PreFilterILE."Item No.";
-                                PreFilterLastItemNo := PreFilterILE."Item No.";
-                            end;
-                        until PreFilterILE.Next() = 0;
-                        SetFilter("No.", PreFilterItemList);
-                    end else
-                        CurrReport.Break();
-                end;
-
-                // โหลดเฉพาะ field ที่ใช้จริงของ Item
+                // ── โหลดเฉพาะ field ที่ใช้จริงของ Item ──
+                // หมายเหตุ: ไม่ทำ prefilter Item ด้วย ILE เพราะรายงานนี้ต้องจับ
+                // item ที่ "ขายแล้วแต่ยังไม่ post เข้า ILE" ได้ด้วย (ดูคอลัมน์ Sold Not Posted)
+                // ถ้า prefilter ด้วย ILE อย่างเดียวจะตัด item เหล่านี้หายไปจากรายงาน
                 SetLoadFields("No.", Description, "Base Unit of Measure",
                               Blocked, Type, "LSC Division Code",
                               "Item Category Code", "LSC Retail Product Code");
@@ -198,12 +201,10 @@ report 50105 "Store Stock Checking"
                 Clear(TempItemVariant);
                 TempItemVariant.DeleteAll();
 
-                // ── Dummy variant (ไม่แยก variant) ──
                 TempItemVariant.Init();
                 TempItemVariant."Item No." := "No.";
                 TempItemVariant.Insert(false);
 
-                // ── ถ้าแสดง variant: ดึง Item Variant มาใส่ Temp ──
                 if RetailSetup."PLSPOS_Show Var for Report VIP" then begin
                     Clear(ItemVariantTB);
                     ItemVariantTB.SetCurrentKey("Item No.", Code);
@@ -253,6 +254,7 @@ report 50105 "Store Stock Checking"
                             Caption = 'Division Filter';
                             TableRelation = "LSC Division";
                         }
+                        //AVTNK	28/11/2024	add field , hide field
                         field(ItemCategory_1; ItemCategoryFilter)
                         {
                             ApplicationArea = All;
@@ -265,6 +267,9 @@ report 50105 "Store Stock Checking"
                             Caption = 'Product Group';
                             TableRelation = "LSC Retail Product Group".Code;
                         }
+                        //C-AVTNK	28/11/2024	add field , hide field
+
+
                     }
                     group("Select One")
                     {
@@ -272,17 +277,23 @@ report 50105 "Store Stock Checking"
                         {
                             ApplicationArea = all;
                             Caption = 'Show Zero :';
+
                         }
                     }
                 }
             }
         }
-
         trigger OnInit()
         begin
+            //AVTNK	29/11/2024	Clear   
             Clear(ItemCategoryFilter);
             Clear(ProductGroupFilter);
+            //C-AVTNK	28/11/2024
         end;
+
+
+
+
     }
 
     trigger OnPreReport()
@@ -291,8 +302,14 @@ report 50105 "Store Stock Checking"
         ComInfo.Get();
         ShowDate := FORMAT(Today, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
         ShowTime := LSVIPRepFucntion.AVTimeFormat(Time);
+
         RetailSetup.Get();
+
+
+
     end;
+
+
 
     var
         LSVIPRepFucntion: Codeunit "PLSR_Report Function";
@@ -302,8 +319,7 @@ report 50105 "Store Stock Checking"
         ItemVariantTB: Record "Item Variant";
         RetailSetup: Record "LSC Retail Setup";
 
-        // ── Temp Store list — build ครั้งเดียวใน OnPreDataItem ──
-        // แทนที่จะ FindSet() ซ้ำทุก Variant ทุก Item
+        // ── Temp store list — build ครั้งเดียวใน OnPreDataItem ──
         TempStoreTB: Record "LSC Store" temporary;
         CachedStoreListReady: Boolean;
 
@@ -312,16 +328,15 @@ report 50105 "Store Stock Checking"
         ReportFilterText: Text[250];
         StoreFilterText: Text[250];
         ItemNoFilter: Code[20];
+
         LocationFilter: Code[20];
+        //OldItemNo: Code[20];
         ItemInventoryQty: Decimal;
         ItemSoldTodayQty: Decimal;
         ItemSoldNotPostedQty: Decimal;
         ItemWaitedTransferQty: Decimal;
         NetInventoryQty: Decimal;
         AsOfDateFilter: Date;
-        PreFilterILE: Record "Item Ledger Entry";
-        PreFilterItemList: Text;
-        PreFilterLastItemNo: Code[20];
         ShowZeroFilter: Boolean;
         ShowNegativeFilter: Boolean;
         ShowItemBlock: Boolean;
@@ -329,8 +344,12 @@ report 50105 "Store Stock Checking"
         ShowLot: Boolean;
         CurrLot: Text[50];
         DivisionFilter: Code[20];
+
+        //AVTNK	28/11/2024 add variable
         ItemCategoryFilter: Code[20];
-        ProductGroupFilter: Code[20];
+
+        ProductGroupFilter: code[20];
+    //C-AVTNK 28/11/2024 add variable
 
     local procedure QtySoldNotPosted(ItemNo: Code[20];
                              StoreFilter: Code[250];
@@ -344,49 +363,45 @@ report 50105 "Store Stock Checking"
         QuantitySold: Decimal;
         QuantityPosted: Decimal;
     begin
-        Clear(QuantitySold);
-        Clear(QuantityPosted);
-        Clear(QtySoldNotPosted);
-
-        // ── Trans. Sales Entry ──
-        Clear(TransSalesEntry);
-        TransSalesEntry.SetCurrentKey("Item No.", "Variant Code", Date);
-        TransSalesEntry.SetRange("Item No.", ItemNo);
+        CLEAR(QuantitySold);
+        CLEAR(QuantityPosted);
+        CLEAR(QtySoldNotPosted);
+        CLEAR(TransSalesEntry);
+        TransSalesEntry.SETCURRENTKEY("Item No.", "Variant Code", Date);
+        TransSalesEntry.SETRANGE("Item No.", ItemNo);
         TransSalesEntry.SetLoadFields("Item No.", "Variant Code", Date, "Store No.", Quantity, "Lot No.");
         if LotFilter <> '' then
             TransSalesEntry.SetRange("Lot No.", LotFilter);
-        if RetailSetup."PLSPOS_Show Var for Report VIP" then
-            TransSalesEntry.SetFilter("Variant Code", VariantFilter);
-        if StoreFilter <> '' then
-            TransSalesEntry.SetFilter("Store No.", StoreFilter);
-        if SoldTodayFilter then
-            TransSalesEntry.SetRange(Date, DateFilter)
-        else
-            TransSalesEntry.SetRange(Date, 0D, DateFilter);
+        IF RetailSetup."PLSPOS_Show Var for Report VIP" THEN
+            TransSalesEntry.SETFILTER("Variant Code", VariantFilter);
+        IF StoreFilter <> '' THEN
+            TransSalesEntry.SETFILTER("Store No.", StoreFilter);
+        IF SoldTodayFilter THEN
+            TransSalesEntry.SETRANGE(Date, DateFilter)
+        ELSE
+            TransSalesEntry.SETRANGE(Date, 0D, DateFilter);
         TransSalesEntry.CalcSums(Quantity);
         QuantitySold := TransSalesEntry.Quantity;
+        // end;
 
-        // ── Trans. Sales Entry Status ──
-        Clear(TransSalesEntryStatus);
-        TransSalesEntryStatus.SetCurrentKey("Item No.", "Variant Code", Status, "Store No.", Date);
-        TransSalesEntryStatus.SetRange("Item No.", ItemNo);
+        CLEAR(TransSalesEntryStatus);
+        TransSalesEntryStatus.SETCURRENTKEY("Item No.", "Variant Code", Status, "Store No.", Date);
+        TransSalesEntryStatus.SETRANGE("Item No.", ItemNo);
         TransSalesEntryStatus.SetLoadFields("Item No.", "Variant Code", Status, "Store No.", Date, Quantity, "Lot No.");
-        if RetailSetup."PLSPOS_Show Var for Report VIP" then
-            TransSalesEntryStatus.SetFilter("Variant Code", VariantFilter);
-        if SoldTodayFilter then
-            TransSalesEntryStatus.SetRange(Date, DateFilter)
-        else
-            TransSalesEntryStatus.SetRange(Date, 0D, DateFilter);
-        TransSalesEntryStatus.SetRange(Status,
-            TransSalesEntryStatus.Status::"Items Posted",
-            TransSalesEntryStatus.Status::Posted);
-        if StoreFilter <> '' then
-            TransSalesEntryStatus.SetFilter("Store No.", StoreFilter);
+        IF RetailSetup."PLSPOS_Show Var for Report VIP" THEN
+            TransSalesEntryStatus.SETFILTER("Variant Code", VariantFilter);
+        IF SoldTodayFilter THEN
+            TransSalesEntryStatus.SETRANGE(Date, DateFilter)
+        ELSE
+            TransSalesEntryStatus.SETRANGE(Date, 0D, DateFilter);
+        TransSalesEntryStatus.SETRANGE(Status, TransSalesEntryStatus.Status::"Items Posted",
+          TransSalesEntryStatus.Status::Posted);
+        IF StoreFilter <> '' THEN
+            TransSalesEntryStatus.SETFILTER("Store No.", StoreFilter);
         if LotFilter <> '' then
             TransSalesEntryStatus.SetRange("Lot No.", LotFilter);
         TransSalesEntryStatus.CalcSums(Quantity);
         QuantityPosted := TransSalesEntryStatus.Quantity;
-
         QtySoldNotPosted := QuantitySold - QuantityPosted;
     end;
 

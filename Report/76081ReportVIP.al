@@ -100,18 +100,17 @@ report 50105 "Store Stock Checking"
                     end;
                     NetInventoryQty := ItemInventoryQty + ItemSoldTodayQty + ItemSoldNotPostedQty;
 
-                    //filter negative quantity only
                     if NetInventoryQty < 0 then
-                        if not ShowNegativeFilter then
-                            SkipLine := true;
-                    //filter negative quantity only - end
+                        if not ShowNegativeFilter then begin
+                            CurrReport.Skip();
+                            exit;
+                        end;
 
-                    //case show zero
-                    //if NetInventoryQty + ItemWaitedTransferQty = 0 then
                     if NetInventoryQty = 0 then
-                        if not ShowZeroFilter then
-                            SkipLine := true;
-                    //case show zero - end
+                        if not ShowZeroFilter then begin
+                            CurrReport.Skip();
+                            exit;
+                        end;
                 end;
             }
 

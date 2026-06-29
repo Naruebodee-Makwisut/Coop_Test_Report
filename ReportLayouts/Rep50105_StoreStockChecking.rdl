@@ -890,9 +890,6 @@ Today</Value>
                       <Value>=Fields!Variant_Code.Value</Value>
                     </SortExpression>
                   </SortExpressions>
-                  <Visibility>
-                    <Hidden>=IIF(Fields!SkipLine.Value,TRUE,FALSE)</Hidden>
-                  </Visibility>
                 </TablixMember>
               </TablixMembers>
             </TablixRowHierarchy>

@@ -24,67 +24,6 @@
       <rd:DataSourceID>9f751b5c-8b4a-4357-8329-9233435bb779</rd:DataSourceID>
     </DataSource>
   </DataSources>
-  <DataSets>
-    <DataSet Name="DataSet_Result">
-      <Query>
-        <DataSourceName>DataSource</DataSourceName>
-        <CommandText />
-      </Query>
-      <Fields>
-        <Field Name="StoreNo_Name_StoreTB">
-          <DataField>StoreNo_Name_StoreTB</DataField>
-        </Field>
-        <Field Name="ReportFilterText">
-          <DataField>ReportFilterText</DataField>
-        </Field>
-        <Field Name="ShowDate">
-          <DataField>ShowDate</DataField>
-        </Field>
-        <Field Name="ShowTime">
-          <DataField>ShowTime</DataField>
-        </Field>
-        <Field Name="ItemNo">
-          <DataField>ItemNo</DataField>
-        </Field>
-        <Field Name="Description_Item">
-          <DataField>Description_Item</DataField>
-        </Field>
-        <Field Name="BaseUOM_Item">
-          <DataField>BaseUOM_Item</DataField>
-        </Field>
-        <Field Name="ItemInventoryQty">
-          <DataField>ItemInventoryQty</DataField>
-        </Field>
-        <Field Name="ItemSoldNotPostedQty">
-          <DataField>ItemSoldNotPostedQty</DataField>
-        </Field>
-        <Field Name="ItemSoldTodayQty">
-          <DataField>ItemSoldTodayQty</DataField>
-        </Field>
-        <Field Name="NetInventoryQty">
-          <DataField>NetInventoryQty</DataField>
-        </Field>
-        <Field Name="ItemWaitedTransferQty">
-          <DataField>ItemWaitedTransferQty</DataField>
-        </Field>
-        <Field Name="ItemWaitedTransferQtyFormat">
-          <DataField>ItemWaitedTransferQtyFormat</DataField>
-        </Field>
-        <Field Name="SkipLine">
-          <DataField>SkipLine</DataField>
-        </Field>
-        <Field Name="ShowLot">
-          <DataField>ShowLot</DataField>
-        </Field>
-        <Field Name="ShowVariant">
-          <DataField>ShowVariant</DataField>
-        </Field>
-        <Field Name="Variant_Code">
-          <DataField>Variant_Code</DataField>
-        </Field>
-      </Fields>
-    </DataSet>
-  </DataSets>
   <ReportSections>
     <ReportSection>
       <Body>
@@ -1151,12 +1090,6 @@ Today</Value>
       </Page>
     </ReportSection>
   </ReportSections>
-  <ReportParametersLayout>
-    <GridLayoutDefinition>
-      <NumberOfColumns>4</NumberOfColumns>
-      <NumberOfRows>2</NumberOfRows>
-    </GridLayoutDefinition>
-  </ReportParametersLayout>
   <Code>Public Function BlankZero(ByVal Value As Decimal)
     if Value = 0 then
         Return ""
@@ -1194,4 +1127,53 @@ End Function
 </Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="StoreNo_Name_StoreTB">
+          <DataField>StoreNo_Name_StoreTB</DataField>
+        </Field>
+        <Field Name="ReportFilterText">
+          <DataField>ReportFilterText</DataField>
+        </Field>
+        <Field Name="ShowDate">
+          <DataField>ShowDate</DataField>
+        </Field>
+        <Field Name="ShowTime">
+          <DataField>ShowTime</DataField>
+        </Field>
+        <Field Name="ItemNo">
+          <DataField>ItemNo</DataField>
+        </Field>
+        <Field Name="Description_Item">
+          <DataField>Description_Item</DataField>
+        </Field>
+        <Field Name="BaseUOM_Item">
+          <DataField>BaseUOM_Item</DataField>
+        </Field>
+        <Field Name="Variant_Code">
+          <DataField>Variant_Code</DataField>
+        </Field>
+        <Field Name="ItemInventoryQty">
+          <DataField>ItemInventoryQty</DataField>
+        </Field>
+        <Field Name="ItemSoldNotPostedQty">
+          <DataField>ItemSoldNotPostedQty</DataField>
+        </Field>
+        <Field Name="ItemSoldTodayQty">
+          <DataField>ItemSoldTodayQty</DataField>
+        </Field>
+        <Field Name="NetInventoryQty">
+          <DataField>NetInventoryQty</DataField>
+        </Field>
+        <Field Name="ShowVariant">
+          <DataField>ShowVariant</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
 </Report>

@@ -10,7 +10,7 @@ report 50105 "Store Stock Checking"
         dataitem(Item; Item)
         {
             DataItemTableView = sorting("No.");
-            PrintOnlyIfDetail = true; //ไม่แสดงผล ถ้าไม่มีข้อมูลลูก
+            PrintOnlyIfDetail = true;
 
             column(StoreNo_Name_StoreTB; StoreFilterText) { }
             column(ReportFilterText; ReportFilterText) { }
@@ -19,6 +19,12 @@ report 50105 "Store Stock Checking"
             column(ItemNo; Item."No.") { }
             column(Description_Item; Item.Description) { }
             column(BaseUOM_Item; Item."Base Unit of Measure") { }
+            column(ItemInventoryQty; format(ItemInventoryQty, 0, '<Sign><Integer Thousand><Decimals>')) { }
+            column(ItemSoldNotPostedQty; format(ItemSoldNotPostedQty, 0, '<Sign><Integer Thousand><Decimals>')) { }
+            column(ItemSoldTodayQty; format(ItemSoldTodayQty, 0, '<Sign><Integer Thousand><Decimals>')) { }
+            column(NetInventoryQty; format(NetInventoryQty, 0, '<Sign><Integer Thousand><Decimals>')) { }
+            column(ItemWaitedTransferQty; ItemWaitedTransferQty) { }
+            column(SkipLine; SkipLine) { }
             column(ShowLot; ShowLot) { }
             column(ShowVariant; RetailSetup."PLSPOS_Show Var for Report VIP") { }
 
@@ -29,14 +35,6 @@ report 50105 "Store Stock Checking"
                 UseTemporary = true;
 
                 column(Variant_Code; Code) { }
-
-                // จานย้ายพวกยอดคำนวณมาใส่ตรงนี้! เพื่อให้ RDLC รับค่าในแต่ละบรรทัดได้ตรงเป๊ะ (ชื่อตัวแปรคงเดิม)
-                column(ItemInventoryQty; format(ItemInventoryQty, 0, '<Sign><Integer Thousand><Decimals>')) { }
-                column(ItemSoldNotPostedQty; format(ItemSoldNotPostedQty, 0, '<Sign><Integer Thousand><Decimals>')) { }
-                column(ItemSoldTodayQty; format(ItemSoldTodayQty, 0, '<Sign><Integer Thousand><Decimals>')) { }
-                column(NetInventoryQty; format(NetInventoryQty, 0, '<Sign><Integer Thousand><Decimals>')) { }
-                column(ItemWaitedTransferQty; ItemWaitedTransferQty) { }
-                column(SkipLine; SkipLine) { }
 
                 trigger OnPreDataItem()
                 begin
@@ -52,32 +50,46 @@ report 50105 "Store Stock Checking"
                     Clear(ItemWaitedTransferQty);
                     Clear(NetInventoryQty);
 
-                    // 1. สร้าง Key สำหรับยิงเข้า Dictionary
-                    DictKey := "Item No.";
+                    // ── Item Inventory Qty จาก Item Ledger Entry ──
+                    // ใช้ CalcSums — BC ทำเป็น SQL SUM ให้แล้ว
+                    Clear(ItemLedgerEntryTB);
+                    ItemLedgerEntryTB.SetCurrentKey("Item No.", "Posting date", "Location Code");
+                    ItemLedgerEntryTB.SetRange("Item No.", Item."No.");
+                    ItemLedgerEntryTB.SetRange("Posting Date", 0D, AsOfDateFilter);
+                    ItemLedgerEntryTB.SetFilter("Location Code", LocationFilter);
+                    ItemLedgerEntryTB.SetLoadFields("Item No.", "Posting Date", "Location Code",
+                                                    "Variant Code", "Remaining Quantity");
                     if RetailSetup."PLSPOS_Show Var for Report VIP" then
-                        DictKey += '|' + Code;
+                        ItemLedgerEntryTB.SetRange("Variant Code", Code);
+                    ItemLedgerEntryTB.CalcSums("Remaining Quantity");
+                    ItemInventoryQty := ItemLedgerEntryTB."Remaining Quantity";
 
-                    // 2. ดึงค่าจาก Memory
-                    if DictInvQty.ContainsKey(DictKey) then
-                        ItemInventoryQty := DictInvQty.Get(DictKey);
+                    // ── Sold Qty — ใช้ Store list ที่ Cache ไว้จาก OnPreDataItem ──
+                    // ไม่ต้อง FindSet() ซ้ำทุก Variant ทุก Item
+                    if LocationFilter <> '' then begin
+                        if CachedStoreListReady then begin
+                            // อ่านจาก Temp Store list ที่ build ไว้แล้ว
+                            TempStoreTB.Reset();
+                            if TempStoreTB.FindSet() then
+                                repeat
+                                    ItemSoldTodayQty += QtySoldNotPosted(Item."No.", TempStoreTB."No.", Code, Today, true, '');
+                                    ItemSoldNotPostedQty += QtySoldNotPosted(Item."No.", TempStoreTB."No.", Code, Today - 1, false, '');
+                                until TempStoreTB.Next() = 0;
+                        end;
+                    end else begin
+                        ItemSoldTodayQty := QtySoldNotPosted(Item."No.", '', Code, Today, true, '');
+                        ItemSoldNotPostedQty := QtySoldNotPosted(Item."No.", '', Code, Today - 1, false, '');
+                    end;
 
-                    if DictSoldTodayQty.ContainsKey(DictKey) then
-                        ItemSoldTodayQty := DictSoldTodayQty.Get(DictKey);
-
-                    if DictSoldNotPostedQty.ContainsKey(DictKey) then
-                        ItemSoldNotPostedQty := DictSoldNotPostedQty.Get(DictKey);
-
-                    // 3. จานแก้ให้แล้ว! ต้องเป็น "ลบ" เพื่อหักยอดขายออกสต๊อก ILE
                     NetInventoryQty := ItemInventoryQty + ItemSoldTodayQty + ItemSoldNotPostedQty;
 
-                    // 4. กรองบรรทัดตาม Filter
                     if NetInventoryQty < 0 then
                         if not ShowNegativeFilter then
-                            CurrReport.Skip();
+                            SkipLine := true;
 
                     if NetInventoryQty = 0 then
                         if not ShowZeroFilter then
-                            CurrReport.Skip();
+                            SkipLine := true;
                 end;
             }
 
@@ -89,11 +101,11 @@ report 50105 "Store Stock Checking"
                     Error('Please input Location filter!');
 
                 Clear(ReportFilterText);
-                if (ItemNoFilter <> '') then begin
+                if ItemNoFilter <> '' then begin
                     ReportFilterText += 'Item No. : ' + FORMAT(ItemNoFilter + ' ');
                     Item.SetFilter("No.", ItemNoFilter);
                 end;
-                if (LocationFilter <> '') then
+                if LocationFilter <> '' then
                     ReportFilterText += ' Location : ' + FORMAT(LocationFilter + ' ');
                 if DivisionFilter <> '' then begin
                     ReportFilterText += ' Division : ' + DivisionFilter;
@@ -105,38 +117,98 @@ report 50105 "Store Stock Checking"
                         ReportFilterText += 'ProductGroupFilter :' + ProductGroupFilter;
                     SetFilter("LSC Retail Product Code", ProductGroupFilter);
                 end;
-                if (ShowItemBlock) then
+                if ShowItemBlock then
                     ReportFilterText += ' Show Item Blocked';
-                if (ShowZeroFilter) then
+                if ShowZeroFilter then
                     ReportFilterText += ' Show Item Quantity Zero';
                 if ShowNegativeFilter then
                     ReportFilterText += ' Show Negative Quantity';
 
+                // ── Store filter text ──
+                // StoreTB.Get() ใช้ "No." เป็น PK ไม่ใช่ Location Code
+                // ต้อง SetFilter "Location Code" แล้ว FindFirst() แทน
                 Clear(StoreTB);
-                if StoreTB.Get(LocationFilter) then
+                StoreTB.SetLoadFields("No.", Name, "Location Code");
+                StoreTB.SetFilter("Location Code", LocationFilter);
+                if StoreTB.FindFirst() then
                     StoreFilterText := StoreTB."No." + ' : ' + StoreTB.Name;
 
                 if not ShowItemBlock then
                     SetRange(Item.Blocked, false);
                 SetFilter(Item.Type, '%1', Type::Inventory);
 
-                // --- DATA FLATTENING : โหลดข้อมูลเข้า DICTIONARY รวดเดียว ---
-                LoadDataIntoDictionary();
+                // ── Build Temp Store list ครั้งเดียว ──
+                // แทนที่จะ FindSet() ซ้ำทุก Variant ทุก Item
+                TempStoreTB.Reset();
+                TempStoreTB.DeleteAll();
+                CachedStoreListReady := false;
+
+                if LocationFilter <> '' then begin
+                    Clear(StoreTB);
+                    StoreTB.SetLoadFields("No.", "Location Code");
+                    StoreTB.SetFilter("Location Code", LocationFilter);
+                    if StoreTB.FindSet() then begin
+                        repeat
+                            TempStoreTB.Init();
+                            TempStoreTB.TransferFields(StoreTB);
+                            TempStoreTB.Insert(false);
+                        until StoreTB.Next() = 0;
+                        CachedStoreListReady := true;
+                    end;
+                end;
+
+                // ── Prefilter Item เฉพาะที่มีใน ILE ของ Location ที่เลือก ──
+                if LocationFilter <> '' then begin
+                    Clear(PreFilterILE);
+                    PreFilterILE.SetCurrentKey("Item No.", "Location Code");
+                    PreFilterILE.SetFilter("Location Code", LocationFilter);
+                    PreFilterILE.SetLoadFields("Item No.", "Location Code");
+                    Clear(PreFilterItemList);
+                    Clear(PreFilterLastItemNo);
+                    if PreFilterILE.FindSet() then begin
+                        repeat
+                            if PreFilterILE."Item No." <> PreFilterLastItemNo then begin
+                                if PreFilterItemList = '' then
+                                    PreFilterItemList := PreFilterILE."Item No."
+                                else
+                                    PreFilterItemList += '|' + PreFilterILE."Item No.";
+                                PreFilterLastItemNo := PreFilterILE."Item No.";
+                            end;
+                        until PreFilterILE.Next() = 0;
+                        SetFilter("No.", PreFilterItemList);
+                    end else
+                        CurrReport.Break();
+                end;
+
+                // โหลดเฉพาะ field ที่ใช้จริงของ Item
+                SetLoadFields("No.", Description, "Base Unit of Measure",
+                              Blocked, Type, "LSC Division Code",
+                              "Item Category Code", "LSC Retail Product Code");
             end;
 
             trigger OnAfterGetRecord()
             begin
+                Clear(SkipLine);
+                Clear(ItemInventoryQty);
+                Clear(ItemSoldTodayQty);
+                Clear(ItemSoldNotPostedQty);
+                Clear(ItemWaitedTransferQty);
+                Clear(NetInventoryQty);
+
                 Clear(TempItemVariant);
                 TempItemVariant.DeleteAll();
 
+                // ── Dummy variant (ไม่แยก variant) ──
                 TempItemVariant.Init();
                 TempItemVariant."Item No." := "No.";
                 TempItemVariant.Insert(false);
 
+                // ── ถ้าแสดง variant: ดึง Item Variant มาใส่ Temp ──
                 if RetailSetup."PLSPOS_Show Var for Report VIP" then begin
                     Clear(ItemVariantTB);
                     ItemVariantTB.SetCurrentKey("Item No.", Code);
-                    ItemVariantTB.SetRange("Item No.", "No."); // จานเติม "No." ให้ เพราะของเดิมลืมใส่ parameter ตรงนี้นะ
+                    ItemVariantTB.SetRange("Item No.", "No.");
+                    ItemVariantTB.SetLoadFields("Item No.", Code);
                     if ItemVariantTB.FindSet() then
                         repeat
                             TempItemVariant.Init();
@@ -205,6 +277,7 @@ report 50105 "Store Stock Checking"
                 }
             }
         }
+
         trigger OnInit()
         begin
             Clear(ItemCategoryFilter);
@@ -214,7 +287,7 @@ report 50105 "Store Stock Checking"
 
     trigger OnPreReport()
     begin
-        SelectLatestVersion(); //เป็น method ที่บอกให้ session นี้ ดึงข้อมูลเวอร์ชันล่าสุดจาก SQL Server แทนที่จะใช้ข้อมูลที่อาจถูก cache อยู่ใน service tier
+        SelectLatestVersion();
         ComInfo.Get();
         ShowDate := FORMAT(Today, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
         ShowTime := LSVIPRepFucntion.AVTimeFormat(Time);
@@ -228,7 +301,11 @@ report 50105 "Store Stock Checking"
         ItemLedgerEntryTB: Record "Item Ledger Entry";
         ItemVariantTB: Record "Item Variant";
         RetailSetup: Record "LSC Retail Setup";
-        TransSalesEntryStatusDummy: Record "LSC Trans. Sales Entry Status";
+
+        // ── Temp Store list — build ครั้งเดียวใน OnPreDataItem ──
+        // แทนที่จะ FindSet() ซ้ำทุก Variant ทุก Item
+        TempStoreTB: Record "LSC Store" temporary;
+        CachedStoreListReady: Boolean;
 
         ShowTime: Text[50];
         ShowDate: Text[50];
@@ -242,6 +319,9 @@ report 50105 "Store Stock Checking"
         ItemWaitedTransferQty: Decimal;
         NetInventoryQty: Decimal;
         AsOfDateFilter: Date;
+        PreFilterILE: Record "Item Ledger Entry";
+        PreFilterItemList: Text;
+        PreFilterLastItemNo: Code[20];
         ShowZeroFilter: Boolean;
         ShowNegativeFilter: Boolean;
         ShowItemBlock: Boolean;
@@ -250,112 +330,64 @@ report 50105 "Store Stock Checking"
         CurrLot: Text[50];
         DivisionFilter: Code[20];
         ItemCategoryFilter: Code[20];
-        ProductGroupFilter: code[20];
+        ProductGroupFilter: Code[20];
 
-        // --- เพิ่มตัวแปรสำหรับ Optimization ---
-        DictInvQty: Dictionary of [Text, Decimal];
-        DictSoldTodayQty: Dictionary of [Text, Decimal];
-        DictSoldNotPostedQty: Dictionary of [Text, Decimal];
-        ILEQuery: Query "PLSR_StoreStockILE_Q";
-        TSEQuery: Query "PLSR_StoreStockTSE_Q";
-        TSESQuery: Query "PLSR_StoreStockTSES_Q";
-        StoreFilterStr: Text;
-        DictKey: Text;
-
-    local procedure LoadDataIntoDictionary()
+    local procedure QtySoldNotPosted(ItemNo: Code[20];
+                             StoreFilter: Code[250];
+                             VariantFilter: Code[250];
+                             DateFilter: Date;
+                             SoldTodayFilter: Boolean;
+                             LotFilter: Code[50]) QtySoldNotPosted: Decimal
+    var
+        TransSalesEntry: Record "LSC Trans. Sales Entry";
+        TransSalesEntryStatus: Record "LSC Trans. Sales Entry Status";
+        QuantitySold: Decimal;
+        QuantityPosted: Decimal;
     begin
-        Clear(DictInvQty);
-        Clear(DictSoldTodayQty);
-        Clear(DictSoldNotPostedQty);
+        Clear(QuantitySold);
+        Clear(QuantityPosted);
+        Clear(QtySoldNotPosted);
 
-        // 1. หา Store ทั้งหมดที่ผูกกับ Location นี้
-        StoreFilterStr := '';
-        Clear(StoreTB);
-        StoreTB.SetFilter("Location Code", LocationFilter);
-        if StoreTB.FindSet() then
-            repeat
-                if StoreFilterStr = '' then
-                    StoreFilterStr := StoreTB."No."
-                else
-                    StoreFilterStr += '|' + StoreTB."No.";
-            until StoreTB.Next() = 0;
+        // ── Trans. Sales Entry ──
+        Clear(TransSalesEntry);
+        TransSalesEntry.SetCurrentKey("Item No.", "Variant Code", Date);
+        TransSalesEntry.SetRange("Item No.", ItemNo);
+        TransSalesEntry.SetLoadFields("Item No.", "Variant Code", Date, "Store No.", Quantity, "Lot No.");
+        if LotFilter <> '' then
+            TransSalesEntry.SetRange("Lot No.", LotFilter);
+        if RetailSetup."PLSPOS_Show Var for Report VIP" then
+            TransSalesEntry.SetFilter("Variant Code", VariantFilter);
+        if StoreFilter <> '' then
+            TransSalesEntry.SetFilter("Store No.", StoreFilter);
+        if SoldTodayFilter then
+            TransSalesEntry.SetRange(Date, DateFilter)
+        else
+            TransSalesEntry.SetRange(Date, 0D, DateFilter);
+        TransSalesEntry.CalcSums(Quantity);
+        QuantitySold := TransSalesEntry.Quantity;
 
-        // 2. Query 1: Item Ledger Entry -> ดึงสต๊อกเข้าระบบ
-        Clear(ILEQuery);
-        ILEQuery.SetFilter(Location_Code_Filter, LocationFilter);
-        ILEQuery.SetFilter(Posting_Date_Filter, '..%1', AsOfDateFilter);
-        if ItemNoFilter <> '' then ILEQuery.SetFilter(Item_No_Filter, ItemNoFilter);
-        ILEQuery.Open();
-        while ILEQuery.Read() do begin
-            DictKey := ILEQuery.Item_No;
-            if RetailSetup."PLSPOS_Show Var for Report VIP" then
-                DictKey += '|' + ILEQuery.Variant_Code;
+        // ── Trans. Sales Entry Status ──
+        Clear(TransSalesEntryStatus);
+        TransSalesEntryStatus.SetCurrentKey("Item No.", "Variant Code", Status, "Store No.", Date);
+        TransSalesEntryStatus.SetRange("Item No.", ItemNo);
+        TransSalesEntryStatus.SetLoadFields("Item No.", "Variant Code", Status, "Store No.", Date, Quantity, "Lot No.");
+        if RetailSetup."PLSPOS_Show Var for Report VIP" then
+            TransSalesEntryStatus.SetFilter("Variant Code", VariantFilter);
+        if SoldTodayFilter then
+            TransSalesEntryStatus.SetRange(Date, DateFilter)
+        else
+            TransSalesEntryStatus.SetRange(Date, 0D, DateFilter);
+        TransSalesEntryStatus.SetRange(Status,
+            TransSalesEntryStatus.Status::"Items Posted",
+            TransSalesEntryStatus.Status::Posted);
+        if StoreFilter <> '' then
+            TransSalesEntryStatus.SetFilter("Store No.", StoreFilter);
+        if LotFilter <> '' then
+            TransSalesEntryStatus.SetRange("Lot No.", LotFilter);
+        TransSalesEntryStatus.CalcSums(Quantity);
+        QuantityPosted := TransSalesEntryStatus.Quantity;
 
-            if DictInvQty.ContainsKey(DictKey) then
-                DictInvQty.Set(DictKey, DictInvQty.Get(DictKey) + ILEQuery.Sum_Remaining_Quantity)
-            else
-                DictInvQty.Add(DictKey, ILEQuery.Sum_Remaining_Quantity);
-        end;
-        ILEQuery.Close();
-
-        // --- จานครอบ IF ป้องกันการดึงยอดขายแบบไร้ขอบเขต ---
-        if StoreFilterStr <> '' then begin
-            // 3. Query 2: Trans Sales Entry -> ดึงยอดขาย POS
-            Clear(TSEQuery);
-            TSEQuery.SetFilter(Date_Filter, '..%1', AsOfDateFilter);
-            if ItemNoFilter <> '' then TSEQuery.SetFilter(Item_No_Filter, ItemNoFilter);
-            TSEQuery.SetFilter(Store_No_Filter, StoreFilterStr); // ไม่ต้องมี IF ดักแล้ว เพราะเรารู้ชัวร์ๆ ว่ามันไม่ว่าง
-            TSEQuery.Open();
-            while TSEQuery.Read() do begin
-                DictKey := TSEQuery.Item_No;
-                if RetailSetup."PLSPOS_Show Var for Report VIP" then
-                    DictKey += '|' + TSEQuery.Variant_Code;
-
-                if TSEQuery.Trans_Date = AsOfDateFilter then begin
-                    if DictSoldTodayQty.ContainsKey(DictKey) then
-                        DictSoldTodayQty.Set(DictKey, DictSoldTodayQty.Get(DictKey) + TSEQuery.Sum_Quantity)
-                    else
-                        DictSoldTodayQty.Add(DictKey, TSEQuery.Sum_Quantity);
-                end else begin
-                    if DictSoldNotPostedQty.ContainsKey(DictKey) then
-                        DictSoldNotPostedQty.Set(DictKey, DictSoldNotPostedQty.Get(DictKey) + TSEQuery.Sum_Quantity)
-                    else
-                        DictSoldNotPostedQty.Add(DictKey, TSEQuery.Sum_Quantity);
-                end;
-            end;
-            TSEQuery.Close();
-
-            // 4. Query 3: Trans Sales Entry Status -> หักลบยอดที่ Post แล้ว
-            Clear(TSESQuery);
-            TSESQuery.SetFilter(Date_Filter, '..%1', AsOfDateFilter);
-            if ItemNoFilter <> '' then TSESQuery.SetFilter(Item_No_Filter, ItemNoFilter);
-            TSESQuery.SetFilter(Store_No_Filter, StoreFilterStr);
-            TSESQuery.SetFilter(Status_Filter, '%1|%2', TransSalesEntryStatusDummy.Status::"Items Posted", TransSalesEntryStatusDummy.Status::Posted);
-            TSESQuery.Open();
-            while TSESQuery.Read() do begin
-                DictKey := TSESQuery.Item_No;
-                if RetailSetup."PLSPOS_Show Var for Report VIP" then
-                    DictKey += '|' + TSESQuery.Variant_Code;
-
-                if TSESQuery.Trans_Date = AsOfDateFilter then begin
-                    if DictSoldTodayQty.ContainsKey(DictKey) then
-                        DictSoldTodayQty.Set(DictKey, DictSoldTodayQty.Get(DictKey) - TSESQuery.Sum_Quantity)
-                    else
-                        DictSoldTodayQty.Add(DictKey, -TSESQuery.Sum_Quantity);
-                end else begin
-                    if DictSoldNotPostedQty.ContainsKey(DictKey) then
-                        DictSoldNotPostedQty.Set(DictKey, DictSoldNotPostedQty.Get(DictKey) - TSESQuery.Sum_Quantity)
-                    else
-                        DictSoldNotPostedQty.Add(DictKey, -TSESQuery.Sum_Quantity);
-                end;
-            end;
-            TSESQuery.Close();
-        end; // ปิด IF StoreFilterStr
-    end;
-
-    // เก็บ Local Procedure ตัวเดิมไว้เป็นติ่ง ไม่ต้องลบทิ้ง เผื่อระบบมี References นอกสายตาเรียกใช้อยู่
-    local procedure QtySoldNotPosted(ItemNo: Code[20]; StoreFilter: Code[250]; VariantFilter: Code[250]; DateFilter: Date; SoldTodayFilter: Boolean; LotFilter: Code[50]) QtySoldNotPosted: Decimal
-    begin
+        QtySoldNotPosted := QuantitySold - QuantityPosted;
     end;
 
     procedure SetLocationFilter(refLocationFilter: Code[20])

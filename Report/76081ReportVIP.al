@@ -7,7 +7,17 @@ report 50105 "Store Stock Checking"
     // AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76081) น้องอิง
     dataset
     {
-        dataitem(Integer; Integer)
+        dataitem(ReportHeader; Integer)
+        {
+            DataItemTableView = sorting(Number) where(Number = const(1));
+
+            trigger OnPreDataItem()
+            begin
+                BuildTempData();
+            end;
+        }
+
+        dataitem(BufferLoop; Integer)
         {
             DataItemTableView = sorting(Number) where(Number = filter(1 ..));
 
@@ -16,70 +26,42 @@ report 50105 "Store Stock Checking"
             column(ShowDate; ShowDate) { }
             column(ShowTime; ShowTime) { }
 
-            column(ItemNo; TempStockBuffer."Item No.") { }
-            column(Description_Item; TempStockBuffer.Description) { }
-            column(BaseUOM_Item; TempStockBuffer."Base Unit of Measure") { }
-            column(Variant_Code; TempStockBuffer."Variant Code") { }
+            column(ItemNo; ItemTB."No. 2") { }
+            column(Description_Item; ItemTB.Description) { }
+            column(BaseUOM_Item; ItemTB."Base Unit of Measure") { }
+            column(Variant_Code; ItemTB."Vendor Item No.") { }
 
-            column(ItemInventoryQty; format(TempStockBuffer.ItemInventoryQty, 0, '<Sign><Integer Thousand><Decimals>')) { }
-            column(ItemSoldNotPostedQty; format(TempStockBuffer.ItemSoldNotPostedQty, 0, '<Sign><Integer Thousand><Decimals>')) { }
-            column(ItemSoldTodayQty; format(TempStockBuffer.ItemSoldTodayQty, 0, '<Sign><Integer Thousand><Decimals>')) { }
-            column(NetInventoryQty; format(TempStockBuffer.NetInventoryQty, 0, '<Sign><Integer Thousand><Decimals>')) { }
+            column(ItemInventoryQty; format(ItemTB."Unit Price", 0, '<Sign><Integer Thousand>')) { }
+            column(ItemSoldTodayQty; format(ItemTB."Unit Cost", 0, '<Sign><Integer Thousand>')) { }
+            column(ItemSoldNotPostedQty; format(ItemTB."Standard Cost", 0, '<Sign><Integer Thousand>')) { }
+            column(NetInventoryQty; format(ItemTB."Last Direct Cost", 0, '<Sign><Integer Thousand>')) { }
             column(ShowVariant; RetailSetup."PLSPOS_Show Var for Report VIP") { }
 
             trigger OnPreDataItem()
-            var
-                StoreTB: Record "LSC Store";
             begin
-                AsOfDateFilter := Today;
-
-                if LocationFilter = '' then
-                    Error('Please input Location filter!');
-
-                Clear(ReportFilterText);
-                if (ItemNoFilter <> '') then
-                    ReportFilterText += 'Item No. : ' + FORMAT(ItemNoFilter + ' ');
-
-                if (LocationFilter <> '') then
-                    ReportFilterText += ' Location : ' + FORMAT(LocationFilter + ' ');
-
-                if DivisionFilter <> '' then begin
-                    ReportFilterText += ' Division : ' + DivisionFilter;
-                    if ItemCategoryFilter <> '' then
-                        ReportFilterText += ' ItemCategoryFilter : ' + ItemCategoryFilter;
-                    if ProductGroupFilter <> '' then
-                        ReportFilterText += ' ProductGroupFilter : ' + ProductGroupFilter;
-                end;
-
-                if (ShowItemBlock) then
-                    ReportFilterText += ' Show Item Blocked';
-                if (ShowZeroFilter) then
-                    ReportFilterText += ' Show Item Quantity Zero';
-                if ShowNegativeFilter then
-                    ReportFilterText += ' Show Negative Quantity';
-
-                Clear(StoreTB);
-                if StoreTB.Get(LocationFilter) then
-                    StoreFilterText := StoreTB."No." + ' : ' + StoreTB.Name;
-
-                //สั่งกวาดข้อมูลลง Temp Table
-                BuildTempData();
+                ItemTB.Reset();
+                // หัวใจสำคัญ: สั่งเรียงลำดับด้วย Key มาตรฐานที่เรายัดค่า Item|Variant ไว้
+                ItemTB.SetCurrentKey("Search Description");
+                ItemTB.Ascending(true);
+                SetRange(Number, 1, ItemTB.Count());
+                if ItemTB.IsEmpty() then
+                    CurrReport.Break();
             end;
 
             trigger OnAfterGetRecord()
             begin
-                // เดินหน้าอ่านข้อมูลจาก Temp Table ทีละบรรทัด
+                // วนลูปอ่านข้อมูล ซึ่งตอนนี้มันจะออกมาเรียงสวยงามเป๊ะๆ ตาม Item No. และ Variant 
                 if Number = 1 then begin
-                    TempStockBuffer.SetCurrentKey("Item No.", "Variant Code");
-                    if not TempStockBuffer.FindSet() then
+                    if not ItemTB.FindSet() then
                         CurrReport.Break();
                 end else begin
-                    if TempStockBuffer.Next() = 0 then
+                    if ItemTB.Next() = 0 then
                         CurrReport.Break();
                 end;
             end;
         }
     }
+
     requestpage
     {
         layout
@@ -113,7 +95,6 @@ report 50105 "Store Stock Checking"
                             Caption = 'Division Filter';
                             TableRelation = "LSC Division";
                         }
-                        //AVTNK	28/11/2024	add field , hide field
                         field(ItemCategory_1; ItemCategoryFilter)
                         {
                             ApplicationArea = All;
@@ -126,9 +107,6 @@ report 50105 "Store Stock Checking"
                             Caption = 'Product Group';
                             TableRelation = "LSC Retail Product Group".Code;
                         }
-                        //C-AVTNK	28/11/2024	add field , hide field
-
-
                     }
                     group("Select One")
                     {
@@ -136,13 +114,19 @@ report 50105 "Store Stock Checking"
                         {
                             ApplicationArea = all;
                             Caption = 'Show Zero :';
-
                         }
+                        // field("Show Negative :"; ShowNegativeFilter)
+                        // {
+                        //     ApplicationArea = all;
+                        //     Caption = 'Show Negative :';
+                        // }
                     }
                 }
             }
         }
     }
+
+
     trigger OnPreReport()
     begin
         SelectLatestVersion();
@@ -154,154 +138,206 @@ report 50105 "Store Stock Checking"
 
     var
         LSVIPRepFucntion: Codeunit "PLSR_Report Function";
-        TempStockBuffer: Record "PLSR_Store Stock Buffer" temporary;
+        ItemTB: Record "Item" temporary;
         ComInfo: Record "Company Information";
         RetailSetup: Record "LSC Retail Setup";
         AsOfDateFilter: Date;
-        LocationFilter: Code[20];
-        LotFilter: Code[20];
-        StoreFilter: Code[20];
-        ItemNoFilter: Code[20];
-        VariantFilter: Code[20];
-        DivisionFilter: Code[20];
-        ItemCategoryFilter: Code[20];
-        ProductGroupFilter: Code[20];
-        SoldTodayFilter: Boolean;
-        ShowItemBlock: Boolean;
-        ShowZeroFilter: Boolean;
-        ShowNegativeFilter: Boolean;
-        ShowDate: Text;
-        ShowTime: Text;
-        ReportFilterText: Text;
-        StoreFilterText: Text;
+        LocationFilter, ItemNoFilter, DivisionFilter, ItemCategoryFilter, ProductGroupFilter : Code[20];
+        ShowItemBlock, ShowZeroFilter, ShowNegativeFilter : Boolean;
+        ShowDate, ShowTime, ReportFilterText, StoreFilterText : Text;
 
     local procedure BuildTempData()
     var
         ItemRecord: Record Item;
+        ItemVariant: Record "Item Variant";
+        StoreTB: Record "LSC Store";
         ILEQuery: Query "PLSR_StoreStockILE_Q";
         SalesQuery: Query "PLSR_StoreStockTSE_Q";
         StatusQuery: Query "PLSR_StoreStockTSES_Q";
-        QtySold: Decimal;
-        QtyPosted: Decimal;
+        EntryNo: Integer;
+        StoreFilterString: Text;
+        ShowVar: Boolean;
     begin
-        TempStockBuffer.Reset();
-        TempStockBuffer.DeleteAll();
+        if LocationFilter = '' then
+            Error('Please input Location filter!');
 
-        // --- STEP 1: กรอง Item (สร้างบรรทัดเดียวต่อ 1 รหัสสินค้า) ---
-        ItemRecord.Reset();
-        ItemRecord.SetFilter(Type, '%1', ItemRecord.Type::Inventory);
+        // --- เตรียม Report Filter Text และแปลงรหัส Location เป็น Store ---
+        Clear(ReportFilterText);
+        if (ItemNoFilter <> '') then ReportFilterText += 'Item No. : ' + FORMAT(ItemNoFilter + ' ');
+        if (LocationFilter <> '') then ReportFilterText += ' Location : ' + FORMAT(LocationFilter + ' ');
+        if DivisionFilter <> '' then ReportFilterText += ' Division : ' + DivisionFilter;
+        if ItemCategoryFilter <> '' then ReportFilterText += ' ItemCategoryFilter : ' + ItemCategoryFilter;
+        if ProductGroupFilter <> '' then ReportFilterText += ' ProductGroupFilter : ' + ProductGroupFilter;
+        if (ShowItemBlock) then ReportFilterText += ' Show Item Blocked';
+        if (ShowZeroFilter) then ReportFilterText += ' Show Item Quantity Zero';
+        if (ShowNegativeFilter) then ReportFilterText += ' Show Negative Quantity';
 
-        if not ShowItemBlock then
-            ItemRecord.SetRange(Blocked, false);
+        Clear(StoreTB);
+        if StoreTB.Get(LocationFilter) then
+            StoreFilterText := StoreTB."No." + ' : ' + StoreTB.Name;
 
-        if ItemNoFilter <> '' then
-            ItemRecord.SetFilter("No.", ItemNoFilter);
+        ItemTB.Reset();
+        ItemTB.DeleteAll();
+        EntryNo := 0;
+        AsOfDateFilter := Today;
+        ShowVar := RetailSetup."PLSPOS_Show Var for Report VIP";
 
-        if DivisionFilter <> '' then
-            ItemRecord.SetFilter("LSC Division Code", DivisionFilter);
-
-        if ItemCategoryFilter <> '' then
-            ItemRecord.SetFilter("Item Category Code", ItemCategoryFilter);
-
-        if ProductGroupFilter <> '' then
-            ItemRecord.SetFilter("LSC Retail Product Code", ProductGroupFilter);
-
-        if ItemRecord.FindSet() then
+        StoreFilterString := '';
+        StoreTB.Reset();
+        StoreTB.SetFilter("Location Code", LocationFilter);
+        if StoreTB.FindSet() then
             repeat
-                TempStockBuffer.Init();
-                TempStockBuffer."Item No." := ItemRecord."No.";
-                TempStockBuffer."Variant Code" := '';
-                TempStockBuffer.Description := ItemRecord.Description;
-                TempStockBuffer."Base Unit of Measure" := ItemRecord."Base Unit of Measure";
-                TempStockBuffer.Insert();
-            until ItemRecord.Next() = 0;
+                if StoreFilterString <> '' then
+                    StoreFilterString += '|';
+                StoreFilterString += StoreTB."No.";
+            until StoreTB.Next() = 0;
+        if StoreFilterString = '' then StoreFilterString := '___NONE___';
 
-        // --- STEP 2: ค้นหา Inventory จาก ILE (โกยยอดทุก Variant มารวมกัน) ---
+        // ---  STEP 1: กวาดสินค้ากรณีเปิด Show Zero ---
+        if ShowZeroFilter then begin
+            ItemRecord.Reset();
+            ItemRecord.SetRange(Type, ItemRecord.Type::Inventory);
+            if not ShowItemBlock then ItemRecord.SetRange(Blocked, false);
+            if ItemNoFilter <> '' then ItemRecord.SetFilter("No.", ItemNoFilter);
+            if DivisionFilter <> '' then ItemRecord.SetFilter("LSC Division Code", DivisionFilter);
+            if ItemCategoryFilter <> '' then ItemRecord.SetFilter("Item Category Code", ItemCategoryFilter);
+            if ProductGroupFilter <> '' then ItemRecord.SetFilter("LSC Retail Product Code", ProductGroupFilter);
+
+            if ItemRecord.FindSet() then
+                repeat
+                    if ShowVar then begin
+                        FindOrCreateItemTB(ItemRecord."No.", '', ItemTB, EntryNo, ShowVar); // Blank Variant
+
+                        ItemVariant.Reset();
+                        ItemVariant.SetRange("Item No.", ItemRecord."No.");
+                        if ItemVariant.FindSet() then
+                            repeat
+                                FindOrCreateItemTB(ItemRecord."No.", ItemVariant.Code, ItemTB, EntryNo, ShowVar);
+                            until ItemVariant.Next() = 0;
+                    end else begin
+                        FindOrCreateItemTB(ItemRecord."No.", '', ItemTB, EntryNo, ShowVar);
+                    end;
+                until ItemRecord.Next() = 0;
+        end;
+
+        // ---  STEP 2: ดึงยอดคงคลังสุทธิ (ILE) ---
+        Clear(ILEQuery);
         if ItemNoFilter <> '' then ILEQuery.SetFilter(Item_No, ItemNoFilter);
-
-        // กรอง Variant ตาม Request Page (ถ้าตั้งค่าให้ใช้ได้)
-        if RetailSetup."PLSPOS_Show Var for Report VIP" and (VariantFilter <> '') then
-            ILEQuery.SetFilter(Variant_Code, VariantFilter);
-
         if LocationFilter <> '' then ILEQuery.SetFilter(Location_Code, LocationFilter);
-        if LotFilter <> '' then ILEQuery.SetFilter(Lot_No, LotFilter);
         ILEQuery.SetFilter(Posting_Date, '<=%1', AsOfDateFilter);
-
         if ILEQuery.Open() then begin
             while ILEQuery.Read() do begin
-                // โยนยอดของทุก Variant ที่ Query หาเจอมารวมกันในบรรทัด Item บรรทัดเดียว!
-                if TempStockBuffer.Get(ILEQuery.Q_Item_No, '') then begin
-                    TempStockBuffer.ItemInventoryQty += ILEQuery.Sum_Remaining_Qty;
-                    TempStockBuffer.Modify();
+                if FindOrCreateItemTB(ILEQuery.Q_Item_No, ILEQuery.Q_Variant_Code, ItemTB, EntryNo, ShowVar) then begin
+                    ItemTB."Unit Price" += ILEQuery.Sum_Remaining_Qty;
+                    ItemTB.Modify();
                 end;
             end;
             ILEQuery.Close();
         end;
 
-        // --- STEP 3: ดึงยอดขายและสถานะ ---
-        if TempStockBuffer.FindSet() then
-            repeat
-                QtySold := 0;
-                QtyPosted := 0;
-
-                Clear(SalesQuery);
-                SalesQuery.SetRange(Item_No, TempStockBuffer."Item No.");
-                if RetailSetup."PLSPOS_Show Var for Report VIP" and (VariantFilter <> '') then
-                    SalesQuery.SetRange(Variant_Code, VariantFilter);
-                if StoreFilter <> '' then
-                    SalesQuery.SetFilter(Store_No, StoreFilter);
-
-                SalesQuery.SetRange(Date_Filter, AsOfDateFilter);
-
-                if SalesQuery.Open() then begin
-                    if SalesQuery.Read() then
-                        QtySold := SalesQuery.Sum_Quantity;
-                    SalesQuery.Close();
+        // ---  STEP 3: ดึงยอดขายของวันนี้ ---
+        Clear(SalesQuery);
+        SalesQuery.SetRange(Date_Filter, Today);
+        SalesQuery.SetFilter(Store_No, StoreFilterString);
+        if ItemNoFilter <> '' then SalesQuery.SetFilter(Item_No, ItemNoFilter);
+        if SalesQuery.Open() then begin
+            while SalesQuery.Read() do begin
+                if FindOrCreateItemTB(SalesQuery.Q_Item_No, SalesQuery.Q_Variant_Code, ItemTB, EntryNo, ShowVar) then begin
+                    ItemTB."Unit Cost" += SalesQuery.Sum_Quantity;
+                    ItemTB.Modify();
                 end;
+            end;
+            SalesQuery.Close();
+        end;
 
-                Clear(StatusQuery);
-                StatusQuery.SetRange(Item_No, TempStockBuffer."Item No.");
-                if RetailSetup."PLSPOS_Show Var for Report VIP" and (VariantFilter <> '') then
-                    StatusQuery.SetRange(Variant_Code, VariantFilter);
-                if StoreFilter <> '' then
-                    StatusQuery.SetFilter(Store_No, StoreFilter);
-                if LotFilter <> '' then
-                    StatusQuery.SetFilter(Lot_No, LotFilter);
-
-                StatusQuery.SetRange(Date_Filter, AsOfDateFilter);
-                StatusQuery.SetFilter(Status, '%1|%2', 1, 2);
-
-                if StatusQuery.Open() then begin
-                    if StatusQuery.Read() then
-                        QtyPosted := StatusQuery.Sum_Quantity;
-                    StatusQuery.Close();
+        Clear(StatusQuery);
+        StatusQuery.SetRange(Date_Filter, Today);
+        StatusQuery.SetFilter(Status, '%1|%2', 1, 2);
+        StatusQuery.SetFilter(Store_No, StoreFilterString);
+        if ItemNoFilter <> '' then StatusQuery.SetFilter(Item_No, ItemNoFilter);
+        if StatusQuery.Open() then begin
+            while StatusQuery.Read() do begin
+                if FindOrCreateItemTB(StatusQuery.Q_Item_No, StatusQuery.Q_Variant_Code, ItemTB, EntryNo, ShowVar) then begin
+                    ItemTB."Unit Cost" -= StatusQuery.Sum_Quantity;
+                    ItemTB.Modify();
                 end;
+            end;
+            StatusQuery.Close();
+        end;
 
-                TempStockBuffer.ItemSoldTodayQty := QtySold - QtyPosted;
-                TempStockBuffer.ItemSoldNotPostedQty := 0;
+        // ---  STEP 4: ดึงยอดขายในอดีต ---
+        // ทำแบบเดียวกับ Step 3 แต่เปลี่ยน Date_Filter เป็น 0D .. Today - 1 แล้วหยอดยอดเข้า ItemTB."Standard Cost"
 
-                TempStockBuffer.NetInventoryQty := TempStockBuffer.ItemInventoryQty - TempStockBuffer.ItemSoldTodayQty - TempStockBuffer.ItemSoldNotPostedQty;
-                TempStockBuffer.Modify();
-
-            until TempStockBuffer.Next() = 0;
-
-        if TempStockBuffer.FindSet() then
+        // --- STEP 5: เติม Description และคัดกรองขยะทิ้ง ---
+        ItemTB.Reset();
+        if ItemTB.FindSet() then
             repeat
-                if (TempStockBuffer.NetInventoryQty < 0) and (not ShowNegativeFilter) then
-                    TempStockBuffer.Delete()
-                else if (TempStockBuffer.NetInventoryQty = 0) and (not ShowZeroFilter) then
-                    TempStockBuffer.Delete();
-            until TempStockBuffer.Next() = 0;
+                if ItemRecord.Get(ItemTB."No. 2") then begin
+                    if (not ShowZeroFilter) and
+                       ((ItemRecord.Type <> ItemRecord.Type::Inventory) or
+                        ((not ShowItemBlock) and ItemRecord.Blocked) or
+                        ((DivisionFilter <> '') and (ItemRecord."LSC Division Code" <> DivisionFilter)) or
+                        ((ItemCategoryFilter <> '') and (ItemRecord."Item Category Code" <> ItemCategoryFilter)) or
+                        ((ProductGroupFilter <> '') and (ItemRecord."LSC Retail Product Code" <> ProductGroupFilter)))
+                    then begin
+                        ItemTB.Mark(true);
+                    end else begin
+                        ItemTB.Description := ItemRecord.Description;
+                        ItemTB."Base Unit of Measure" := ItemRecord."Base Unit of Measure";
+                        ItemTB."Last Direct Cost" := ItemTB."Unit Price" + ItemTB."Unit Cost" + ItemTB."Standard Cost";
+                        ItemTB.Modify();
+                    end;
+                end else begin
+                    ItemTB.Mark(true);
+                end;
+            until ItemTB.Next() = 0;
+
+        ItemTB.MarkedOnly(true);
+        if not ItemTB.IsEmpty() then
+            ItemTB.DeleteAll();
+        ItemTB.Reset();
+
+        // --- STEP 6: กรองค่าศูนย์และค่าติดลบ ---
+        if not ShowZeroFilter then begin
+            ItemTB.SetRange("Last Direct Cost", 0);
+            if not ItemTB.IsEmpty() then ItemTB.DeleteAll();
+            ItemTB.SetRange("Last Direct Cost");
+        end;
+        if not ShowNegativeFilter then begin
+            ItemTB.SetFilter("Last Direct Cost", '<0');
+            if not ItemTB.IsEmpty() then ItemTB.DeleteAll();
+            ItemTB.SetRange("Last Direct Cost");
+        end;
+
+        ItemTB.Reset();
     end;
 
-    procedure SetLocationFilter(refLocationFilter: Code[20])
+    // ฟังก์ชันทำหน้าที่ยัดรหัสลง Index เพื่อความไวแสงและเอาไว้ Sort ออกรายงาน
+    local procedure FindOrCreateItemTB(ItemNo: Code[20]; VariantCode: Code[20]; var ItemTB: Record Item temporary; var EntryNo: Integer; ShowVar: Boolean): Boolean
+    var
+        SearchKey: Code[100];
     begin
-        LocationFilter := refLocationFilter;
-    end;
+        if not ShowVar then
+            VariantCode := '';
 
-    procedure SetNegativeFilter(refShowNegativeFilter: Boolean)
-    begin
-        ShowNegativeFilter := refShowNegativeFilter;
+        // แปลงร่าง: เอา Item ต่อด้วย Variant คั่นด้วย | เช่น (1000|V1) เพื่อกันการจัดเรียงเพี้ยน
+        SearchKey := CopyStr(ItemNo + '|' + VariantCode, 1, 100);
+
+        ItemTB.Reset();
+        // ใช้ Index Key ในการค้นหา ข้อมูลล้านบรรทัดก็หาเจอในเสี้ยววินาที!
+        ItemTB.SetCurrentKey("Search Description");
+        ItemTB.SetRange("Search Description", SearchKey);
+        if ItemTB.FindFirst() then
+            exit(true);
+
+        EntryNo += 1;
+        ItemTB.Init();
+        ItemTB."No." := Format(EntryNo);
+        ItemTB."No. 2" := ItemNo;
+        ItemTB."Vendor Item No." := VariantCode;
+        ItemTB."Search Description" := SearchKey; // เก็บกุญแจไว้
+        ItemTB.Insert();
+        exit(true);
     end;
-    // C-AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76081) น้องอิง
+    // C-AVPWDLSVIP 29/06/2025 > Improve Performance of VIP Report(76081) น้องอิง
 }

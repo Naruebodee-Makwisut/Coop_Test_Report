@@ -1,5 +1,6 @@
 query 50045 "PLSR_StoreStockILE_Q"
 {
+    Caption = 'Store Stock ILE';
     QueryType = Normal;
     elements
     {
@@ -17,28 +18,17 @@ query 50045 "PLSR_StoreStockILE_Q"
             {
                 Method = Sum;
             }
-            dataitem(ItemMaster; Item)
-            {
-                DataItemLink = "No." = ItemLedgerEntry."Item No.";
-
-                filter(Item_Category; "Item Category Code") { }
-                filter(Product_Group; "LSC Retail Product Code") { }
-                filter(Division_Code; "LSC Division Code") { }
-                filter(Is_Blocked; Blocked) { }
-
-                column(Item_Desc; Description) { }
-                column(Base_UOM; "Base Unit of Measure") { }
-            }
         }
     }
 }
 
 query 50046 "PLSR_StoreStockTSE_Q"
 {
+    Caption = 'Store Stock TSE';
     QueryType = Normal;
     elements
     {
-        dataitem(TransSales; "LSC Trans. Sales Entry")
+        dataitem(TransSalesEntry; "LSC Trans. Sales Entry")
         {
             filter(Item_No; "Item No.") { }
             filter(Variant_Code; "Variant Code") { }
@@ -51,28 +41,17 @@ query 50046 "PLSR_StoreStockTSE_Q"
             {
                 Method = Sum;
             }
-            dataitem(ItemMaster; Item)
-            {
-                DataItemLink = "No." = TransSales."Item No.";
-
-                filter(Item_Category; "Item Category Code") { }
-                filter(Product_Group; "LSC Retail Product Code") { }
-                filter(Division_Code; "LSC Division Code") { }
-                filter(Is_Blocked; Blocked) { }
-
-                column(Item_Desc; Description) { }
-                column(Base_UOM; "Base Unit of Measure") { }
-            }
         }
     }
 }
 
 query 50047 "PLSR_StoreStockTSES_Q"
 {
+    Caption = 'Store Stock TSES';
     QueryType = Normal;
     elements
     {
-        dataitem(TransSalesStatus; "LSC Trans. Sales Entry Status")
+        dataitem(TransSalesEntryStatus; "LSC Trans. Sales Entry Status")
         {
             filter(Item_No; "Item No.") { }
             filter(Variant_Code; "Variant Code") { }
@@ -86,18 +65,6 @@ query 50047 "PLSR_StoreStockTSES_Q"
             column(Sum_Quantity; Quantity)
             {
                 Method = Sum;
-            }
-            dataitem(ItemMaster; Item)
-            {
-                DataItemLink = "No." = TransSalesStatus."Item No.";
-
-                filter(Item_Category; "Item Category Code") { }
-                filter(Product_Group; "LSC Retail Product Code") { }
-                filter(Division_Code; "LSC Division Code") { }
-                filter(Is_Blocked; Blocked) { }
-
-                column(Item_Desc; Description) { }
-                column(Base_UOM; "Base Unit of Measure") { }
             }
         }
     }

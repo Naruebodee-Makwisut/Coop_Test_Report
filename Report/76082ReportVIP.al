@@ -5,6 +5,7 @@ report 50112 "PLSR_Store_Sales_VAT"
     RDLCLayout = './ReportLayouts/Rep76082_StoreSalesVAT.rdl';
     PreviewMode = PrintLayout;
 
+    // AVPWDLSVIP 30/06/2026 > Improve Performance of VIP Report(76082) - น้องปอ
     dataset
     {
         dataitem(TransHeader; "LSC Transaction Header")
@@ -738,4 +739,6 @@ report 50112 "PLSR_Store_Sales_VAT"
                 Addr[5] := StoreTB."PLSLC_Address 5";
             end;
     end;
+
+    // C-AVPWDLSVIP 36/06/2026 > Improve Performance of VIP Report(76082) - น้องปอ
 }

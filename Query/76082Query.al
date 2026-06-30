@@ -2,6 +2,8 @@ query 50055 "PLSR_StoreSalesVATAmt_Q"
 {
     Caption = 'Store Sales VAT Amount';
     QueryType = Normal;
+
+    // AVPWDLSVIP 30/06/2026 > Improve Performance of VIP Report(76082) - น้องปอ
     elements
     {
         dataitem(TransactionHeader; "LSC Transaction Header")
@@ -24,4 +26,5 @@ query 50055 "PLSR_StoreSalesVATAmt_Q"
             }
         }
     }
+    // C-AVPWDLSVIP 30/06/2026 > Improve Performance of VIP Report(76082) - น้องปอ
 }

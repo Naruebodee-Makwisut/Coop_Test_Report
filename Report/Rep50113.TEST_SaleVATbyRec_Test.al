@@ -149,7 +149,6 @@ report 50113 "TEST_Sale VAT by Rec_Test"
                 if TmpTransHeader.IsEmpty() then
                     CurrReport.Break()
                 else begin
-                    TmpTransHeader.SetCurrentKey("Store No.", "POS Terminal No.", "Transaction No.");
                     TmpTransHeader.FindSet(); // เลื่อน Pointer ไปที่ตัวแรกเตรียมพร้อมให้ลูปเริ่มทำงาน
                 end;
 

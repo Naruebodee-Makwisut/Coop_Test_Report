@@ -2,7 +2,7 @@ query 50054 "TEST_Store Sales VAT Query"
 {
     QueryType = Normal;
     DataAccessIntent = ReadOnly;
-
+    OrderBy = ascending(Store_No_, POS_Terminal_No_, Transaction_No_);
     elements
     {
         dataitem(TransHeader; "LSC Transaction Header")

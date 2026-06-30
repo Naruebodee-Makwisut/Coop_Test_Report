@@ -2,22 +2,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "BRANCH1",
-            "request": "launch",
             "type": "al",
-            "environmentType": "OnPrem",
-            "server": "http://localhost",
-            "serverInstance": "BC260_BRANCH1",
-            "port": 26059,
-            "authentication": "Windows",
-            "startupObjectId": 22,
-            "startupObjectType": "Page",
-            "breakOnError": "All",
+            "request": "launch",
+            "name": "Your own server",
+            "server": "http://172.188.18.251/",
+            "serverInstance": "BC240_TEST",
+            "port": 7069,
+            "authentication": "UserPassword",
+            "breakOnError": true,
             "launchBrowser": true,
             "enableLongRunningSqlStatements": true,
             "enableSqlInformationDebugger": true,
-            "tenant": "default",
-            "usePublicURLFromServer": true,
             "schemaUpdateMode": "ForceSync"
         }
     ]

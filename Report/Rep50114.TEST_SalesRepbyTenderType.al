@@ -7,7 +7,6 @@ report 50114 "TEST_Sales Rep by Tender Type"
 
     dataset
     {
-        // เปลี่ยนมาใช้สอยลูปด้วยตาราง Integer หลอก ดึงจากหน่วยความจำชั่วคราว
         dataitem(ReportLoop; Integer)
         {
             DataItemTableView = sorting(Number) where(Number = filter(1 ..));
@@ -22,19 +21,19 @@ report 50114 "TEST_Sales Rep by Tender Type"
             { }
             column(ReportFilterText; ReportFilterText)
             { }
-            column(Store_No_TransSale; TmpTransPayEntry."Store No.")
+            column(Store_No_TransSale; TempTransPayEntry."Store No.")
             { }
-            column(POS_Terminal_No_TransPayEntry; TmpTransPayEntry."POS Terminal No.")
+            column(POS_Terminal_No_TransPayEntry; TempTransPayEntry."POS Terminal No.")
             { }
-            column(Tender_Type_TransPayEntry; TmpTransPayEntry."Tender Type")
+            column(Tender_Type_TransPayEntry; TempTransPayEntry."Tender Type")
             { }
             column(Description_TenderTypeTB; TenderDescription)
             { }
-            column(Receipt_No_TransPayEntry; TmpTransPayEntry."Receipt No.")
+            column(Receipt_No_TransPayEntry; TempTransPayEntry."Receipt No.")
             { }
             column(MarkChangeLine; MarkChangeLine)
             { }
-            column(Date_TransPayEntry; Format(TmpTransPayEntry.Date, 0, '<Closing><Day,2>/<Month,2>/<Year4>'))
+            column(Date_TransPayEntry; Format(TempTransPayEntry.Date, 0, '<Closing><Day,2>/<Month,2>/<Year4>'))
             { }
             column(TransType; TransType)
             { }
@@ -44,12 +43,11 @@ report 50114 "TEST_Sales Rep by Tender Type"
             { }
             column(Name_MemberContactTB; MemberContactTB.Name + ' ' + MemberContactTB."Name 2")
             { }
-            column(Amount_Tendered_TransPayEntry; TmpTransPayEntry."Amount Tendered")
+            column(Amount_Tendered_TransPayEntry; TempTransPayEntry."Amount Tendered")
             { }
 
             trigger OnPreDataItem()
             begin
-                // Setup ส่วนตัวกรองงวดวันที่เหมือนเดิม
                 IF Choose1Filter THEN BEGIN
                     DateFilter := FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + '..' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                     PeriodDate := 'ประจำงวดวันที่ ' + FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + ' ถึง ' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
@@ -60,17 +58,11 @@ report 50114 "TEST_Sales Rep by Tender Type"
                         PeriodDate := 'ประจำงวดวันที่ ' + FORMAT(FDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                     END;
 
-                // เคลียร์ข้อมูลเก่าในถังเก็บชั่วคราว
-                TmpTransPayEntry.Reset();
-                TmpTransPayEntry.DeleteAll();
+                TempTransPayEntry.Reset();
+                TempTransPayEntry.DeleteAll();
                 Clear(TmpTenderTypeDesc);
                 Clear(TmpMemberCard);
-                // TmpTenderTypeDesc.Reset();
-                // TmpTenderTypeDesc.DeleteAll();
-                // TmpMemberCard.Reset();
-                // TmpMemberCard.DeleteAll();
 
-                // ตั้งค่าท่อรับข้อมูลให้กับ Query Object ตัวใหม่
                 if DateFilter <> '' then
                     SalesTenderQry.SetFilter(Date_Filter, DateFilter);
                 if StoreFilter <> '' then
@@ -80,47 +72,43 @@ report 50114 "TEST_Sales Rep by Tender Type"
 
                 if CashOnlyFilter then
                     SalesTenderQry.SetFilter(Tender_Type_Filter, '%1|%2', '1', '9')
-                else if TenderTypeFilter <> '' then
-                    SalesTenderQry.SetFilter(Tender_Type_Filter, TenderTypeFilter);
+                else
+                    if TenderTypeFilter <> '' then
+                        SalesTenderQry.SetFilter(Tender_Type_Filter, TenderTypeFilter);
 
                 if StaffFilter <> '' then
                     SalesTenderQry.SetFilter(Staff_Filter, StaffFilter);
                 if ChangeLineFilter then
                     SalesTenderQry.SetRange(Change_Line_Filter, false);
 
-                // ยิงคิวรีรวดเดียวแล้วยัดข้อมูลลงถัง Temp Table บนหน่วยความจำ
                 if SalesTenderQry.Open() then begin
                     while SalesTenderQry.Read() do begin
-                        TmpTransPayEntry.Init();
-                        TmpTransPayEntry."Store No." := SalesTenderQry.Store_No_;
-                        TmpTransPayEntry."POS Terminal No." := SalesTenderQry.POS_Terminal_No_;
-                        TmpTransPayEntry."Transaction No." := SalesTenderQry.Transaction_No_;
-                        TmpTransPayEntry."Line No." := SalesTenderQry.Line_No_;
-                        TmpTransPayEntry."Tender Type" := SalesTenderQry.Tender_Type_;
-                        TmpTransPayEntry."Receipt No." := SalesTenderQry.Receipt_No_;
-                        TmpTransPayEntry.Date := SalesTenderQry.Date;
-                        TmpTransPayEntry."Amount Tendered" := SalesTenderQry.Amount_Tendered;
-                        TmpTransPayEntry."Change Line" := SalesTenderQry.Change_Line;
-                        TmpTransPayEntry."Safe type" := SalesTenderQry.Safe_type;
-                        TmpTransPayEntry.Insert();
+                        TempTransPayEntry.Init();
+                        TempTransPayEntry."Store No." := SalesTenderQry.Store_No_;
+                        TempTransPayEntry."POS Terminal No." := SalesTenderQry.POS_Terminal_No_;
+                        TempTransPayEntry."Transaction No." := SalesTenderQry.Transaction_No_;
+                        TempTransPayEntry."Line No." := SalesTenderQry.Line_No_;
+                        TempTransPayEntry."Tender Type" := SalesTenderQry.Tender_Type_;
+                        TempTransPayEntry."Receipt No." := SalesTenderQry.Receipt_No_;
+                        TempTransPayEntry.Date := SalesTenderQry.Date;
+                        TempTransPayEntry."Amount Tendered" := SalesTenderQry.Amount_Tendered;
+                        TempTransPayEntry."Change Line" := SalesTenderQry.Change_Line;
+                        TempTransPayEntry."Safe type" := SalesTenderQry.Safe_type;
+                        TempTransPayEntry.Insert();
 
-                        // พักรายละเอียดของ Tender Type และเบอร์ Infocode ไว้ใน Temp คู่อื่นๆ
                         KeyText := SalesTenderQry.Store_No_ + '_' + SalesTenderQry.Tender_Type_;
                         if not TmpTenderTypeDesc.ContainsKey(KeyText) then begin
                             TmpTenderTypeDesc.Add(KeyText, SalesTenderQry.Tender_Description);
                             TmpTenderInfocode.Add(KeyText, SalesTenderQry.PLSPOS_Infocode_Card_No_);
                         end;
 
-                        // พักข้อมูลเลขบัตรสมาชิกที่โยงมาจากหัวบิล
                         KeyTextHeader := SalesTenderQry.Store_No_ + '_' + SalesTenderQry.POS_Terminal_No_ + '_' + Format(SalesTenderQry.Transaction_No_);
-                        if (SalesTenderQry.Member_Card_No_ <> '') and (not TmpMemberCard.ContainsKey(KeyTextHeader)) then begin
+                        if (SalesTenderQry.Member_Card_No_ <> '') and (not TmpMemberCard.ContainsKey(KeyTextHeader)) then
                             TmpMemberCard.Add(KeyTextHeader, SalesTenderQry.Member_Card_No_);
-                        end;
                     end;
                     SalesTenderQry.Close();
                 end;
 
-                // ประกอบข้อความหัวรายงาน (Report Filter Text) เหมือนสูตรเดิมของคุณ
                 IF (StoreFilter <> '') THEN ReportFilterText += 'Store No : ' + FORMAT(StoreFilter + ' ');
                 if POSTerminalFilter <> '' then ReportFilterText += ' POS Terminal No. : ' + POSTerminalFilter;
                 if TenderTypeFilter <> '' then ReportFilterText += ' Tender type : ' + TenderTypeFilter;
@@ -128,11 +116,10 @@ report 50114 "TEST_Sales Rep by Tender Type"
                 if CashOnlyFilter then ReportFilterText += ' ยอดขายเงินสด';
                 if ChangeLineFilter then ReportFilterText += ' ไม่แสดงเงินทอน';
 
-                // ตรวจสอบเช็ค Pointer ถ้าไม่เจอบิลสักใบให้ยกเลิกลูปทิ้งทันที
-                if TmpTransPayEntry.IsEmpty() then
+                if TempTransPayEntry.IsEmpty() then
                     CurrReport.Break()
                 else
-                    TmpTransPayEntry.FindSet();
+                    TempTransPayEntry.FindSet();
             end;
 
             trigger OnAfterGetRecord()
@@ -140,41 +127,36 @@ report 50114 "TEST_Sales Rep by Tender Type"
                 CurrentMemberCard: Code[20];
                 CurrentInfocode: Code[20];
             begin
-                // วนลูป Integer เลื่อน Pointer ข้อมูล Temp ขยับไปเรื่อยๆ ทีนละบรรทัด
-                if Number > 1 then begin
-                    if TmpTransPayEntry.Next() = 0 then
+                if Number > 1 then
+                    if TempTransPayEntry.Next() = 0 then
                         CurrReport.Break();
-                end;
 
                 Clear(TransType);
                 Clear(MemberShipCardTB);
                 Clear(MemberContactTB);
 
-                // 1. ตรวจสอบข้อมูลผู้ติดต่อสมาชิก (ดึงข้อมูลจาก Key บิลที่ Cache ไว้ในความจำ)
-                KeyTextHeader := TmpTransPayEntry."Store No." + '_' + TmpTransPayEntry."POS Terminal No." + '_' + Format(TmpTransPayEntry."Transaction No.");
+                KeyTextHeader := TempTransPayEntry."Store No." + '_' + TempTransPayEntry."POS Terminal No." + '_' + Format(TempTransPayEntry."Transaction No.");
                 if TmpMemberCard.ContainsKey(KeyTextHeader) then begin
                     CurrentMemberCard := TmpMemberCard.Get(KeyTextHeader);
                     if MemberShipCardTB.Get(CurrentMemberCard) then
                         if MemberContactTB.Get(MemberShipCardTB."Account No.", MemberShipCardTB."Contact No.") then;
                 end;
 
-                // 2. ดึงรายละเอียดคำอธิบายของ Tender Type ในลูป
                 Clear(TenderDescription);
                 Clear(CardNo);
-                KeyText := TmpTransPayEntry."Store No." + '_' + TmpTransPayEntry."Tender Type";
+                KeyText := TempTransPayEntry."Store No." + '_' + TempTransPayEntry."Tender Type";
                 if TmpTenderTypeDesc.ContainsKey(KeyText) then begin
                     TenderDescription := TmpTenderTypeDesc.Get(KeyText);
                     CurrentInfocode := TmpTenderInfocode.Get(KeyText);
 
-                    // 3. หากมีเงื่อนไข Infocode เลขที่บัตร ให้คิวรีเจาะดึงเฉพาะฟิลด์ Information ทันที
                     if CurrentInfocode <> '' then begin
                         Clear(TransInfoEntry);
                         TransInfoEntry.SetCurrentKey("Store No.", "POS Terminal No.", "Transaction No.", "Transaction Type", "Line No.");
-                        TransInfoEntry.SetRange("Store No.", TmpTransPayEntry."Store No.");
-                        TransInfoEntry.SetRange("POS Terminal No.", TmpTransPayEntry."POS Terminal No.");
-                        TransInfoEntry.SetRange("Transaction No.", TmpTransPayEntry."Transaction No.");
+                        TransInfoEntry.SetRange("Store No.", TempTransPayEntry."Store No.");
+                        TransInfoEntry.SetRange("POS Terminal No.", TempTransPayEntry."POS Terminal No.");
+                        TransInfoEntry.SetRange("Transaction No.", TempTransPayEntry."Transaction No.");
                         TransInfoEntry.SetRange("Transaction Type", TransInfoEntry."Transaction Type"::"Payment Entry");
-                        TransInfoEntry.SetRange("Line No.", TmpTransPayEntry."Line No.");
+                        TransInfoEntry.SetRange("Line No.", TempTransPayEntry."Line No.");
                         TransInfoEntry.SetRange(Infocode, CurrentInfocode);
                         TransInfoEntry.SetLoadFields(Information);
                         if TransInfoEntry.FindFirst() then
@@ -182,12 +164,11 @@ report 50114 "TEST_Sales Rep by Tender Type"
                     end;
                 end;
 
-                // 4. มาร์กเครื่องหมายสำหรับเงินทอนท้ายบรรทัด
                 Clear(MarkChangeLine);
-                if TmpTransPayEntry."Change Line" then
+                if TempTransPayEntry."Change Line" then
                     MarkChangeLine := 'เงินทอน';
-                if TmpTransPayEntry."Safe type" <> TmpTransPayEntry."Safe type"::" " then
-                    MarkChangeLine := Format(TmpTransPayEntry."Safe type");
+                if TempTransPayEntry."Safe type" <> TempTransPayEntry."Safe type"::" " then
+                    MarkChangeLine := Format(TempTransPayEntry."Safe type");
             end;
         }
     }
@@ -207,11 +188,13 @@ report 50114 "TEST_Sales Rep by Tender Type"
                             ApplicationArea = All;
                             TableRelation = "LSC Store"."No.";
                             Caption = 'Store No. :';
+                            ToolTip = 'Specifies the store no. to filter the report.';
                         }
                         field("POS Terminal :"; POSTerminalFilter)
                         {
                             ApplicationArea = All;
                             Caption = 'POS Terminal :';
+                            ToolTip = 'Specifies the POS Terminal to filter the report.';
                             trigger OnLookup(var Text: Text): Boolean
                             begin
                                 Clear(POSTerminalTB);
@@ -226,23 +209,27 @@ report 50114 "TEST_Sales Rep by Tender Type"
                         {
                             ApplicationArea = All;
                             Caption = 'ยอดขายเงินสด :';
+                            ToolTip = 'Specifies the ยอดขายเงินสด to filter the report.';
                         }
                         field("ไม่แสดงเงินทอน :"; ChangeLineFilter)
                         {
                             ApplicationArea = All;
                             Caption = 'ไม่แสดงเงินทอน :';
+                            ToolTip = 'Specifies the ไม่แสดงเงินทอน to filter the report.';
                         }
                         field("Tender Type :"; TenderTypeFilter)
                         {
                             ApplicationArea = All;
                             TableRelation = "LSC Tender Type".Code;
                             Caption = 'Tender Type :';
+                            ToolTip = 'Specifies the Tender Type to filter the report.';
                         }
                         field("Staff ID :"; StaffFilter)
                         {
                             ApplicationArea = All;
                             TableRelation = "LSC Staff".ID;
                             Caption = 'Staff ID :';
+                            ToolTip = 'Specifies the Staff ID to filter the report.';
                         }
                     }
                     group("Date Filter 1")
@@ -251,6 +238,7 @@ report 50114 "TEST_Sales Rep by Tender Type"
                         {
                             ApplicationArea = All;
                             Caption = 'Period';
+                            ToolTip = 'Specifies the Period to filter the report.';
                             trigger OnValidate()
                             begin
                                 if Choose1Filter then
@@ -266,6 +254,7 @@ report 50114 "TEST_Sales Rep by Tender Type"
                                 ApplicationArea = All;
                                 Editable = Choose1Filter;
                                 Caption = 'Start Date';
+                                ToolTip = 'Specifies the Start Date to filter the report.';
                             }
 
                             field("End Date"; TodateFilter)
@@ -273,6 +262,7 @@ report 50114 "TEST_Sales Rep by Tender Type"
                                 ApplicationArea = All;
                                 Editable = Choose1Filter;
                                 Caption = 'End Date';
+                                ToolTip = 'Specifies the End Date to filter the report.';
                             }
                         }
                     }
@@ -282,6 +272,7 @@ report 50114 "TEST_Sales Rep by Tender Type"
                         {
                             ApplicationArea = All;
                             Caption = 'At Date';
+                            ToolTip = 'Specifies the At Date to filter the report.';
                             trigger OnValidate()
                             begin
                                 if Choose2Filter then
@@ -297,6 +288,7 @@ report 50114 "TEST_Sales Rep by Tender Type"
                                 ApplicationArea = All;
                                 Editable = Choose2Filter;
                                 Caption = 'Date';
+                                ToolTip = 'Specifies the Date to filter the report.';
                             }
                         }
                     }
@@ -320,40 +312,48 @@ report 50114 "TEST_Sales Rep by Tender Type"
     end;
 
     var
-        LSVIPRepFunction: Codeunit "PLSR_Report Function";
+        // Record
         ComInfo: Record "Company Information";
         MemberContactTB: Record "LSC Member Contact";
         MemberShipCardTB: Record "LSC Membership Card";
-        TransInfoEntry: Record "LSC Trans. Infocode Entry";
         POSTerminalTB: Record "LSC POS Terminal";
+        TempTransPayEntry: Record "LSC Trans. Payment Entry" temporary;
+        TransInfoEntry: Record "LSC Trans. Infocode Entry";
+
+        // Codeunit
+        LSVIPRepFunction: Codeunit "PLSR_Report Function";
+
+        // Query
         SalesTenderQry: Query "TEST_Sales By Tender Query";
 
-        // ตัวแปร Temporary เก็บข้อมูล Memory เพื่อสปีดความเร็วรายงาน
-        TmpTransPayEntry: Record "LSC Trans. Payment Entry" temporary;
-        TmpTenderTypeDesc: Dictionary of [Text, Text];
-        TmpTenderInfocode: Dictionary of [Text, Code[20]];
+        // Other types
         TmpMemberCard: Dictionary of [Text, Code[20]];
+        TmpTenderInfocode: Dictionary of [Text, Code[20]];
+        TmpTenderTypeDesc: Dictionary of [Text[100], Text[100]];
 
-        KeyText: Text;
-        KeyTextHeader: Text;
-        TenderDescription: Text[100];
-        StoreFilter: Code[20];
-        POSTerminalFilter: Code[20];
-        TenderTypeFilter: Code[20];
-        StaffFilter: Code[20];
-        ShowTime: Text[50];
-        ShowDate: Text[50];
-        DateFilter: Text[100];
-        TransType: Text[50];
-        PeriodDate: Text[150];
-        ReportFilterText: Text[250];
-        CardNo: Text[4];
-        FromDateFilter: Date;
-        TodateFilter: Date;
-        FDateFilter: Date;
         CashOnlyFilter: Boolean;
         ChangeLineFilter: Boolean;
-        MarkChangeLine: Text[30];
         Choose1Filter: Boolean;
         Choose2Filter: Boolean;
+
+        CardNo: Text[4];
+        DateFilter: Text[100];
+        KeyText: Text[100];
+        KeyTextHeader: Text;
+        MarkChangeLine: Text[30];
+        PeriodDate: Text[150];
+        ReportFilterText: Text[250];
+        ShowDate: Text[50];
+        ShowTime: Text[50];
+        TenderDescription: Text[100];
+        TransType: Text[50];
+
+        FDateFilter: Date;
+        FromDateFilter: Date;
+        TodateFilter: Date;
+
+        POSTerminalFilter: Code[20];
+        StaffFilter: Code[20];
+        StoreFilter: Code[20];
+        TenderTypeFilter: Code[20];
 }

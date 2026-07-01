@@ -58,12 +58,11 @@ report 50111 "TEST_Sales Rep by Special Gr"
                         CLEAR(SaleQty);
                         CLEAR(SaleLCY);
 
-                        // >>> ดึงข้อมูลจาก TmpItemSum แทน <<<
-                        TmpItemSum.Reset();
-                        TmpItemSum.SetRange("No.", Item."No.");
-                        if TmpItemSum.FindFirst() then begin
-                            SaleQty := -TmpItemSum."Unit Price"; // ดึงค่า Qty ที่ฝากไว้
-                            SaleLCY := -TmpItemSum."Profit %";   // ดึงค่า Amount ที่ฝากไว้
+                        TempItemSum.Reset();
+                        TempItemSum.SetRange("No.", Item."No.");
+                        if TempItemSum.FindFirst() then begin
+                            SaleQty := -TempItemSum."Unit Price"; // ดึงค่า Qty ที่ฝากไว้
+                            SaleLCY := -TempItemSum."Profit %";   // ดึงค่า Amount ที่ฝากไว้
                         end;
 
                         if not ShowZeroFilter then
@@ -75,7 +74,6 @@ report 50111 "TEST_Sales Rep by Special Gr"
 
             trigger OnPreDataItem()
             begin
-                // --- โค้ดจัดการ DateFilter และ Header_txt เดิมของคุณคงไว้ด้านบน ---
                 IF Choose1Filter THEN BEGIN
                     DateFilter := FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + '..' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                     DateHeader := 'ประจำงวดวันที่ ' + FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + ' ถึง ' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
@@ -92,11 +90,9 @@ report 50111 "TEST_Sales Rep by Special Gr"
                         Header_txt += ' , ' + "Item Special Groups".GETFILTERS
                     else
                         Header_txt := CopyStr("Item Special Groups".GETFILTERS(), 1, 250);
-                // -------------------------------------------------------------
 
-                // >>> แก้ไขโค้ดส่วน QUERY ใน OnPreDataItem <<<
-                TmpItemSum.Reset();
-                TmpItemSum.DeleteAll();
+                TempItemSum.Reset();
+                TempItemSum.DeleteAll();
 
                 if DateFilter <> '' then
                     POSSalesSumQry.SetFilter(Date_Filter, DateFilter);
@@ -105,12 +101,11 @@ report 50111 "TEST_Sales Rep by Special Gr"
 
                 if POSSalesSumQry.Open() then begin
                     while POSSalesSumQry.Read() do begin
-                        TmpItemSum.Init();
-                        TmpItemSum."No." := POSSalesSumQry.Item_No_;
-                        // ใช้ฟิลด์ Decimal ที่มีอยู่ในตาราง Item เป็นที่พักข้อมูลชั่วคราว
-                        TmpItemSum."Unit Price" := POSSalesSumQry.Sum_Quantity;    // พักค่า Qty
-                        TmpItemSum."Profit %" := POSSalesSumQry.Sum_Amount;       // พักค่า Amount
-                        TmpItemSum.Insert();
+                        TempItemSum.Init();
+                        TempItemSum."No." := POSSalesSumQry.Item_No_;
+                        TempItemSum."Unit Price" := POSSalesSumQry.Sum_Quantity;
+                        TempItemSum."Profit %" := POSSalesSumQry.Sum_Amount;
+                        TempItemSum.Insert();
                     end;
                     POSSalesSumQry.Close();
                 end;
@@ -133,11 +128,13 @@ report 50111 "TEST_Sales Rep by Special Gr"
                             ApplicationArea = All;
                             TableRelation = "LSC Store"."No.";
                             Caption = 'Store No. :';
+                            ToolTip = 'Specifies the Store No. to filter the report.';
                         }
                         field("Show Zero:"; ShowZeroFilter)
                         {
                             ApplicationArea = All;
                             Caption = 'Show Zero:';
+                            ToolTip = 'Specifies the Show Zero to filter the report.';
                         }
                     }
                     group("Date Filter 1")
@@ -146,6 +143,7 @@ report 50111 "TEST_Sales Rep by Special Gr"
                         {
                             ApplicationArea = All;
                             Caption = 'Period';
+                            ToolTip = 'Specifies the Period to filter the report.';
                             trigger OnValidate()
                             begin
                                 if Choose1Filter then
@@ -161,6 +159,7 @@ report 50111 "TEST_Sales Rep by Special Gr"
                                 ApplicationArea = All;
                                 Editable = Choose1Filter;
                                 Caption = 'Start Date';
+                                ToolTip = 'Specifies the Start Date to filter the report.';
                             }
 
                             field("End Date"; TodateFilter)
@@ -168,6 +167,7 @@ report 50111 "TEST_Sales Rep by Special Gr"
                                 ApplicationArea = All;
                                 Editable = Choose1Filter;
                                 Caption = 'End Date';
+                                ToolTip = 'Specifies the End Date to filter the report.';
                             }
                         }
                     }
@@ -177,6 +177,7 @@ report 50111 "TEST_Sales Rep by Special Gr"
                         {
                             ApplicationArea = All;
                             Caption = 'At Date';
+                            ToolTip = 'Specifies the At Date to filter the report.';
                             trigger OnValidate()
                             begin
                                 if Choose2Filter then
@@ -192,6 +193,7 @@ report 50111 "TEST_Sales Rep by Special Gr"
                                 ApplicationArea = All;
                                 Editable = Choose2Filter;
                                 Caption = 'Date';
+                                ToolTip = 'Specifies the Date to filter the report.';
                             }
 
                         }
@@ -217,29 +219,32 @@ report 50111 "TEST_Sales Rep by Special Gr"
     end;
 
     var
-        LSVIPRepFunction: Codeunit "PLSR_Report Function";
         ComInfo: Record "Company Information";
-        TransSales: Record "LSC Trans. Sales Entry";
+        TempItemSum: Record Item temporary;
+        // TransSales: Record "LSC Trans. Sales Entry";
+
+        LSVIPRepFunction: Codeunit "PLSR_Report Function";
+
         POSSalesSumQry: Query "TEST_POS Sales Sum Query";
-        TmpItemSum: Record Item temporary;
-        ShowTime: Text[50];
-        ShowDate: Text[50];
-        DateFilter: Text[100];
-        DateHeader: Text[150];
-        Header_txt: Text[250];
-        StoreFilter: Code[20];
-        FromDateFilter: Date;
-        TodateFilter: Date;
-        FDateFilter: Date;
+
         Choose1Filter: Boolean;
         Choose2Filter: Boolean;
         ShowZeroFilter: Boolean;
-        SaleQty: Decimal;
+        FDateFilter: Date;
+        FromDateFilter: Date;
+        TodateFilter: Date;
         SaleLCY: Decimal;
-        Sale_LCYCaptionLbl: Label 'ยอดขายสุทธิ (Inc. VAT)';
-        Qty_CaptionLbl: Label 'จำนวน';
+        SaleQty: Decimal;
+        DateFilter: Text[100];
+        DateHeader: Text[150];
+        Header_txt: Text[250];
+        ShowDate: Text[50];
+        ShowTime: Text[50];
+        StoreFilter: Code[20];
         DescriptionCaptionLbl: Label 'ชื่อสินค้า';
         Item_No_CaptionLbl: Label 'รหัสสินค้า';
+        Qty_CaptionLbl: Label 'จำนวน';
+        Sale_LCYCaptionLbl: Label 'ยอดขายสุทธิ (Inc. VAT)';
         Special_GroupCaptionLbl: Label 'Special Group';
         TotalCaptionLbl: Label 'Total';
 }

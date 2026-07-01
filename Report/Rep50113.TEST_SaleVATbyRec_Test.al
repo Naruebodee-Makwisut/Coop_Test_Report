@@ -37,10 +37,10 @@ report 50113 "TEST_Sale VAT by Rec_Test"
             { }
             column(RunningNum; RunningNum)
             { }
-            // เปลี่ยนมาดึงค่าผ่านตัวแปร TmpTransHeader แทนตารางจริง
-            column(Date_TransHeader; Format(TmpTransHeader.Date, 0, '<Closing><Day,2>/<Month,2>/<Year4>'))
+            // เปลี่ยนมาดึงค่าผ่านตัวแปร TempTransHeader แทนตารางจริง
+            column(Date_TransHeader; Format(TempTransHeader.Date, 0, '<Closing><Day,2>/<Month,2>/<Year4>'))
             { }
-            column(Receipt_No_TransHeader; TmpTransHeader."Receipt No.")
+            column(Receipt_No_TransHeader; TempTransHeader."Receipt No.")
             { }
             column(Full_VAT_No_TransHeader; FullVATNo)
             { }
@@ -48,30 +48,29 @@ report 50113 "TEST_Sale VAT by Rec_Test"
             { }
             column(TransType; TransType)
             { }
-            column(POS_Customer_Name; TmpTransHeader."PLSLC_POS Customer Name" + ' ' + TmpTransHeader."PLSLC_POS Customer Name 2" + ' ' + TmpTransHeader."PLSLC_POS Customer Name 3")
+            column(POS_Customer_Name; TempTransHeader."PLSLC_POS Customer Name" + ' ' + TempTransHeader."PLSLC_POS Customer Name 2" + ' ' + TempTransHeader."PLSLC_POS Customer Name 3")
             { }
-            column(POS_VAT_Registration_TransHeader; TmpTransHeader."PLSLC_POS VAT Registration")
+            column(POS_VAT_Registration_TransHeader; TempTransHeader."PLSLC_POS VAT Registration")
             { }
-            column(POS_Branch_No_TransHeader; TmpTransHeader."PLSLC_POS Branch No.")
+            column(POS_Branch_No_TransHeader; TempTransHeader."PLSLC_POS Branch No.")
             { }
-            column(Store_No_TransHeader; TmpTransHeader."Store No.")
+            column(Store_No_TransHeader; TempTransHeader."Store No.")
             { }
-            column(POS_Terminal_No_; TmpTransHeader."POS Terminal No.")
+            column(POS_Terminal_No_; TempTransHeader."POS Terminal No.")
             { }
-            column(Transaction_No_; TmpTransHeader."Transaction No.")
+            column(Transaction_No_; TempTransHeader."Transaction No.")
             { }
-            column(Net_Amount_TransHeader; -TmpTransHeader."Net Amount")
+            column(Net_Amount_TransHeader; -TempTransHeader."Net Amount")
             { }
             column(VATAmount_TransHeader; VATAmount)
             { }
-            column(Gross_Amount_TransHeader; -TmpTransHeader."Gross Amount")
+            column(Gross_Amount_TransHeader; -TempTransHeader."Gross Amount")
             { }
-            column(Rounded_TransHeader; -TmpTransHeader.Rounded)
+            column(Rounded_TransHeader; -TempTransHeader.Rounded)
             { }
 
             trigger OnPreDataItem()
             begin
-                // --- 1. จัดการ DateFilter และ Text เหมือนเดิม ---
                 IF Choose1Filter THEN BEGIN
                     DateFilter := FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + '..' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                     PeriodDate := 'ประจำงวดวันที่ ' + FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + ' ถึง ' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
@@ -81,19 +80,16 @@ report 50113 "TEST_Sale VAT by Rec_Test"
                         DateFilter := FORMAT(FDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                         PeriodDate := 'ประจำงวดวันที่ ' + FORMAT(FDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                     END;
-                if StoreFilter <> '' then begin
+                if StoreFilter <> '' then
                     ReportFilterText := 'Store No.: ' + StoreFilter;
-                end;
 
-                // --- 2. เคลียร์ตัวแปร Temporary Table ใน Memory ---
-                TmpTransHeader.Reset();
-                TmpTransHeader.DeleteAll();
-                TmpStore.Reset();
-                TmpStore.DeleteAll();
-                TmpPOSTerminal.Reset();
-                TmpPOSTerminal.DeleteAll();
+                TempTransHeader.Reset();
+                TempTransHeader.DeleteAll();
+                TempStore.Reset();
+                TempStore.DeleteAll();
+                TempPOSTerminal.Reset();
+                TempPOSTerminal.DeleteAll();
 
-                // --- 3. ดึงข้อมูลจาก Query ยัดเข้าตัวแปร Temp ตรง ๆ ---
                 StoreVATQry.SetFilter(Receipt_No_Filter, '<>%1', '');
                 StoreVATQry.SetFilter(Entry_Status_Filter, '<>%1', StoreVATQry.Entry_Status_Filter::Voided);
                 if DateFilter <> '' then
@@ -103,106 +99,100 @@ report 50113 "TEST_Sale VAT by Rec_Test"
 
                 if StoreVATQry.Open() then begin
                     while StoreVATQry.Read() do begin
-                        TmpTransHeader.Init();
-                        TmpTransHeader."Store No." := StoreVATQry.Store_No_;
-                        TmpTransHeader."POS Terminal No." := StoreVATQry.POS_Terminal_No_;
-                        TmpTransHeader."Transaction No." := StoreVATQry.Transaction_No_;
-                        TmpTransHeader."Receipt No." := StoreVATQry.Receipt_No_;
-                        TmpTransHeader.Date := StoreVATQry.Date;
-                        TmpTransHeader."Net Amount" := StoreVATQry.Net_Amount;
-                        TmpTransHeader."Gross Amount" := StoreVATQry.Gross_Amount;
-                        TmpTransHeader.Rounded := StoreVATQry.Rounded;
-                        TmpTransHeader."Sale Is Return Sale" := StoreVATQry.Sale_Is_Return_Sale;
-                        TmpTransHeader."PLSLC_Refund Full VAT No." := StoreVATQry.PLSLC_Refund_Full_VAT_No_;
-                        TmpTransHeader."PLSLC_Full VAT No." := StoreVATQry.PLSLC_Full_VAT_No_;
-                        TmpTransHeader."PLSLC_POS Customer Name" := StoreVATQry.PLSLC_POS_Customer_Name;
-                        TmpTransHeader."PLSLC_POS Customer Name 2" := StoreVATQry.PLSLC_POS_Customer_Name_2;
-                        TmpTransHeader."PLSLC_POS Customer Name 3" := StoreVATQry.PLSLC_POS_Customer_Name_3;
-                        TmpTransHeader."PLSLC_POS VAT Registration" := StoreVATQry.PLSLC_POS_VAT_Registration;
-                        TmpTransHeader."PLSLC_POS Branch No." := StoreVATQry.PLSLC_POS_Branch_No_;
-                        TmpTransHeader.Insert();
+                        TempTransHeader.Init();
+                        TempTransHeader."Store No." := StoreVATQry.Store_No_;
+                        TempTransHeader."POS Terminal No." := StoreVATQry.POS_Terminal_No_;
+                        TempTransHeader."Transaction No." := StoreVATQry.Transaction_No_;
+                        TempTransHeader."Receipt No." := StoreVATQry.Receipt_No_;
+                        TempTransHeader.Date := StoreVATQry.Date;
+                        TempTransHeader."Net Amount" := StoreVATQry.Net_Amount;
+                        TempTransHeader."Gross Amount" := StoreVATQry.Gross_Amount;
+                        TempTransHeader.Rounded := StoreVATQry.Rounded;
+                        TempTransHeader."Sale Is Return Sale" := StoreVATQry.Sale_Is_Return_Sale;
+                        TempTransHeader."PLSLC_Refund Full VAT No." := StoreVATQry.PLSLC_Refund_Full_VAT_No_;
+                        TempTransHeader."PLSLC_Full VAT No." := StoreVATQry.PLSLC_Full_VAT_No_;
+                        TempTransHeader."PLSLC_POS Customer Name" := StoreVATQry.PLSLC_POS_Customer_Name;
+                        TempTransHeader."PLSLC_POS Customer Name 2" := StoreVATQry.PLSLC_POS_Customer_Name_2;
+                        TempTransHeader."PLSLC_POS Customer Name 3" := StoreVATQry.PLSLC_POS_Customer_Name_3;
+                        TempTransHeader."PLSLC_POS VAT Registration" := StoreVATQry.PLSLC_POS_VAT_Registration;
+                        TempTransHeader."PLSLC_POS Branch No." := StoreVATQry.PLSLC_POS_Branch_No_;
+                        TempTransHeader.Insert();
 
-                        if not TmpStore.Get(StoreVATQry.Store_No_) then begin
-                            TmpStore.Init();
-                            TmpStore."No." := StoreVATQry.Store_No_;
-                            TmpStore."PLSLC_Branch No." := StoreVATQry.PLSLC_Branch_No_;
-                            TmpStore."PLSLC_Show Full Vat At HQ" := StoreVATQry.PLSLC_Show_Full_Vat_At_HQ;
-                            TmpStore.Address := StoreVATQry.Store_Address;
-                            TmpStore."Address 2" := StoreVATQry.Store_Address_2;
-                            TmpStore."PLSLC_Address 3" := StoreVATQry.PLSLC_Address_3;
-                            TmpStore."PLSLC_Address 4" := StoreVATQry.PLSLC_Address_4;
-                            TmpStore."PLSLC_Address 5" := StoreVATQry.PLSLC_Address_5;
-                            TmpStore.Insert();
+                        if not TempStore.Get(StoreVATQry.Store_No_) then begin
+                            TempStore.Init();
+                            TempStore."No." := StoreVATQry.Store_No_;
+                            TempStore."PLSLC_Branch No." := StoreVATQry.PLSLC_Branch_No_;
+                            TempStore."PLSLC_Show Full Vat At HQ" := StoreVATQry.PLSLC_Show_Full_Vat_At_HQ;
+                            TempStore.Address := StoreVATQry.Store_Address;
+                            TempStore."Address 2" := StoreVATQry.Store_Address_2;
+                            TempStore."PLSLC_Address 3" := StoreVATQry.PLSLC_Address_3;
+                            TempStore."PLSLC_Address 4" := StoreVATQry.PLSLC_Address_4;
+                            TempStore."PLSLC_Address 5" := StoreVATQry.PLSLC_Address_5;
+                            TempStore.Insert();
                         end;
 
-                        if not TmpPOSTerminal.Get(StoreVATQry.POS_Terminal_No_) then begin
-                            TmpPOSTerminal.Init();
-                            TmpPOSTerminal."No." := StoreVATQry.POS_Terminal_No_;
-                            TmpPOSTerminal."PLSLC_POS No." := StoreVATQry.PLSLC_POS_No_;
-                            TmpPOSTerminal.Insert();
+                        if not TempPOSTerminal.Get(StoreVATQry.POS_Terminal_No_) then begin
+                            TempPOSTerminal.Init();
+                            TempPOSTerminal."No." := StoreVATQry.POS_Terminal_No_;
+                            TempPOSTerminal."PLSLC_POS No." := StoreVATQry.PLSLC_POS_No_;
+                            TempPOSTerminal.Insert();
                         end;
                     end;
                     StoreVATQry.Close();
                 end;
 
-                // ตรวจสอบข้อมูลใน Temp ถ้าไม่มีบิลเลยให้ยกเลิกการพิมพ์ loop นี้ไปเลย
-                if TmpTransHeader.IsEmpty() then
+                if TempTransHeader.IsEmpty() then
                     CurrReport.Break()
-                else begin
-                    TmpTransHeader.FindSet(); // เลื่อน Pointer ไปที่ตัวแรกเตรียมพร้อมให้ลูปเริ่มทำงาน
-                end;
+                else
+                    TempTransHeader.FindSet();
 
             end;
 
             trigger OnAfterGetRecord()
             begin
-                // วนลูป Integer ไปเรื่อย ๆ โดยเช็ค Pointer ข้อมูลใน TmpTransHeader
-                if Number > 1 then begin
-                    if TmpTransHeader.Next() = 0 then
+                if Number > 1 then
+                    if TempTransHeader.Next() = 0 then
                         CurrReport.Break(); // ถ้าหมดข้อมูลในคลังแล้ว ให้สั่งหลุดลูป Integer ทันที
-                end;
 
                 Clear(FullVATNo);
                 Clear(StoreTB);
                 Clear(AddrText);
 
-                // ดึงข้อมูล Store มาสเตอร์จากตัวแปร Temp ใน memory
-                if TmpStore.Get(TmpTransHeader."Store No.") then begin
-                    StoreTB := TmpStore;
-                    if TmpStore."PLSLC_Show Full Vat At HQ" then begin
+                if TempStore.Get(TempTransHeader."Store No.") then begin
+                    StoreTB := TempStore;
+                    if TempStore."PLSLC_Show Full Vat At HQ" then begin
                         AddrText[1] := ComInfo.Address;
                         AddrText[2] := ComInfo."Address 2";
                         AddrText[3] := ComInfo.City + ' ' + ComInfo.County + ' ' + ComInfo."Post Code";
                     end else begin
-                        AddrText[1] := TmpStore.Address;
-                        AddrText[2] := TmpStore."Address 2";
-                        AddrText[3] := TmpStore."PLSLC_Address 3";
-                        AddrText[4] := TmpStore."PLSLC_Address 4";
-                        AddrText[5] := TmpStore."PLSLC_Address 5";
+                        AddrText[1] := TempStore.Address;
+                        AddrText[2] := TempStore."Address 2";
+                        AddrText[3] := TempStore."PLSLC_Address 3";
+                        AddrText[4] := TempStore."PLSLC_Address 4";
+                        AddrText[5] := TempStore."PLSLC_Address 5";
                     end;
                 end;
 
-                if OldStoreNo <> TmpTransHeader."Store No." then begin
-                    OldStoreNo := TmpTransHeader."Store No.";
+                if OldStoreNo <> TempTransHeader."Store No." then begin
+                    OldStoreNo := TempTransHeader."Store No.";
                     Clear(RunningNum);
                 end;
                 RunningNum += 1;
 
                 Clear(VATAmount);
-                VATAmount := Round((-TmpTransHeader."Gross Amount") - (-TmpTransHeader."Net Amount"), 0.01, '=');
+                VATAmount := Round((-TempTransHeader."Gross Amount") - (-TempTransHeader."Net Amount"), 0.01, '=');
 
-                // ดึงข้อมูล POS Terminal มาสเตอร์จากตัวแปร Temp ใน memory
                 Clear(POSTerminalTB);
-                if TmpPOSTerminal.Get(TmpTransHeader."POS Terminal No.") then
-                    POSTerminalTB := TmpPOSTerminal;
+                if TempPOSTerminal.Get(TempTransHeader."POS Terminal No.") then
+                    POSTerminalTB := TempPOSTerminal;
 
                 Clear(TransType);
-                if (TmpTransHeader."Sale Is Return Sale") then begin
+                if (TempTransHeader."Sale Is Return Sale") then begin
                     TransType := 'Refund';
-                    FullVATNo := TmpTransHeader."PLSLC_Refund Full VAT No.";
+                    FullVATNo := TempTransHeader."PLSLC_Refund Full VAT No.";
                 end else begin
                     TransType := 'Sales';
-                    FullVATNo := TmpTransHeader."PLSLC_Full VAT No.";
+                    FullVATNo := TempTransHeader."PLSLC_Full VAT No.";
                 end;
             end;
         }
@@ -223,6 +213,7 @@ report 50113 "TEST_Sale VAT by Rec_Test"
                             ApplicationArea = All;
                             TableRelation = "LSC Store"."No.";
                             Caption = 'Store No. :';
+                            ToolTip = 'Specifies the Store No. to filter the report.';
                         }
                     }
                     group("Date Filter 1")
@@ -231,6 +222,7 @@ report 50113 "TEST_Sale VAT by Rec_Test"
                         {
                             ApplicationArea = All;
                             Caption = 'Period';
+                            ToolTip = 'Specifies the Period to filter the report.';
                             trigger OnValidate()
                             begin
                                 if Choose1Filter then
@@ -246,6 +238,7 @@ report 50113 "TEST_Sale VAT by Rec_Test"
                                 ApplicationArea = All;
                                 Editable = Choose1Filter;
                                 Caption = 'Start Date';
+                                ToolTip = 'Specifies the Start Date to filter the report.';
                             }
 
                             field("End Date"; TodateFilter)
@@ -253,6 +246,7 @@ report 50113 "TEST_Sale VAT by Rec_Test"
                                 ApplicationArea = All;
                                 Editable = Choose1Filter;
                                 Caption = 'End Date';
+                                ToolTip = 'Specifies the End Date to filter the report.';
                             }
                         }
                     }
@@ -262,6 +256,7 @@ report 50113 "TEST_Sale VAT by Rec_Test"
                         {
                             ApplicationArea = All;
                             Caption = 'At Date';
+                            ToolTip = 'Specifies the At Date to filter the report.';
                             trigger OnValidate()
                             begin
                                 if Choose2Filter then
@@ -277,6 +272,7 @@ report 50113 "TEST_Sale VAT by Rec_Test"
                                 ApplicationArea = All;
                                 Editable = Choose2Filter;
                                 Caption = 'Date';
+                                ToolTip = 'Specifies the Date to filter the report.';
                             }
                         }
                     }
@@ -301,33 +297,40 @@ report 50113 "TEST_Sale VAT by Rec_Test"
     end;
 
     var
-        LSVIPRepFunction: Codeunit "PLSR_Report Function";
+        // Record
         ComInfo: Record "Company Information";
-        StoreTB: Record "LSC Store";
-        VATBussTB: Record "VAT Business Posting Group";
         POSTerminalTB: Record "LSC POS Terminal";
+        StoreTB: Record "LSC Store";
+        TempPOSTerminal: Record "LSC POS Terminal" temporary;
+        TempStore: Record "LSC Store" temporary;
+        TempTransHeader: Record "LSC Transaction Header" temporary;
+        // VATBussTB: Record "VAT Business Posting Group";
+
+        LSVIPRepFunction: Codeunit "PLSR_Report Function";
+
         StoreVATQry: Query "TEST_Store Sales VAT Query";
 
-        // >>> ประกาศตัวแปรตารางชั่วคราว (Temporary Variables) แบบชัดเจนตรงนี้ <<<
-        TmpTransHeader: Record "LSC Transaction Header" temporary;
-        TmpStore: Record "LSC Store" temporary;
-        TmpPOSTerminal: Record "LSC POS Terminal" temporary;
+        Choose1Filter: Boolean;
+        Choose2Filter: Boolean;
 
-        ShowTime: Text[50];
-        ShowDate: Text[50];
+        FDateFilter: Date;
+        FromDateFilter: Date;
+        TodateFilter: Date;
+
+        VATAmount: Decimal;
+
+        RunningNum: Integer;
+
+        AddrText: array[5] of Text[100];
+
         DateFilter: Text[100];
         PeriodDate: Text[150];
         ReportFilterText: Text[250];
+        ShowDate: Text[50];
+        ShowTime: Text[50];
         TransType: Text[50];
-        AddrText: array[5] of Text[100];
-        StoreFilter: Code[20];
+
+        FullVATNo: Code[20];
         OldStoreNo: Code[20];
-        FullVATNo: code[20];
-        FromDateFilter: Date;
-        TodateFilter: Date;
-        FDateFilter: Date;
-        RunningNum: Integer;
-        VATAmount: Decimal;
-        Choose1Filter: Boolean;
-        Choose2Filter: Boolean;
+        StoreFilter: Code[20];
 }

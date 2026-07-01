@@ -35,19 +35,19 @@ report 50104 "Member Sales History"
             column(CurrTime; Format(CurrTime)) { }
 
             // Data columns — อ่านค่าจาก Current* variables ที่ fill จาก Query
-            column(Member_Account_No_; CurrentMemberAccountNo) { }
-            column(Description_MemberAcc; CurrentMemberAccountDesc) { }
-            column(Store_No_; CurrentStoreNo) { }
-            column(Document_No_; CurrentDocumentNo) { }
-            column("Date"; Format(CurrentDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>')) { }
-            column(SaleIsReturnSale_TransacH; CurrentSaleIsReturnSale) { }
-            column(Item_No_; CurrentItemNo) { }
-            column(Description; CurrentDescription) { }
-            column(Item_Variant_Code; CurrentItemVariantCode) { }
+            column(Member_Account_No_; MemberSalesHistoryQ.Member_Account_No_) { }
+            column(Description_MemberAcc; MemberSalesHistoryQ.Member_Account_Description) { }
+            column(Store_No_; MemberSalesHistoryQ.Store_No_) { }
+            column(Document_No_; MemberSalesHistoryQ.Document_No_) { }
+            column("Date"; Format(MemberSalesHistoryQ.Date, 0, '<Closing><Day,2>/<Month,2>/<Year4>')) { }
+            column(SaleIsReturnSale_TransacH; MemberSalesHistoryQ.Sale_Is_Return_Sale) { }
+            column(Item_No_; MemberSalesHistoryQ.Item_No_) { }
+            column(Description; MemberSalesHistoryQ.Description) { }
+            column(Item_Variant_Code; MemberSalesHistoryQ.Item_Variant_Code) { }
             column(UOM_TransSale; CurrentUOM) { }
             column(QTYTranSale; CurrentQty) { }
             column(PriceTranSale; CurrentPrice) { }
-            column(Discount_Amount; CurrentDiscountAmount) { }
+            column(Discount_Amount; MemberSalesHistoryQ.Discount_Amount) { }
 
             trigger OnPreDataItem()
             begin
@@ -94,17 +94,9 @@ report 50104 "Member Sales History"
                 if not MemberSalesHistoryQ.Read() then
                     CurrReport.Break();
 
-                // ── Fill current variables จากผล Query ──
-                CurrentMemberAccountNo := MemberSalesHistoryQ.Member_Account_No_;
-                CurrentMemberAccountDesc := MemberSalesHistoryQ.Member_Account_Description;
-                CurrentStoreNo := MemberSalesHistoryQ.Store_No_;
-                CurrentDocumentNo := MemberSalesHistoryQ.Document_No_;
-                CurrentDate := MemberSalesHistoryQ.Date;
-                CurrentSaleIsReturnSale := MemberSalesHistoryQ.Sale_Is_Return_Sale;
-                CurrentItemNo := MemberSalesHistoryQ.Item_No_;
-                CurrentDescription := MemberSalesHistoryQ.Description;
-                CurrentItemVariantCode := MemberSalesHistoryQ.Item_Variant_Code;
-                CurrentDiscountAmount := MemberSalesHistoryQ.Discount_Amount;
+                Clear(CurrentQty);
+                Clear(CurrentPrice);
+                Clear(CurrentUOM);
 
                 // ── ตรรกะ UOM / QTY / Price เดิม แต่อ่านจาก Query แทน FindFirst() ──
                 // Priority 1: Trans. Sales Entry (JOIN อยู่แล้วใน Query)

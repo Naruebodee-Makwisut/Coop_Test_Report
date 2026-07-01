@@ -1,75 +1,61 @@
-query 50050 "TransDiscount Q"
+query 50050 "PLSR_Q_DiscEntrySalesItem"
 {
-    Caption = 'Trans Discount Query';
     QueryType = Normal;
-    OrderBy = ascending(Store_No_, POS_Terminal_No_, Transaction_No_, Line_No_);
+    Caption = 'Discount/Coupon Entry Sales Item (Query)';
+    OrderBy = ascending(Store_No), ascending(POS_Terminal_No), ascending(Transaction_No), ascending(Line_No);
 
-    // AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76088) - น้องปอ
+    // AVPWDLSVIP 01/07/2026 > Improve Performance of VIP Report(76088) - น้องปอ
     elements
     {
-        dataitem(TransDiscEntry; "LSC Trans. Discount Entry")
+        dataitem(DiscEntry; "LSC Trans. Discount Entry")
         {
-            filter(StoreFilter; "Store No.") { }
-            filter(PosTerminalNoFilter; "POS Terminal No.") { }
-            filter(TransactionNoFilter; "Transaction No.") { }
-            filter(OfferNoFilter; "Offer No.") { }
+            DataItemTableFilter = "Offer Type" = filter("Total Discount" | Coupon), "Discount Amount" = filter(<> 0);
 
-            column(Store_No_; "Store No.") { }
-            column(POS_Terminal_No_; "POS Terminal No.") { }
-            column(Transaction_No_; "Transaction No.") { }
-            column(Line_No_; "Line No.") { }
-            column(Offer_No_; "Offer No.") { }
-            column(Offer_Type_; "Offer Type") { }
-            column(Discount_Amount_; "Discount Amount") { }
+            column(Store_No; "Store No.")
+            { }
+            column(POS_Terminal_No; "POS Terminal No.")
+            { }
+            column(Transaction_No; "Transaction No.")
+            { }
+            column(Line_No; "Line No.")
+            { }
+            column(Offer_No; "Offer No.")
+            { }
+            column(Offer_Type; "Offer Type")
+            { }
+            column(Discount_Amount; "Discount Amount")
+            { }
 
-            // JOIN: Trans. Sales Entry → ดึง Item No.
-            dataitem(TransSalesEntry; "LSC Trans. Sales Entry")
+            dataitem(TransHeader; "LSC Transaction Header")
             {
-                DataItemLink =
-                    "Store No." = TransDiscEntry."Store No.",
-                    "POS Terminal No." = TransDiscEntry."POS Terminal No.",
-                    "Transaction No." = TransDiscEntry."Transaction No.",
-                    "Line No." = TransDiscEntry."Line No.";
-                SqlJoinType = LeftOuterJoin;
+                DataItemLink = "Store No." = DiscEntry."Store No.", "POS Terminal No." = DiscEntry."POS Terminal No.", "Transaction No." = DiscEntry."Transaction No.";
+                DataItemTableFilter = "Transaction Type" = const(Sales), "Entry Status" = filter(<> Voided);
+                SqlJoinType = InnerJoin;
 
-                column(Item_No_; "Item No.") { }
+                column(Receipt_No; "Receipt No.")
+                { }
+                column(Header_Date; Date)
+                { }
 
-                // JOIN: Item → ดึง Description
-                dataitem(ItemTB; Item)
+                dataitem(SalesEntry; "LSC Trans. Sales Entry")
                 {
-                    DataItemLink = "No." = TransSalesEntry."Item No.";
+                    DataItemLink = "Store No." = DiscEntry."Store No.", "POS Terminal No." = DiscEntry."POS Terminal No.", "Transaction No." = DiscEntry."Transaction No.", "Line No." = DiscEntry."Line No.";
                     SqlJoinType = LeftOuterJoin;
 
-                    column(Item_Description; Description) { }
+                    column(Item_No; "Item No.")
+                    { }
 
-                    // JOIN: LSC Barcodes → ดึง Barcode No.
-                    dataitem(BarcodesTB; "LSC Barcodes")
+                    dataitem(ItemQ; Item)
                     {
-                        DataItemLink = "Item No." = TransSalesEntry."Item No.";
+                        DataItemLink = "No." = SalesEntry."Item No.";
                         SqlJoinType = LeftOuterJoin;
 
-                        column(Barcode_No_; "Barcode No.") { }
-
-                        // JOIN: LSC Periodic Discount → ดึง Description
-                        // ไม่ JOIN CouponHeader เพราะ Offer Type อาจเป็น Coupon
-                        // → จัดการ Coupon Description ด้วย Cache ใน Report แทน
-                        dataitem(PeriodicDiscTB; "LSC Periodic Discount")
-                        {
-                            DataItemLink = "No." = TransDiscEntry."Offer No.";
-                            SqlJoinType = LeftOuterJoin;
-
-                            column(Periodic_Disc_Description; Description) { }
-                        }
+                        column(Item_Description; Description)
+                        { }
                     }
                 }
             }
         }
     }
-
-    trigger OnBeforeOpen()
-    begin
-    end;
-
-
-    // C-AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76088) - น้องปอ
+    // C-AVPWDLSVIP 01/07/2026 > Improve Performance of VIP Report(76088) - น้องปอ
 }

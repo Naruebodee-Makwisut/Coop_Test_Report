@@ -1,63 +1,56 @@
-query 50051 "TransBenefit Q"
+query 50051 "PLSR_Q_BenefitEntrySalesItem"
 {
-    Caption = 'Trans Benefit Query';
     QueryType = Normal;
-    OrderBy = ascending(Store_No_, POS_Terminal_No_, Transaction_No_, Line_No_);
+    Caption = 'Discount Benefit Entry Sales Item (Query)';
+    OrderBy = ascending(Store_No), ascending(POS_Terminal_No), ascending(Transaction_No), ascending(Line_No);
 
-    // AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76088) - น้องปอ
+    // AVPWDLSVIP 01/07/2026 > Improve Performance of VIP Report(76088) - น้องปอ
     elements
     {
-        dataitem(TransBenefitEntry; "LSC Trans. Disc. Benefit Entry")
+        dataitem(BenefitEntry; "LSC Trans. Disc. Benefit Entry")
         {
-            filter(StoreFilter; "Store No.") { }
-            filter(PosTerminalNoFilter; "POS Terminal No.") { }
-            filter(TransactionNoFilter; "Transaction No.") { }
-            filter(OfferNoFilter; "Offer No.") { }
+            DataItemTableFilter = "Offer Type" = const("Total Discount"), Type = filter(Item | Coupon);
 
-            column(Store_No_; "Store No.") { }
-            column(POS_Terminal_No_; "POS Terminal No.") { }
-            column(Transaction_No_; "Transaction No.") { }
-            column(Line_No_; "Line No.") { }
-            column(Offer_No_; "Offer No.") { }
-            column(Offer_Type_; "Offer Type") { }
-            column(No_; "No.") { }
-            column(Quantity_; Quantity) { }
-            column(Value_; Value) { }
-            column(Variant_Code_; "Variant Code") { }
-            column(Type_; Type) { }
+            column(Store_No; "Store No.")
+            { }
+            column(POS_Terminal_No; "POS Terminal No.")
+            { }
+            column(Transaction_No; "Transaction No.")
+            { }
+            column(Line_No; "Line No.")
+            { }
+            column(Offer_No; "Offer No.")
+            { }
+            column(Benefit_Type; Type)
+            { }
+            column(Item_No; "No.")
+            { }
+            column(Benefit_Value; Value)
+            { }
+            column(Benefit_Quantity; Quantity)
+            { }
 
-            // JOIN: Item → ดึง Description
-            dataitem(ItemTB; Item)
+            dataitem(TransHeader; "LSC Transaction Header")
             {
-                DataItemLink = "No." = TransBenefitEntry."No.";
-                SqlJoinType = LeftOuterJoin;
+                DataItemLink = "Store No." = BenefitEntry."Store No.", "POS Terminal No." = BenefitEntry."POS Terminal No.", "Transaction No." = BenefitEntry."Transaction No.";
+                DataItemTableFilter = "Transaction Type" = const(Sales), "Entry Status" = filter(<> Voided);
+                SqlJoinType = InnerJoin;
 
-                column(Item_Description; Description) { }
+                column(Receipt_No; "Receipt No.")
+                { }
+                column(Header_Date; Date)
+                { }
 
-                // JOIN: LSC Barcodes → ดึง Barcode No.
-                dataitem(BarcodesTB; "LSC Barcodes")
+                dataitem(ItemQ; Item)
                 {
-                    DataItemLink = "Item No." = TransBenefitEntry."No.";
+                    DataItemLink = "No." = BenefitEntry."No.";
                     SqlJoinType = LeftOuterJoin;
 
-                    column(Barcode_No_; "Barcode No.") { }
-
-                    // JOIN: LSC Periodic Discount → ดึง Description
-                    dataitem(PeriodicDiscTB; "LSC Periodic Discount")
-                    {
-                        DataItemLink = "No." = TransBenefitEntry."Offer No.";
-                        SqlJoinType = LeftOuterJoin;
-
-                        column(Periodic_Disc_Description; Description) { }
-                    }
+                    column(Item_Description; Description)
+                    { }
                 }
             }
         }
     }
-
-    trigger OnBeforeOpen()
-    begin
-    end;
-
-    // C-AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76088) - น้องปอ
+    // C-AVPWDLSVIP 01/07/2026 > Improve Performance of VIP Report(76088) - น้องปอ
 }

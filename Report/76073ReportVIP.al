@@ -57,6 +57,7 @@ report 50111 "TEST_Sales Rep by Special Gr"
                     begin
                         CLEAR(SaleQty);
                         CLEAR(SaleLCY);
+                        Clear(TempItemSum);
 
                         TempItemSum.Reset();
                         TempItemSum.SetRange("No.", Item."No.");
@@ -75,11 +76,15 @@ report 50111 "TEST_Sales Rep by Special Gr"
             trigger OnPreDataItem()
             begin
                 IF Choose1Filter THEN BEGIN
+                    Clear(DateFilter);
+                    Clear(DateHeader);
                     DateFilter := FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + '..' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                     DateHeader := 'ประจำงวดวันที่ ' + FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + ' ถึง ' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                 END
                 ELSE
                     IF Choose2Filter THEN BEGIN
+                        Clear(DateFilter);
+                        Clear(DateHeader);
                         DateFilter := FORMAT(FDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                         DateHeader := 'ประจำงวดวันที่ ' + FORMAT(FDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                     END;
@@ -91,8 +96,11 @@ report 50111 "TEST_Sales Rep by Special Gr"
                     else
                         Header_txt := CopyStr("Item Special Groups".GETFILTERS(), 1, 250);
 
+                Clear(TempItemSum);
                 TempItemSum.Reset();
                 TempItemSum.DeleteAll();
+
+                Clear(POSSalesSumQry);
 
                 if DateFilter <> '' then
                     POSSalesSumQry.SetFilter(Date_Filter, DateFilter);
@@ -207,6 +215,11 @@ report 50111 "TEST_Sales Rep by Special Gr"
             Choose1Filter := false;
             Choose2Filter := true;
             ShowZeroFilter := true;
+
+            Clear(FromDateFilter);
+            Clear(TodateFilter);
+            Clear(FDateFilter);
+            Clear(StoreFilter);
         end;
 
     }

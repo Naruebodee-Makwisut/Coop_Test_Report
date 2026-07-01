@@ -1,6 +1,6 @@
 query 50045 "PLSR_StoreStockILE_Q"
 {
-    QueryType = Normal;
+    Caption = 'Store Stock ILE';
     DataAccessIntent = ReadOnly;
     OrderBy = ascending(Q_Item_No, Posting_DateF, Location_CodeF);
     elements
@@ -38,6 +38,7 @@ query 50045 "PLSR_StoreStockILE_Q"
 
 query 50046 "PLSR_StoreStockTSE_Q"
 {
+    Caption = 'Store Stock TSE';
     QueryType = Normal;
     DataAccessIntent = ReadOnly;
     OrderBy = ascending(Q_Item_No, Q_Variant_Code, Date);
@@ -74,6 +75,7 @@ query 50046 "PLSR_StoreStockTSE_Q"
 
 query 50047 "PLSR_StoreStockTSES_Q"
 {
+    Caption = 'Store Stock TSES';
     QueryType = Normal;
     DataAccessIntent = ReadOnly;
     OrderBy = ascending(Q_Item_No, Q_Variant_Code, StatusF, Store_No_, Date);

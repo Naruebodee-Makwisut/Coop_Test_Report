@@ -1,18 +1,23 @@
-query 50058 "TEST_Sales By Tender Query"
+query 50052 "PLSR Tender Payment Entry Q"
 {
+    Caption = 'POS Sales Report by Tender Type Query';
     QueryType = Normal;
+    OrderBy = ascending(Store_No_, POS_Terminal_No_, Tender_Type_, Transaction_No_, Line_No_);
     DataAccessIntent = ReadOnly;
 
     elements
     {
         dataitem(TransPayEntry; "LSC Trans. Payment Entry")
         {
+            // กำหนดช่อง Filter ท่อส่งข้อมูลจาก Report
             filter(Date_Filter; "Date") { }
             filter(Store_Filter; "Store No.") { }
             filter(POS_Terminal_Filter; "POS Terminal No.") { }
             filter(Tender_Type_Filter; "Tender Type") { }
             filter(Staff_Filter; "Staff ID") { }
             filter(Change_Line_Filter; "Change Line") { }
+
+            // ดึงฟิลด์ที่ต้องการใช้จาก TransPayEntry
             column(Store_No_; "Store No.") { }
             column(POS_Terminal_No_; "POS Terminal No.") { }
             column(Transaction_No_; "Transaction No.") { }
@@ -24,6 +29,7 @@ query 50058 "TEST_Sales By Tender Query"
             column(Change_Line; "Change Line") { }
             column(Safe_type; "Safe type") { }
 
+            // ชั้นที่ 1: Join เข้ากับตาราง Tender Type เพื่อเอา Description
             dataitem(TenderType; "LSC Tender Type")
             {
                 DataItemLink = "Store No." = TransPayEntry."Store No.", "Code" = TransPayEntry."Tender Type";
@@ -31,6 +37,8 @@ query 50058 "TEST_Sales By Tender Query"
 
                 column(Tender_Description; Description) { }
                 column(PLSPOS_Infocode_Card_No_; "PLSPOS_Infocode Card No.") { }
+
+                // ชั้นที่ 2: ซ้อนลงมาข้างล่าง แต่ดึง Link กลับไปที่ตารางบนสุด (TransPayEntry) เพื่อหา Header บิล
                 dataitem(TransHeader; "LSC Transaction Header")
                 {
                     DataItemLink = "Store No." = TransPayEntry."Store No.", "POS Terminal No." = TransPayEntry."POS Terminal No.", "Transaction No." = TransPayEntry."Transaction No.";

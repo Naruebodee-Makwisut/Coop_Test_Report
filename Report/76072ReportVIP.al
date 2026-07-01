@@ -56,19 +56,6 @@ report 50101 "Sales Report By ProdGroup"
                         PeriodDate := 'ประจำงวดวันที่ ' + Format(FDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                     end;
 
-                // รับ filter จาก RequestFilterFields ของ dataitem หลอก
-                // if TransSaleFilter.GetFilter("Store No.") <> '' then begin
-                //     QuerySalesProdGroup.SetFilter(StoreNoFilter, TransSaleFilter.GetFilter("Store No."));
-                //     ReportFilterText += 'Store No : ' + TransSaleFilter.GetFilter("Store No.") + ' ';
-                // end;
-                // if TransSaleFilter.GetFilter("Item No.") <> '' then begin
-                //     QuerySalesProdGroup.SetFilter(ItemNoFilter, TransSaleFilter.GetFilter("Item No."));
-                //     ReportFilterText += ' Item No: ' + TransSaleFilter.GetFilter("Item No.") + ' ';
-                // end;
-                // if TransSaleFilter.GetFilter("Retail Product Code") <> '' then begin
-                //     QuerySalesProdGroup.SetFilter(ProductGroupFilter, TransSaleFilter.GetFilter("Retail Product Code"));
-                //     ReportFilterText += ' Product Group Code : ' + TransSaleFilter.GetFilter("Retail Product Code") + ' ';
-                // end;
                 if StoreFilter <> '' then begin
                     QuerySalesProdGroup.SetFilter(StoreNoFilter, StoreFilter);
                     ReportFilterText += 'Store No : ' + StoreFilter + ' ';

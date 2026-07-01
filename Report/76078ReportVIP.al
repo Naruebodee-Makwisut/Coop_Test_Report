@@ -1,8 +1,8 @@
-report 50114 "TEST_Sales Rep by Tender Type"
+report 50110 "Sales Rep by Tender Type"
 {
     Caption = 'POS Sales Report by Tender Type';
     DefaultLayout = RDLC;
-    RDLCLayout = './ReportLayouts/Rep50114_POSSalesReportByTenderType.rdl';
+    RDLCLayout = './ReportLayouts/Rep50110_POSSalesReportByTenderType.rdl';
     PreviewMode = PrintLayout;
 
     dataset
@@ -141,8 +141,9 @@ report 50114 "TEST_Sales Rep by Tender Type"
 
                         // พักข้อมูลเลขบัตรสมาชิกที่โยงมาจากหัวบิล
                         KeyTextHeader := SalesTenderQry.Store_No_ + '_' + SalesTenderQry.POS_Terminal_No_ + '_' + Format(SalesTenderQry.Transaction_No_);
-                        if (SalesTenderQry.Member_Card_No_ <> '') and (not TmpMemberCard.ContainsKey(KeyTextHeader)) then
+                        if (SalesTenderQry.Member_Card_No_ <> '') and (not TmpMemberCard.ContainsKey(KeyTextHeader)) then 
                             TmpMemberCard.Add(KeyTextHeader, SalesTenderQry.Member_Card_No_);
+                        
                     end;
                     SalesTenderQry.Close();
                 end;
@@ -168,9 +169,10 @@ report 50114 "TEST_Sales Rep by Tender Type"
                 CurrentInfocode: Code[20];
             begin
                 // วนลูป Integer เลื่อน Pointer ข้อมูล Temp ขยับไปเรื่อยๆ ทีนละบรรทัด
-                if Number > 1 then
+                if Number > 1 then begin
                     if TempTransPayEntry.Next() = 0 then
                         CurrReport.Break();
+                end;
 
                 Clear(TransType);
                 Clear(MemberShipCardTB);
@@ -357,46 +359,49 @@ report 50114 "TEST_Sales Rep by Tender Type"
     end;
 
     var
+        LSVIPRepFunction: Codeunit "PLSR_Report Function";
         ComInfo: Record "Company Information";
         MemberContactTB: Record "LSC Member Contact";
         MemberShipCardTB: Record "LSC Membership Card";
-        POSTerminalTB: Record "LSC POS Terminal";
-        TempTransPayEntry: Record "LSC Trans. Payment Entry" temporary;
         TransInfoEntry: Record "LSC Trans. Infocode Entry";
-        LSVIPRepFunction: Codeunit "PLSR_Report Function";
-        SalesTenderQry: Query "TEST_Sales By Tender Query";
+        POSTerminalTB: Record "LSC POS Terminal";
+        SalesTenderQry: Query "PLSR Tender Payment Entry Q";
+
+        // ตัวแปร Temporary เก็บข้อมูล Memory เพื่อสปีดความเร็วรายงาน
+        TempTransPayEntry: Record "LSC Trans. Payment Entry" temporary;
+        TmpTenderTypeDesc: Dictionary of [Text, Text];
+        TmpTenderInfocode: Dictionary of [Text, Code[20]];
         TmpMemberCard: Dictionary of [Text, Code[20]];
         TmpStoreTotal: Dictionary of [Text, Decimal];
-        TmpTenderInfocode: Dictionary of [Text, Code[20]];
-        TmpTenderTotal: Dictionary of [Text, Decimal];
-        TmpTenderTypeDesc: Dictionary of [Text[100], Text[100]];
         TmpTerminalTotal: Dictionary of [Text, Decimal];
-        CashOnlyFilter: Boolean;
-        ChangeLineFilter: Boolean;
-        Choose1Filter: Boolean;
-        Choose2Filter: Boolean;
-        FDateFilter: Date;
-        FromDateFilter: Date;
-        TodateFilter: Date;
+        TmpTenderTotal: Dictionary of [Text, Decimal];
+
         GrandTotal: Decimal;
-        CardNo: Text[4];
-        DateFilter: Text[100];
-        KeyText: Text[100];
+        StoreKey: Text;
+        TerminalKey: Text;
+        TenderKey: Text;
+        KeyText: Text;
         KeyTextHeader: Text;
-        MarkChangeLine: Text[30];
+        TenderDescription: Text[100];
+        StoreFilter: Code[20];
+        POSTerminalFilter: Code[20];
+        TenderTypeFilter: Code[20];
+        StaffFilter: Code[20];
+        ShowTime: Text[50];
+        ShowDate: Text[50];
+        DateFilter: Text[100];
+        TransType: Text[50];
         PeriodDate: Text[150];
         ReportFilterText: Text[250];
-        ShowDate: Text[50];
-        ShowTime: Text[50];
-        StoreKey: Text;
-        TenderDescription: Text[100];
-        TenderKey: Text;
-        TerminalKey: Text;
-        TransType: Text[50];
-        POSTerminalFilter: Code[20];
-        StaffFilter: Code[20];
-        StoreFilter: Code[20];
-        TenderTypeFilter: Code[20];
+        CardNo: Text[4];
+        FromDateFilter: Date;
+        TodateFilter: Date;
+        FDateFilter: Date;
+        CashOnlyFilter: Boolean;
+        ChangeLineFilter: Boolean;
+        MarkChangeLine: Text[30];
+        Choose1Filter: Boolean;
+        Choose2Filter: Boolean;
 
     local procedure GetStoreTotalSafe(KeytextG: Text): Decimal
     begin

@@ -2,7 +2,7 @@ query 50043 "Member Point Entry Q"
 {
     // ดึง Point ในช่วง Period แยกตาม Entry Type เพื่อให้ Report แยก
     // PointEarned / PointRedeemed / PointAdjust / PointExpire
-    Caption = 'MemberBalancePoint Period';
+    Caption = 'MemberBalancePoint';
     QueryType = Normal;
     OrderBy = ascending(Account_No_, Entry_Type);
 

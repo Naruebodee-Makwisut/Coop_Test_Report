@@ -2,7 +2,7 @@ report 50106 "PLSR_Sales Report By Division2"
 {
     Caption = 'POS Sales Report By Division';
     DefaultLayout = RDLC;
-    RDLCLayout = './ReportLayouts/Rep76070_POSSalesReportByDivision.rdl';
+    RDLCLayout = './ReportLayouts/Rep50106_POSSalesReportByDivision.rdl';
     PreviewMode = PrintLayout;
 
     dataset
@@ -11,7 +11,7 @@ report 50106 "PLSR_Sales Report By Division2"
         {
             DataItemTableView = sorting(Number) where(Number = filter('1..'));
 
-            column(Variant_Code; PosSalesQry.Variant_Code) { } // PosSalesQry. คือการดึงข้อมูลจาก Query แทนดึงตรงๆจาก Table
+            column(Variant_Code; PosSalesQry.Variant_Code) { }
             column(Name_ComInfo; ComInfo.Name) { }
             column(ShowDate; ShowDate) { }
             column(ShowTime; ShowTime) { }
@@ -19,7 +19,7 @@ report 50106 "PLSR_Sales Report By Division2"
             column(ReportFilterText; ReportFilterText) { }
             column(Store_No_TransSale; PosSalesQry.Store_No) { }
             column(Division_Code_TransSale; PosSalesQry.LSC_Division_Code) { }
-            column(Division_TransSale; PosSalesQry.Division_Code + ' - ' + PosSalesQry.Division_Description) { }
+            column(Division_TransSale; Division_TransSale) { }
 
             column(Receipt_No_TransSale; PosSalesQry.Receipt_No) { }
             column(Date_TransSale; Format(PosSalesQry.Date, 0, '<Closing><Day,2>/<Month,2>/<Year4>')) { }
@@ -62,10 +62,7 @@ report 50106 "PLSR_Sales Report By Division2"
                     PosSalesQry.SetFilter(DivisionCodeFilter, DivisionCodeFilter);
                     ReportFilterText += ' Division Code : ' + DivisionCodeFilter + ' ';
                 end;
-                Clear(TransType); //เคลียร์ตัวแปรไว้ก่อน
-                Clear(Qty);
-                Clear(UnitPrice);
-                Clear(BaseQty);
+
                 PosSalesQry.Open();
             end;
 
@@ -75,10 +72,14 @@ report 50106 "PLSR_Sales Report By Division2"
                 if not PosSalesQry.Read() then
                     CurrReport.Break();
 
+                Clear(TransType);
                 TransType := Format(PosSalesQry.Transaction_Type);
                 if PosSalesQry.Return_No_Sale then
                     TransType := 'Refund';
 
+                Clear(Qty);
+                Clear(BaseQty);
+                Clear(UnitPrice);
                 if PosSalesQry.UOM_Quantity <> 0 then
                     Qty := -PosSalesQry.UOM_Quantity
                 else
@@ -90,10 +91,16 @@ report 50106 "PLSR_Sales Report By Division2"
                     UnitPrice := PosSalesQry.Price;
 
                 BaseQty := -PosSalesQry.Quantity;
+
+
+                Clear(Division_TransSale);
+                if PosSalesQry.Division_Code <> '' then
+                    Division_TransSale := PosSalesQry.Division_Code + ' - ' + PosSalesQry.Division_Description;
             end;
 
             trigger OnPostDataItem()
             begin
+
                 PosSalesQry.Close();
             end;
         }
@@ -204,12 +211,12 @@ report 50106 "PLSR_Sales Report By Division2"
     end;
 
     var
-        PosSalesQry: Query "PLSR_Sales Report By DivisionQ"; //ตัวแปรรับคิวรี่มาใช้งาน ไม่ต้องดึง table เยอะ
+        PosSalesQry: Query "PLSR_Sales Report By DivisionQ";
         LSVIPRepFunction: Codeunit "PLSR_Report Function";
         ComInfo: Record "Company Information";
-        // ItemTB: Record Item; ไปอยู่ในคิวรี่แทนแล้ว
-        //  DivisonTB: Record "LSC Division";
-        // TransHeaderTB: Record "LSC Transaction Header";
+        ItemTB: Record Item;
+        DivisonTB: Record "LSC Division";
+        TransHeaderTB: Record "LSC Transaction Header";
         RettailSetup: Record "LSC Retail Setup";
 
         ShowTime: Text[50];
@@ -229,5 +236,6 @@ report 50106 "PLSR_Sales Report By Division2"
         UnitPrice: Decimal;
         Choose1Filter: Boolean;
         Choose2Filter: Boolean;
+        Division_TransSale: Text[250];
 
 }

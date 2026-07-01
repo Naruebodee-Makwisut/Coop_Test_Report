@@ -1,10 +1,10 @@
-report 50110 "PLSR_Store Stock Checking 2"
+report 50105 "Store Stock Checking"
 {
     Caption = 'Store Stock Checking';
     DefaultLayout = RDLC;
     RDLCLayout = './ReportLayouts/Rep50105_StoreStockChecking.rdl';
     PreviewMode = PrintLayout;
-
+    // AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76081) น้องอิง
     dataset
     {
         dataitem(ReportHeader; Integer)
@@ -111,6 +111,11 @@ report 50110 "PLSR_Store Stock Checking 2"
                             ApplicationArea = all;
                             Caption = 'Show Zero :';
                         }
+                        // field("Show Negative :"; ShowNegativeFilter)
+                        // {
+                        //     ApplicationArea = all;
+                        //     Caption = 'Show Negative :';
+                        // }
                     }
                 }
             }
@@ -172,7 +177,6 @@ report 50110 "PLSR_Store Stock Checking 2"
         StoreTB.Reset();
         StoreTB.SetFilter("Location Code", LocationFilter);
         if StoreTB.FindSet() then
-        
             repeat
                 if StoreFilterString <> '' then
                     StoreFilterString += '|';
@@ -192,6 +196,7 @@ report 50110 "PLSR_Store Stock Checking 2"
             if ItemRecord.FindSet() then
                 repeat
                     if RetailSetup."PLSPOS_Show Var for Report VIP" then begin
+                        FindOrCreateItemTB(ItemRecord."No.", '', ItemRecord.Description, ItemRecord."Base Unit of Measure", ItemTB, EntryNo, RetailSetup."PLSPOS_Show Var for Report VIP");
                         ItemVariant.Reset();
                         ItemVariant.SetRange("Item No.", ItemRecord."No.");
                         if ItemVariant.FindSet() then
@@ -208,7 +213,7 @@ report 50110 "PLSR_Store Stock Checking 2"
         Clear(ILEQuery);
         if ItemNoFilter <> '' then ILEQuery.SetRange(Item_No, ItemNoFilter);
         if LocationFilter <> '' then ILEQuery.SetRange(Location_Code, LocationFilter);
-        ILEQuery.SetFilter(Posting_Date, '<=%1', Today);
+        ILEQuery.SetRange(Posting_Date, 0D, Today - 1);
         if not ShowItemBlock then ILEQuery.SetRange(Is_Blocked, false);
         if DivisionFilter <> '' then ILEQuery.SetRange(Division_Code, DivisionFilter);
         if ItemCategoryFilter <> '' then ILEQuery.SetRange(Item_Category, ItemCategoryFilter);
@@ -259,7 +264,7 @@ report 50110 "PLSR_Store Stock Checking 2"
         if IsToday then
             SalesQuery.SetRange(Date_Filter, Today)
         else
-            SalesQuery.SetFilter(Date_Filter, '<%1', Today);
+            SalesQuery.SetRange(Date_Filter, 0D, Today - 1);
 
         SalesQuery.SetFilter(Store_No, StoreFilterStr);
 
@@ -286,7 +291,7 @@ report 50110 "PLSR_Store Stock Checking 2"
         if IsToday then
             StatusQuery.SetRange(Date_Filter, Today)
         else
-            StatusQuery.SetFilter(Date_Filter, '<%1', Today);
+            StatusQuery.SetRange(Date_Filter, 0D, Today - 1);
         StatusQuery.SetFilter(Status, '%1|%2', 1, 2);
         StatusQuery.SetFilter(Store_No, StoreFilterStr);
         if ItemNoFilter <> '' then StatusQuery.SetRange(Item_No, ItemNoFilter);
@@ -341,4 +346,5 @@ report 50110 "PLSR_Store Stock Checking 2"
         ItemTB.Insert();
         exit(true);
     end;
+    // C-AVPWDLSVIP 29/06/2025 > Improve Performance of VIP Report(76081) น้องอิง
 }

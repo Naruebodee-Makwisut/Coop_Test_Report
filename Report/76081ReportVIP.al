@@ -37,10 +37,6 @@ report 50110 "PLSR_Store Stock Checking 2"
 
             trigger OnPreDataItem()
             begin
-                ComInfo.Get();
-                ShowDate := FORMAT(Today, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
-                ShowTime := LSVIPRepFucntion.AVTimeFormat(Time);
-
                 ItemTB.Reset();
                 ItemTB.SetCurrentKey("Search Description");
                 ItemTB.Ascending(true);
@@ -135,7 +131,6 @@ report 50110 "PLSR_Store Stock Checking 2"
         ItemTB: Record "Item" temporary;
         ComInfo: Record "Company Information";
         RetailSetup: Record "LSC Retail Setup";
-        AsOfDateFilter: Date;
         LocationFilter, ItemNoFilter, DivisionFilter, ItemCategoryFilter, ProductGroupFilter : Code[20];
         ShowItemBlock, ShowZeroFilter, ShowNegativeFilter : Boolean;
         ShowDate, ShowTime, ReportFilterText, StoreFilterText : Text;
@@ -150,7 +145,6 @@ report 50110 "PLSR_Store Stock Checking 2"
         StatusQuery: Query "PLSR_StoreStockTSES_Q";
         EntryNo: Integer;
         StoreFilterString: Text;
-        ShowVar: Boolean;
     begin
         if LocationFilter = '' then
             Error('Please input Location filter!');
@@ -173,13 +167,12 @@ report 50110 "PLSR_Store Stock Checking 2"
         ItemTB.Reset();
         ItemTB.DeleteAll();
         EntryNo := 0;
-        AsOfDateFilter := Today;
-        ShowVar := RetailSetup."PLSPOS_Show Var for Report VIP";
 
         StoreFilterString := '';
         StoreTB.Reset();
         StoreTB.SetFilter("Location Code", LocationFilter);
         if StoreTB.FindSet() then
+        
             repeat
                 if StoreFilterString <> '' then
                     StoreFilterString += '|';
@@ -192,39 +185,38 @@ report 50110 "PLSR_Store Stock Checking 2"
             ItemRecord.Reset();
             ItemRecord.SetRange(Type, ItemRecord.Type::Inventory);
             if not ShowItemBlock then ItemRecord.SetRange(Blocked, false);
-            if ItemNoFilter <> '' then ItemRecord.SetFilter("No.", ItemNoFilter);
-            if DivisionFilter <> '' then ItemRecord.SetFilter("LSC Division Code", DivisionFilter);
-            if ItemCategoryFilter <> '' then ItemRecord.SetFilter("Item Category Code", ItemCategoryFilter);
-            if ProductGroupFilter <> '' then ItemRecord.SetFilter("LSC Retail Product Code", ProductGroupFilter);
+            if ItemNoFilter <> '' then ItemRecord.SetRange("No.", ItemNoFilter);
+            if DivisionFilter <> '' then ItemRecord.SetRange("LSC Division Code", DivisionFilter);
+            if ItemCategoryFilter <> '' then ItemRecord.SetRange("Item Category Code", ItemCategoryFilter);
+            if ProductGroupFilter <> '' then ItemRecord.SetRange("LSC Retail Product Code", ProductGroupFilter);
             if ItemRecord.FindSet() then
                 repeat
-                    if ShowVar then begin
-                        FindOrCreateItemTB(ItemRecord."No.", '', ItemRecord.Description, ItemRecord."Base Unit of Measure", ItemTB, EntryNo, ShowVar);
+                    if RetailSetup."PLSPOS_Show Var for Report VIP" then begin
                         ItemVariant.Reset();
                         ItemVariant.SetRange("Item No.", ItemRecord."No.");
                         if ItemVariant.FindSet() then
                             repeat
-                                FindOrCreateItemTB(ItemRecord."No.", ItemVariant.Code, ItemRecord.Description, ItemRecord."Base Unit of Measure", ItemTB, EntryNo, ShowVar);
+                                FindOrCreateItemTB(ItemRecord."No.", ItemVariant.Code, ItemRecord.Description, ItemRecord."Base Unit of Measure", ItemTB, EntryNo, RetailSetup."PLSPOS_Show Var for Report VIP");
                             until ItemVariant.Next() = 0;
                     end else begin
-                        FindOrCreateItemTB(ItemRecord."No.", '', ItemRecord.Description, ItemRecord."Base Unit of Measure", ItemTB, EntryNo, ShowVar);
+                        FindOrCreateItemTB(ItemRecord."No.", '', ItemRecord.Description, ItemRecord."Base Unit of Measure", ItemTB, EntryNo, RetailSetup."PLSPOS_Show Var for Report VIP");
                     end;
                 until ItemRecord.Next() = 0;
         end;
 
         // ---  STEP 2: ดึงยอดคงคลังสุทธิ (ILE) + ยัดฟิลเตอร์เข้าตัว Query ตรงๆ เพื่อความเร็วระดับ SQL ---
         Clear(ILEQuery);
-        if ItemNoFilter <> '' then ILEQuery.SetFilter(Item_No, ItemNoFilter);
-        if LocationFilter <> '' then ILEQuery.SetFilter(Location_Code, LocationFilter);
-        ILEQuery.SetFilter(Posting_Date, '<=%1', AsOfDateFilter);
+        if ItemNoFilter <> '' then ILEQuery.SetRange(Item_No, ItemNoFilter);
+        if LocationFilter <> '' then ILEQuery.SetRange(Location_Code, LocationFilter);
+        ILEQuery.SetFilter(Posting_Date, '<=%1', Today);
         if not ShowItemBlock then ILEQuery.SetRange(Is_Blocked, false);
-        if DivisionFilter <> '' then ILEQuery.SetFilter(Division_Code, DivisionFilter);
-        if ItemCategoryFilter <> '' then ILEQuery.SetFilter(Item_Category, ItemCategoryFilter);
-        if ProductGroupFilter <> '' then ILEQuery.SetFilter(Product_Group, ProductGroupFilter);
+        if DivisionFilter <> '' then ILEQuery.SetRange(Division_Code, DivisionFilter);
+        if ItemCategoryFilter <> '' then ILEQuery.SetRange(Item_Category, ItemCategoryFilter);
+        if ProductGroupFilter <> '' then ILEQuery.SetRange(Product_Group, ProductGroupFilter);
 
         if ILEQuery.Open() then begin
             while ILEQuery.Read() do begin
-                if FindOrCreateItemTB(ILEQuery.Q_Item_No, ILEQuery.Q_Variant_Code, ILEQuery.Item_Desc, ILEQuery.Base_UOM, ItemTB, EntryNo, ShowVar) then begin
+                if FindOrCreateItemTB(ILEQuery.Q_Item_No, ILEQuery.Q_Variant_Code, ILEQuery.Item_Desc, ILEQuery.Base_UOM, ItemTB, EntryNo, RetailSetup."PLSPOS_Show Var for Report VIP") then begin
                     ItemTB."Unit Price" += ILEQuery.Sum_Remaining_Qty;
                     ItemTB.Modify();
                 end;
@@ -232,86 +224,9 @@ report 50110 "PLSR_Store Stock Checking 2"
             ILEQuery.Close();
         end;
 
-        // ---  STEP 3: ดึงยอดขายของวันนี้ ---
-        Clear(SalesQuery);
-        SalesQuery.SetRange(Date_Filter, Today);
-        SalesQuery.SetFilter(Store_No, StoreFilterString);
-        if ItemNoFilter <> '' then SalesQuery.SetFilter(Item_No, ItemNoFilter);
-        if not ShowItemBlock then SalesQuery.SetRange(Is_Blocked, false);
-        if DivisionFilter <> '' then SalesQuery.SetFilter(Division_Code, DivisionFilter);
-        if ItemCategoryFilter <> '' then SalesQuery.SetFilter(Item_Category, ItemCategoryFilter);
-        if ProductGroupFilter <> '' then SalesQuery.SetFilter(Product_Group, ProductGroupFilter);
-
-        if SalesQuery.Open() then begin
-            while SalesQuery.Read() do begin
-                if FindOrCreateItemTB(SalesQuery.Q_Item_No, SalesQuery.Q_Variant_Code, SalesQuery.Item_Desc, SalesQuery.Base_UOM, ItemTB, EntryNo, ShowVar) then begin
-                    ItemTB."Unit Cost" += SalesQuery.Sum_Quantity;
-                    ItemTB.Modify();
-                end;
-            end;
-            SalesQuery.Close();
-        end;
-
-        Clear(StatusQuery);
-        StatusQuery.SetRange(Date_Filter, Today);
-        StatusQuery.SetFilter(Status, '%1|%2', 1, 2);
-        StatusQuery.SetFilter(Store_No, StoreFilterString);
-        if ItemNoFilter <> '' then StatusQuery.SetFilter(Item_No, ItemNoFilter);
-        if not ShowItemBlock then StatusQuery.SetRange(Is_Blocked, false);
-        if DivisionFilter <> '' then StatusQuery.SetFilter(Division_Code, DivisionFilter);
-        if ItemCategoryFilter <> '' then StatusQuery.SetFilter(Item_Category, ItemCategoryFilter);
-        if ProductGroupFilter <> '' then StatusQuery.SetFilter(Product_Group, ProductGroupFilter);
-
-        if StatusQuery.Open() then begin
-            while StatusQuery.Read() do begin
-                if FindOrCreateItemTB(StatusQuery.Q_Item_No, StatusQuery.Q_Variant_Code, StatusQuery.Item_Desc, StatusQuery.Base_UOM, ItemTB, EntryNo, ShowVar) then begin
-                    ItemTB."Unit Cost" -= StatusQuery.Sum_Quantity;
-                    ItemTB.Modify();
-                end;
-            end;
-            StatusQuery.Close();
-        end;
-
-        // ---  STEP 4: ดึงยอดขายในอดีต ---
-        Clear(SalesQuery);
-        SalesQuery.SetFilter(Date_Filter, '<%1', Today);
-        SalesQuery.SetFilter(Store_No, StoreFilterString);
-        if ItemNoFilter <> '' then SalesQuery.SetFilter(Item_No, ItemNoFilter);
-        if not ShowItemBlock then SalesQuery.SetRange(Is_Blocked, false);
-        if DivisionFilter <> '' then SalesQuery.SetFilter(Division_Code, DivisionFilter);
-        if ItemCategoryFilter <> '' then SalesQuery.SetFilter(Item_Category, ItemCategoryFilter);
-        if ProductGroupFilter <> '' then SalesQuery.SetFilter(Product_Group, ProductGroupFilter);
-
-        if SalesQuery.Open() then begin
-            while SalesQuery.Read() do begin
-                if FindOrCreateItemTB(SalesQuery.Q_Item_No, SalesQuery.Q_Variant_Code, SalesQuery.Item_Desc, SalesQuery.Base_UOM, ItemTB, EntryNo, ShowVar) then begin
-                    ItemTB."Standard Cost" += SalesQuery.Sum_Quantity;
-                    ItemTB.Modify();
-                end;
-            end;
-            SalesQuery.Close();
-        end;
-
-        Clear(StatusQuery);
-        StatusQuery.SetFilter(Date_Filter, '<%1', Today);
-        StatusQuery.SetFilter(Status, '%1|%2', 1, 2);
-        StatusQuery.SetFilter(Store_No, StoreFilterString);
-        if ItemNoFilter <> '' then StatusQuery.SetFilter(Item_No, ItemNoFilter);
-        if not ShowItemBlock then StatusQuery.SetRange(Is_Blocked, false);
-        if DivisionFilter <> '' then StatusQuery.SetFilter(Division_Code, DivisionFilter);
-        if ItemCategoryFilter <> '' then StatusQuery.SetFilter(Item_Category, ItemCategoryFilter);
-        if ProductGroupFilter <> '' then StatusQuery.SetFilter(Product_Group, ProductGroupFilter);
-
-        if StatusQuery.Open() then begin
-            while StatusQuery.Read() do begin
-                if FindOrCreateItemTB(StatusQuery.Q_Item_No, StatusQuery.Q_Variant_Code, StatusQuery.Item_Desc, StatusQuery.Base_UOM, ItemTB, EntryNo, ShowVar) then begin
-                    ItemTB."Standard Cost" -= StatusQuery.Sum_Quantity;
-                    ItemTB.Modify();
-                end;
-            end;
-            StatusQuery.Close();
-        end;
-
+        // ---  STEP 3: ดึงยอดขายของวันนี้ STEP 4: ดึงยอดขายในอดีต ---
+        ProcessSalesAndStatusData(true, StoreFilterString, EntryNo);  // ยอดวันนี้
+        ProcessSalesAndStatusData(false, StoreFilterString, EntryNo); // ยอดอดีต
         // ---  STEP 5: คำนวณยอดสุทธิใน Memory (ข้อมูลคลีนหมดจดแล้ว ไม่มีการยิง SQL GET อีกต่อไป!) ---
         ItemTB.Reset();
         if ItemTB.FindSet() then
@@ -335,6 +250,64 @@ report 50110 "PLSR_Store Stock Checking 2"
         ItemTB.Reset();
     end;
 
+    local procedure ProcessSalesAndStatusData(IsToday: Boolean; StoreFilterStr: Text; var CurrentEntryNo: Integer)
+    var
+        SalesQuery: Query "PLSR_StoreStockTSE_Q";
+        StatusQuery: Query "PLSR_StoreStockTSES_Q";
+    begin
+        Clear(SalesQuery);
+        if IsToday then
+            SalesQuery.SetRange(Date_Filter, Today)
+        else
+            SalesQuery.SetFilter(Date_Filter, '<%1', Today);
+
+        SalesQuery.SetFilter(Store_No, StoreFilterStr);
+
+        if ItemNoFilter <> '' then SalesQuery.SetRange(Item_No, ItemNoFilter);
+        if not ShowItemBlock then SalesQuery.SetRange(Is_Blocked, false);
+        if DivisionFilter <> '' then SalesQuery.SetRange(Division_Code, DivisionFilter);
+        if ItemCategoryFilter <> '' then SalesQuery.SetRange(Item_Category, ItemCategoryFilter);
+        if ProductGroupFilter <> '' then SalesQuery.SetRange(Product_Group, ProductGroupFilter);
+
+        if SalesQuery.Open() then begin
+            while SalesQuery.Read() do begin
+                if FindOrCreateItemTB(SalesQuery.Q_Item_No, SalesQuery.Q_Variant_Code, SalesQuery.Item_Desc, SalesQuery.Base_UOM, ItemTB, CurrentEntryNo, RetailSetup."PLSPOS_Show Var for Report VIP") then begin
+                    if IsToday then
+                        ItemTB."Unit Cost" += SalesQuery.Sum_Quantity
+                    else
+                        ItemTB."Standard Cost" += SalesQuery.Sum_Quantity;
+                    ItemTB.Modify();
+                end;
+            end;
+            SalesQuery.Close();
+        end;
+
+        Clear(StatusQuery);
+        if IsToday then
+            StatusQuery.SetRange(Date_Filter, Today)
+        else
+            StatusQuery.SetFilter(Date_Filter, '<%1', Today);
+        StatusQuery.SetFilter(Status, '%1|%2', 1, 2);
+        StatusQuery.SetFilter(Store_No, StoreFilterStr);
+        if ItemNoFilter <> '' then StatusQuery.SetRange(Item_No, ItemNoFilter);
+        if not ShowItemBlock then StatusQuery.SetRange(Is_Blocked, false);
+        if DivisionFilter <> '' then StatusQuery.SetRange(Division_Code, DivisionFilter);
+        if ItemCategoryFilter <> '' then StatusQuery.SetRange(Item_Category, ItemCategoryFilter);
+        if ProductGroupFilter <> '' then StatusQuery.SetRange(Product_Group, ProductGroupFilter);
+
+        if StatusQuery.Open() then begin
+            while StatusQuery.Read() do begin
+                if FindOrCreateItemTB(StatusQuery.Q_Item_No, StatusQuery.Q_Variant_Code, StatusQuery.Item_Desc, StatusQuery.Base_UOM, ItemTB, CurrentEntryNo, RetailSetup."PLSPOS_Show Var for Report VIP") then begin
+                    if IsToday then
+                        ItemTB."Unit Cost" -= StatusQuery.Sum_Quantity
+                    else
+                        ItemTB."Standard Cost" -= StatusQuery.Sum_Quantity;
+                    ItemTB.Modify();
+                end;
+            end;
+            StatusQuery.Close();
+        end;
+    end;
     // แก้ไขฟังก์ชันให้รับชื่อและหน่วยนับมาหยอดเข้า Temporary Table ทันทีที่ถูกสร้าง
     local procedure FindOrCreateItemTB(ItemNo: Code[20]; VariantCode: Code[20]; ItemDesc: Text[100]; BaseUOM: Code[10]; var ItemTB: Record Item temporary; var EntryNo: Integer; ShowVar: Boolean): Boolean
     var

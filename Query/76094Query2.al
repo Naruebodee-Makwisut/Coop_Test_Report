@@ -1,4 +1,4 @@
-query 50043 "Member Point Period Q"
+query 50043 "Member Point Entry Q"
 {
     // ดึง Point ในช่วง Period แยกตาม Entry Type เพื่อให้ Report แยก
     // PointEarned / PointRedeemed / PointAdjust / PointExpire

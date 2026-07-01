@@ -46,34 +46,37 @@ report 50103 "Member Balance Point"
                     repeat
                         Clear(AVTempMemberTB);
                         AVTempMemberTB.Init();
-                        AVTempMemberTB."No." := MemberAccountTB."No.";
-                        AVTempMemberTB.Description := MemberAccountTB.Description;
+                        // AVTempMemberTB."No." := MemberAccountTB."No.";
+                        // AVTempMemberTB.Description := MemberAccountTB.Description;
+                        AVTempMemberTB.TransferFields(MemberAccountTB);
                         AVTempMemberTB.Insert();
                     until MemberAccountTB.Next() = 0;
 
                 // === Step 2: Query BF → update Temp Table ===
-                QueryPointBF.SetFilter(Date, '..%1', FromDateFilter - 1);
+                // QueryPointBF.SetFilter(Date, '..%1', FromDateFilter - 1);
+                QueryPointBF.SetRange(Date, 0D, FromDateFilter - 1);
                 if MemberAccountLoader.GetFilter("No.") <> '' then
                     QueryPointBF.SetFilter(Account_No, MemberAccountLoader.GetFilter("No."));
                 QueryPointBF.Open();
                 while QueryPointBF.Read() do begin
                     AVTempMemberTB.Reset();  // ← Reset แทน Clear เพื่อล้าง filter เฉยๆ ไม่ล้าง record
-                    AVTempMemberTB.SetRange("No.", QueryPointBF.Account_No_);
-                    if AVTempMemberTB.FindFirst() then begin
+                    // AVTempMemberTB.SetRange("No.", QueryPointBF.Account_No_);
+                    if AVTempMemberTB.Get(QueryPointBF.Account_No_) then begin
                         AVTempMemberTB."Expired Points" += QueryPointBF.Points;
                         AVTempMemberTB.Modify();
                     end;
                 end;
+                QueryPointBF.Close();
 
                 // === Step 3: Query In Period → update Temp Table ===
-                QueryPointInPeriod.SetFilter(Date, '%1..%2', FromDateFilter, TodateFilter);
+                QueryPointInPeriod.SetRange(Date, FromDateFilter, TodateFilter);
                 if MemberAccountLoader.GetFilter("No.") <> '' then
                     QueryPointInPeriod.SetFilter(Account_No, MemberAccountLoader.GetFilter("No."));
                 QueryPointInPeriod.Open();
                 while QueryPointInPeriod.Read() do begin
                     AVTempMemberTB.Reset();  // ← Reset แทน Clear
-                    AVTempMemberTB.SetRange("No.", QueryPointInPeriod.Account_No_);
-                    if AVTempMemberTB.FindFirst() then begin
+                    // AVTempMemberTB.SetRange("No.", QueryPointInPeriod.Account_No_);
+                    if AVTempMemberTB.Get(QueryPointInPeriod.Account_No_) then begin
                         case QueryPointInPeriod.Entry_Type of
                             QueryPointInPeriod.Entry_Type::Sales:
                                 AVTempMemberTB."Issued Award Points" += QueryPointInPeriod.Points;
@@ -88,6 +91,7 @@ report 50103 "Member Balance Point"
                         AVTempMemberTB.Modify();
                     end;
                 end;
+                QueryPointInPeriod.Close();
 
                 CurrReport.Break();
                 //======================แบบออกทุก Account No.=============================
@@ -176,9 +180,9 @@ report 50103 "Member Balance Point"
 
             trigger OnPreDataItem()
             begin
-                ComInfo.Get();
-                ShowDate := FORMAT(Today, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
-                ShowTime := LSVIPRepFunction.AVTimeFormat(Time);
+                // ComInfo.Get();
+                // ShowDate := FORMAT(Today, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
+                // ShowTime := LSVIPRepFunction.AVTimeFormat(Time);
 
                 // Reset ไว้ก่อน ยังไม่ FindSet ที่นี่
                 AVTempMemberTB.Reset();
@@ -244,8 +248,9 @@ report 50103 "Member Balance Point"
         MemberAccountTB: Record "LSC Member Account";
         LSVIPRepFunction: Codeunit "PLSR_Report Function";
         AVTempMemberTB: Record "LSC Member Account" temporary;
-        QueryPointBF: Query "Member Point BF Q";
-        QueryPointInPeriod: Query "Member Point Period Q";
+        // QueryPointBF: Query "Member Point BF Q";
+        QueryPointBF: Query "Member Point Entry Q";
+        QueryPointInPeriod: Query "Member Point Entry Q";
         DateFilter: Text[100];
         PeriodDate: Text[150];
         ReportFilterText: Text;

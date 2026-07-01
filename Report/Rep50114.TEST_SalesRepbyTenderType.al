@@ -168,7 +168,11 @@ report 50114 "TEST_Sales Rep by Tender Type"
                 CurrentInfocode: Code[20];
             begin
                 // วนลูป Integer เลื่อน Pointer ข้อมูล Temp ขยับไปเรื่อยๆ ทีนละบรรทัด
+<<<<<<< HEAD
                 if Number > 1 then begin
+=======
+                if Number > 1 then
+>>>>>>> 510f886f521bbf43b41fb921d60873e67be8a030
                     if TempTransPayEntry.Next() = 0 then
                         CurrReport.Break();
                 end;
@@ -234,6 +238,10 @@ report 50114 "TEST_Sales Rep by Tender Type"
                             ApplicationArea = All;
                             TableRelation = "LSC Store"."No.";
                             Caption = 'Store No. :';
+<<<<<<< HEAD
+=======
+                            ToolTip = 'Specifies the Store No. to filter the report.';
+>>>>>>> 510f886f521bbf43b41fb921d60873e67be8a030
                         }
                         field("POS Terminal :"; POSTerminalFilter)
                         {
@@ -347,11 +355,15 @@ report 50114 "TEST_Sales Rep by Tender Type"
     end;
 
     var
+<<<<<<< HEAD
         LSVIPRepFunction: Codeunit "PLSR_Report Function";
+=======
+>>>>>>> 510f886f521bbf43b41fb921d60873e67be8a030
         ComInfo: Record "Company Information";
         MemberContactTB: Record "LSC Member Contact";
         MemberShipCardTB: Record "LSC Membership Card";
         TransInfoEntry: Record "LSC Trans. Infocode Entry";
+<<<<<<< HEAD
         POSTerminalTB: Record "LSC POS Terminal";
         SalesTenderQry: Query "TEST_Sales By Tender Query";
 
@@ -385,11 +397,22 @@ report 50114 "TEST_Sales Rep by Tender Type"
         FromDateFilter: Date;
         TodateFilter: Date;
         FDateFilter: Date;
+=======
+        LSVIPRepFunction: Codeunit "PLSR_Report Function";
+        SalesTenderQry: Query "TEST_Sales By Tender Query";
+        TmpMemberCard: Dictionary of [Text, Code[20]];
+        TmpStoreTotal: Dictionary of [Text, Decimal];
+        TmpTenderInfocode: Dictionary of [Text, Code[20]];
+        TmpTenderTotal: Dictionary of [Text, Decimal];
+        TmpTenderTypeDesc: Dictionary of [Text[100], Text[100]];
+        TmpTerminalTotal: Dictionary of [Text, Decimal];
+>>>>>>> 510f886f521bbf43b41fb921d60873e67be8a030
         CashOnlyFilter: Boolean;
         ChangeLineFilter: Boolean;
         MarkChangeLine: Text[30];
         Choose1Filter: Boolean;
         Choose2Filter: Boolean;
+<<<<<<< HEAD
 
     local procedure GetStoreTotalSafe(Keytext: Text): Decimal
     begin
@@ -409,6 +432,49 @@ report 50114 "TEST_Sales Rep by Tender Type"
     begin
         if TmpTenderTotal.ContainsKey(Keytext) then
             exit(TmpTenderTotal.Get(Keytext));
+=======
+        FDateFilter: Date;
+        FromDateFilter: Date;
+        TodateFilter: Date;
+        GrandTotal: Decimal;
+        CardNo: Text[4];
+        DateFilter: Text[100];
+        KeyText: Text[100];
+        KeyTextHeader: Text;
+        MarkChangeLine: Text[30];
+        PeriodDate: Text[150];
+        ReportFilterText: Text[250];
+        ShowDate: Text[50];
+        ShowTime: Text[50];
+        StoreKey: Text;
+        TenderDescription: Text[100];
+        TenderKey: Text;
+        TerminalKey: Text;
+        TransType: Text[50];
+        POSTerminalFilter: Code[20];
+        StaffFilter: Code[20];
+        StoreFilter: Code[20];
+        TenderTypeFilter: Code[20];
+
+    local procedure GetStoreTotalSafe(KeytextG: Text): Decimal
+    begin
+        if TmpStoreTotal.ContainsKey(KeytextG) then
+            exit(TmpStoreTotal.Get(KeytextG));
+        exit(0);
+    end;
+
+    local procedure GetTerminalTotalSafe(KeytextG: Text): Decimal
+    begin
+        if TmpTerminalTotal.ContainsKey(KeytextG) then
+            exit(TmpTerminalTotal.Get(KeytextG));
+        exit(0);
+    end;
+
+    local procedure GetTenderTotalSafe(KeytextG: Text): Decimal
+    begin
+        if TmpTenderTotal.ContainsKey(KeytextG) then
+            exit(TmpTenderTotal.Get(KeytextG));
+>>>>>>> 510f886f521bbf43b41fb921d60873e67be8a030
         exit(0);
     end;
 

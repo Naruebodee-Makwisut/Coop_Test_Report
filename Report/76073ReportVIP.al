@@ -57,11 +57,8 @@ report 50111 "TEST_Sales Rep by Special Gr"
                     begin
                         CLEAR(SaleQty);
                         CLEAR(SaleLCY);
-                        Clear(TempItemSum);
-
                         TempItemSum.Reset();
-                        TempItemSum.SetRange("No.", Item."No.");
-                        if TempItemSum.FindFirst() then begin
+                        if TempItemSum.Get(Item."No.") then begin
                             SaleQty := -TempItemSum."Unit Price"; // ดึงค่า Qty ที่ฝากไว้
                             SaleLCY := -TempItemSum."Profit %";   // ดึงค่า Amount ที่ฝากไว้
                         end;
@@ -75,19 +72,18 @@ report 50111 "TEST_Sales Rep by Special Gr"
 
             trigger OnPreDataItem()
             begin
+                Clear(DateFilter);
+                Clear(DateHeader);
                 IF Choose1Filter THEN BEGIN
-                    Clear(DateFilter);
-                    Clear(DateHeader);
                     DateFilter := FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + '..' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                     DateHeader := 'ประจำงวดวันที่ ' + FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + ' ถึง ' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                 END
                 ELSE
                     IF Choose2Filter THEN BEGIN
-                        Clear(DateFilter);
-                        Clear(DateHeader);
                         DateFilter := FORMAT(FDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                         DateHeader := 'ประจำงวดวันที่ ' + FORMAT(FDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                     END;
+                Clear(Header_txt);
                 IF (StoreFilter <> '') THEN
                     Header_txt += 'Store No : ' + FORMAT(StoreFilter + ' ');
                 IF ("Item Special Groups".GETFILTERS <> '') THEN
@@ -96,7 +92,6 @@ report 50111 "TEST_Sales Rep by Special Gr"
                     else
                         Header_txt := CopyStr("Item Special Groups".GETFILTERS(), 1, 250);
 
-                Clear(TempItemSum);
                 TempItemSum.Reset();
                 TempItemSum.DeleteAll();
 
@@ -218,7 +213,6 @@ report 50111 "TEST_Sales Rep by Special Gr"
 
             Clear(FromDateFilter);
             Clear(TodateFilter);
-            Clear(FDateFilter);
             Clear(StoreFilter);
         end;
 

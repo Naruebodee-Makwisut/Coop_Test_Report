@@ -37,14 +37,17 @@ report 50115 "PLSR_Active Member 2"
                 CompanyInforTB.Get();
 
                 if (FilterMemberName <> '') or (FilterPhoneNo <> '') or (FilterIDCard <> '') then begin
+                    Clear(MemberContactTB);
                     if FilterMemberName <> '' then begin
                         FilterMemberName := '*' + UpperCase(FilterMemberName) + '*';
-                        MemberSalesQry.SetFilter(Search_Name, FilterMemberName);
+                        MemberContactTB.SetFilter("Search Name", FilterMemberName);
                     end;
                     if FilterPhoneNo <> '' then
-                        MemberSalesQry.SetRange(Mobile_Phone_No_, FilterPhoneNo);
+                        MemberContactTB.SetRange("Mobile Phone No.", FilterPhoneNo);
                     if FilterIDCard <> '' then
-                        MemberSalesQry.SetRange(PLSWS_ID_Card_No_, FilterIDCard);
+                        MemberContactTB.SetRange("PLSWS_ID Card No.", FilterIDCard);
+                    if MemberContactTB.FindFirst() then
+                        MemberSalesQry.SetRange(MemberAccountNo, MemberContactTB."Account No.");
                 end;
 
                 if FilterDate <> 0D then begin

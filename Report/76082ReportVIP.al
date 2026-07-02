@@ -740,5 +740,5 @@ report 50112 "PLSR_Store_Sales_VAT"
             end;
     end;
 
-    // C-AVPWDLSVIP 36/06/2026 > Improve Performance of VIP Report(76082) - น้องปอ
+    // C-AVPWDLSVIP 30/06/2026 > Improve Performance of VIP Report(76082) - น้องปอ
 }

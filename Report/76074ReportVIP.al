@@ -69,8 +69,11 @@ report 50115 "PLSR_Sales_Report by Item"
                 IF (ItemNoFilter <> '') THEN
                     ReportFilterText += ' Item No: ' + FORMAT(ItemNoFilter + ' ');
 
+                // Grand totals: one SQL aggregate, independent of the ShowQtyZero line filter
                 CalculateGrandTotals();
 
+                // One query round trip (SQL-side GROUP BY) instead of one CalcSums per
+                // Item/UOM/Price group, then build the render lists fully in memory
                 PrecomputeRowData();
 
                 if RenderItemNo.Count = 0 then
@@ -221,9 +224,10 @@ report 50115 "PLSR_Sales_Report by Item"
         Choose1Filter: Boolean;
         Choose2Filter: Boolean;
 
+        // Precomputed render lists - one entry per output line, built once in PrecomputeRowData()
         RenderItemNo: List of [Code[20]];
         RenderUOM: List of [Code[10]];
-        RenderItemDesc: List of [Text[101]];
+        RenderItemDesc: List of [Text[250]];
         RenderLineQty: List of [Decimal];
         RenderPriceTransSale: List of [Decimal];
         RenderLineAmount: List of [Decimal];
@@ -233,9 +237,10 @@ report 50115 "PLSR_Sales_Report by Item"
         RenderLinePercentAmount: List of [Decimal];
         RenderLinePercentTotalAmount: List of [Decimal];
 
+        // Scalars for the row currently being rendered
         CurrItemNo: Code[20];
         CurrUOM: Code[10];
-        CurrItemDesc: Text[101];
+        CurrItemDesc: Text[250];
         CurrLineQty: Decimal;
         CurrPriceTransSale: Decimal;
         CurrLineAmount: Decimal;
@@ -274,10 +279,10 @@ report 50115 "PLSR_Sales_Report by Item"
         DiscAmtByKey: Dictionary of [Text, Decimal];
         TotalAmtByKey: Dictionary of [Text, Decimal];
         UOMQtyByKey: Dictionary of [Text, Decimal];
-        MaxUOMPriceByKey: Dictionary of [Text, Decimal];
+        FirstUOMPriceByKey: Dictionary of [Text, Decimal];
         GroupKey: Text;
         LastItemNo: Code[20];
-        LastItemDesc: Text[101];
+        LastItemDesc: Text[250];
         LQty: Decimal;
         LPrice: Decimal;
         LAmount: Decimal;
@@ -285,6 +290,9 @@ report 50115 "PLSR_Sales_Report by Item"
         LTotalAmount: Decimal;
         i: Integer;
     begin
+        // Phase 1: single query round trip. SQL groups by Item/UOM/Price (+Date/Store,
+        // unavoidably - see note in the query object), returning far fewer rows than the
+        // raw 73k+ entries, and definitely far fewer round trips than one-CalcSums-per-group.
         IF DateFilter <> '' THEN
             SalesQuery.SetFilter(TransDate, DateFilter);
         IF StoreFilter <> '' THEN
@@ -304,17 +312,21 @@ report 50115 "PLSR_Sales_Report by Item"
                 DiscAmtByKey.Add(GroupKey, 0);
                 TotalAmtByKey.Add(GroupKey, 0);
                 UOMQtyByKey.Add(GroupKey, 0);
-                MaxUOMPriceByKey.Add(GroupKey, 0);
+                // Captured only here, on first sight of this group - matches the original
+                // report's behaviour of taking "UOM Price" from whichever row FindSet()
+                // landed on first, rather than aggregating it (it is NOT summed/maxed).
+                FirstUOMPriceByKey.Add(GroupKey, SalesQuery.UOM_Price);
             end;
+            // Re-aggregate across Date/Store in memory - no DB calls here, just arithmetic
             QtyByKey.Set(GroupKey, QtyByKey.Get(GroupKey) + SalesQuery.Sum_Quantity);
             DiscAmtByKey.Set(GroupKey, DiscAmtByKey.Get(GroupKey) + SalesQuery.Sum_DiscountAmount);
             TotalAmtByKey.Set(GroupKey, TotalAmtByKey.Get(GroupKey) + SalesQuery.Sum_TotalRoundedAmt);
             UOMQtyByKey.Set(GroupKey, UOMQtyByKey.Get(GroupKey) + SalesQuery.Sum_UOMQuantity);
-            if SalesQuery.Max_UOMPrice > MaxUOMPriceByKey.Get(GroupKey) then
-                MaxUOMPriceByKey.Set(GroupKey, SalesQuery.Max_UOMPrice);
         end;
         SalesQuery.Close();
 
+        // Phase 2: build the final render lists (ShowQtyZero filter + % calc), in the same
+        // ascending Item/UOM/Price order the query returned (GroupKeys preserves first-seen order)
         Clear(RenderItemNo);
         Clear(RenderUOM);
         Clear(RenderItemDesc);
@@ -337,8 +349,8 @@ report 50115 "PLSR_Sales_Report by Item"
                 LQty := -QtyByKey.Get(GroupKey);
 
             if not ((not ShowQtyZero) and (LQty = 0)) then begin
-                if MaxUOMPriceByKey.Get(GroupKey) <> 0 then
-                    LPrice := MaxUOMPriceByKey.Get(GroupKey)
+                if FirstUOMPriceByKey.Get(GroupKey) <> 0 then
+                    LPrice := FirstUOMPriceByKey.Get(GroupKey)
                 else
                     LPrice := PriceOfKey.Get(GroupKey);
 
@@ -346,6 +358,8 @@ report 50115 "PLSR_Sales_Report by Item"
                 LDiscAmount := DiscAmtByKey.Get(GroupKey);
                 LTotalAmount := -TotalAmtByKey.Get(GroupKey);
 
+                // Item lookup cached per distinct Item No. - same cardinality as before,
+                // just now driven off the grouped keys instead of the raw dataitem loop
                 if ItemNoOfKey.Get(GroupKey) <> LastItemNo then begin
                     LastItemNo := ItemNoOfKey.Get(GroupKey);
                     Clear(ItemRec);

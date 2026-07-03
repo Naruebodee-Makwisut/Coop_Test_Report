@@ -290,9 +290,6 @@ report 50115 "PLSR_Sales_Report by Item"
         LTotalAmount: Decimal;
         i: Integer;
     begin
-        // Phase 1: single query round trip. SQL groups by Item/UOM/Price (+Date/Store,
-        // unavoidably - see note in the query object), returning far fewer rows than the
-        // raw 73k+ entries, and definitely far fewer round trips than one-CalcSums-per-group.
         IF DateFilter <> '' THEN
             SalesQuery.SetFilter(TransDate, DateFilter);
         IF StoreFilter <> '' THEN
@@ -312,9 +309,6 @@ report 50115 "PLSR_Sales_Report by Item"
                 DiscAmtByKey.Add(GroupKey, 0);
                 TotalAmtByKey.Add(GroupKey, 0);
                 UOMQtyByKey.Add(GroupKey, 0);
-                // Captured only here, on first sight of this group - matches the original
-                // report's behaviour of taking "UOM Price" from whichever row FindSet()
-                // landed on first, rather than aggregating it (it is NOT summed/maxed).
                 FirstUOMPriceByKey.Add(GroupKey, SalesQuery.UOM_Price);
             end;
             // Re-aggregate across Date/Store in memory - no DB calls here, just arithmetic

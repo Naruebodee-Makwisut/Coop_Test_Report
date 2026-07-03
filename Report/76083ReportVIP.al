@@ -4,7 +4,7 @@ report 50113 "TEST_Sale VAT by Rec_Test"
     DefaultLayout = RDLC;
     RDLCLayout = './ReportLayouts/Rep50113_StoreSalesVATByReceipt.rdl';
     PreviewMode = PrintLayout;
-
+    // AVNMTLSVIP 03/07/2025 > Improve Performance of VIP Report(76083)
     dataset
     {
         dataitem(Integer; Integer)
@@ -343,4 +343,5 @@ report 50113 "TEST_Sale VAT by Rec_Test"
         FullVATNo: Code[20];
         OldStoreNo: Code[20];
         StoreFilter: Code[20];
+    // C-AVNMTLSVIP 03/07/2025 > Improve Performance of VIP Report(76083)
 }

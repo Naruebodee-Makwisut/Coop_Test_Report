@@ -14,13 +14,21 @@ report 50106 "PLSR_Sales Report By Division2"
             // ==========================================
             // 1. คอลัมน์ระดับรายการข้อมูลดิบ (Detail Rows)
             // ==========================================
+            column(Name_ComInfo; ComInfo.Name) { }
+            column(ShowDate; ShowDate) { }
+            column(ShowTime; ShowTime) { }
+            column(PeriodDate; PeriodDate) { }
+            column(ReportFilterText; ReportFilterText) { }
+
             column(Variant_Code; LSCTB."Variant Code") { }
             column(Store_No_TransSale; LSCTB."Store No.") { }
             column(Division_Code_TransSale; LSCTB."Division Code") { }
+            column(Division_TransSale; LSCTB."Posting Exception Key") { }
             column(Receipt_No_TransSale; LSCTB."Receipt No.") { }
             column(Date_TransSale; Format(LSCTB.Date, 0, '<Closing><Day,2>/<Month,2>/<Year4>')) { }
             column(TransType; LSCTB."POS Line Description") { }
             column(Item_No_TransSale; LSCTB."Item No.") { }
+            column(Item_Name_ItemTB; LSCTB."Item Description") { }
             column(Qty; LSCTB.Quantity) { }
             column(Unit_of_Measure_TransSale; LSCTB."Unit of Measure") { }
             column(BaseQty; LSCTB."UOM Quantity") { }
@@ -51,11 +59,6 @@ report 50106 "PLSR_Sales Report By Division2"
             column(GrandTotal_Qty; GrandTotal_Qty) { }
             column(GrandTotal_Amount; GrandTotal_Amount) { }
             column(GrandTotal_Discount; GrandTotal_Discount) { }
-
-            // (คอลัมน์ ComInfo, ShowDate, ShowTime ใส่ไว้ปกติ)
-            column(Name_ComInfo; ComInfo.Name) { }
-            column(ShowDate; ShowDate) { }
-            column(ShowTime; ShowTime) { }
 
             trigger OnPreDataItem()
             var
@@ -153,7 +156,9 @@ report 50106 "PLSR_Sales Report By Division2"
                     LSCTB."Receipt No." := PosSalesQry.Receipt_No;
                     LSCTB.Date := PosSalesQry.Date;
                     LSCTB."Item No." := PosSalesQry.Item_No;
+                    LSCTB."Item Description" := PosSalesQry.Item_Description + ' ' + PosSalesQry.Item_Description_2;
                     LSCTB."Division Code" := PosSalesQry.Division_Code;
+                    LSCTB."Posting Exception Key" := PosSalesQry.Division_Code + ' - ' + PosSalesQry.Division_Description;
                     LSCTB.Quantity := PosSalesQry.Quantity;
                     LSCTB.Price := PosSalesQry.Price;
                     LSCTB."Discount Amount" := PosSalesQry.Discount_Amount;

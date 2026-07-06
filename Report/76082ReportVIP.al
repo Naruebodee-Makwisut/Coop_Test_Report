@@ -36,12 +36,18 @@ report 50112 "PLSR_Store_Sales_VAT"
 
                 CLEAR(OldStoreNo);
                 CLEAR(OldBranch);
+                CLEAR(OldPOSNo);
+                CLEAR(OldTransDate);
                 CLEAR(Description);
                 CLEAR(Running);
                 CLEAR(GroupRunning);
                 CLEAR(GroupNetAmt);
                 CLEAR(GroupGrossAmt);
                 CLEAR(GroupVATAmt);
+                CLEAR(FullVATNo);
+                CLEAR(VATAmt);
+                CLEAR(TransType);
+                CLEAR(StoreBranch);
 
                 TempTransactionHeaderTemp.Reset();
                 TempTransactionHeaderTemp.DeleteAll();
@@ -516,6 +522,5 @@ report 50112 "PLSR_Store_Sales_VAT"
                 Addr[5] := StoreTB."PLSLC_Address 5";
             end;
     end;
-
-    // C-AVPWDLSVIP 30/06/2026 > Improve Performance of VIP Report(76082) - น้องปอ
+    // AVPWDLSVIP 30/06/2026 > Improve Performance of VIP Report(76082) - น้องปอ
 }

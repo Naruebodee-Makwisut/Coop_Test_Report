@@ -5,6 +5,7 @@ report 50104 "Member Sales History"
     RDLCLayout = './ReportLayouts/Rep50104_MemberSalesHistory.rdl';
     PreviewMode = PrintLayout;
 
+    // AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76092) - น้องปอ
     dataset
     {
         // ── Dummy dataitem 1: รับ RequestFilterFields สำหรับ Member Contact ──
@@ -34,19 +35,19 @@ report 50104 "Member Sales History"
             column(CurrTime; Format(CurrTime)) { }
 
             // Data columns — อ่านค่าจาก Current* variables ที่ fill จาก Query
-            column(Member_Account_No_; CurrentMemberAccountNo) { }
-            column(Description_MemberAcc; CurrentMemberAccountDesc) { }
-            column(Store_No_; CurrentStoreNo) { }
-            column(Document_No_; CurrentDocumentNo) { }
-            column("Date"; Format(CurrentDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>')) { }
-            column(SaleIsReturnSale_TransacH; CurrentSaleIsReturnSale) { }
-            column(Item_No_; CurrentItemNo) { }
-            column(Description; CurrentDescription) { }
-            column(Item_Variant_Code; CurrentItemVariantCode) { }
+            column(Member_Account_No_; MemberSalesHistoryQ.Member_Account_No_) { }
+            column(Description_MemberAcc; MemberSalesHistoryQ.Member_Account_Description) { }
+            column(Store_No_; MemberSalesHistoryQ.Store_No_) { }
+            column(Document_No_; MemberSalesHistoryQ.Document_No_) { }
+            column("Date"; Format(MemberSalesHistoryQ.Date, 0, '<Closing><Day,2>/<Month,2>/<Year4>')) { }
+            column(SaleIsReturnSale_TransacH; MemberSalesHistoryQ.Sale_Is_Return_Sale) { }
+            column(Item_No_; MemberSalesHistoryQ.Item_No_) { }
+            column(Description; MemberSalesHistoryQ.Description) { }
+            column(Item_Variant_Code; MemberSalesHistoryQ.Item_Variant_Code) { }
             column(UOM_TransSale; CurrentUOM) { }
             column(QTYTranSale; CurrentQty) { }
             column(PriceTranSale; CurrentPrice) { }
-            column(Discount_Amount; CurrentDiscountAmount) { }
+            column(Discount_Amount; MemberSalesHistoryQ.Discount_Amount) { }
 
             trigger OnPreDataItem()
             begin
@@ -61,14 +62,14 @@ report 50104 "Member Sales History"
                 Clear(DateFilter);
                 Clear(DateHeader);
 
-                if Choose1 then begin
+                if ChoosePeriod then begin
                     if (FromDate <> 0D) and (ToDate <> 0D) then begin
                         DateHeader := 'ประจำงวดวันที่ ' + Format(FromDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + ' ถึง ' + Format(ToDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                         MemberSalesHistoryQ.SetFilter(DateFilter, '%1..%2', FromDate, ToDate);
                     end;
                 end else
-                    if Choose2 then begin
-                        DateHeader := 'ประจำงวดวันที่ ' + Format(FDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
+                    if ChooseAtDate then begin
+                        DateHeader := 'ประจำงวดวันที่ ' + Format(FDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + ' ถึง ' + Format(FDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                         MemberSalesHistoryQ.SetFilter(DateFilter, '%1', FDate);
                     end;
 
@@ -93,17 +94,9 @@ report 50104 "Member Sales History"
                 if not MemberSalesHistoryQ.Read() then
                     CurrReport.Break();
 
-                // ── Fill current variables จากผล Query ──
-                CurrentMemberAccountNo := MemberSalesHistoryQ.Member_Account_No_;
-                CurrentMemberAccountDesc := MemberSalesHistoryQ.Member_Account_Description;
-                CurrentStoreNo := MemberSalesHistoryQ.Store_No_;
-                CurrentDocumentNo := MemberSalesHistoryQ.Document_No_;
-                CurrentDate := MemberSalesHistoryQ.Date;
-                CurrentSaleIsReturnSale := MemberSalesHistoryQ.Sale_Is_Return_Sale;
-                CurrentItemNo := MemberSalesHistoryQ.Item_No_;
-                CurrentDescription := MemberSalesHistoryQ.Description;
-                CurrentItemVariantCode := MemberSalesHistoryQ.Item_Variant_Code;
-                CurrentDiscountAmount := MemberSalesHistoryQ.Discount_Amount;
+                Clear(CurrentQty);
+                Clear(CurrentPrice);
+                Clear(CurrentUOM);
 
                 // ── ตรรกะ UOM / QTY / Price เดิม แต่อ่านจาก Query แทน FindFirst() ──
                 // Priority 1: Trans. Sales Entry (JOIN อยู่แล้วใน Query)
@@ -140,7 +133,7 @@ report 50104 "Member Sales History"
             {
                 group("Filter")
                 {
-                    field("Period"; Choose1)
+                    field("Period"; ChoosePeriod)
                     {
                         Caption = 'Period';
                         Style = Strong;
@@ -149,23 +142,23 @@ report 50104 "Member Sales History"
 
                         trigger OnValidate()
                         begin
-                            if Choose1 then
-                                Choose2 := false
+                            if ChoosePeriod then
+                                ChooseAtDate := false
                             else
-                                Choose2 := true;
+                                ChooseAtDate := true;
                         end;
                     }
                     field("Start Date"; FromDate)
                     {
                         Caption = 'Start Date';
                         ApplicationArea = All;
-                        Enabled = Choose1;
+                        Enabled = ChoosePeriod;
                     }
                     field("End Date"; ToDate)
                     {
                         Caption = 'End Date';
                         ApplicationArea = All;
-                        Enabled = Choose1;
+                        Enabled = ChoosePeriod;
 
                         trigger OnValidate()
                         begin
@@ -173,7 +166,7 @@ report 50104 "Member Sales History"
                                 Error('End Date < Start Date');
                         end;
                     }
-                    field("At Date"; Choose2)
+                    field("At Date"; ChooseAtDate)
                     {
                         Caption = 'At Date';
                         Style = Strong;
@@ -182,17 +175,17 @@ report 50104 "Member Sales History"
 
                         trigger OnValidate()
                         begin
-                            if Choose2 then
-                                Choose1 := false
+                            if ChooseAtDate then
+                                ChoosePeriod := false
                             else
-                                Choose1 := true;
+                                ChoosePeriod := true;
                         end;
                     }
                     field("Date"; FDate)
                     {
                         Caption = 'Date';
                         ApplicationArea = All;
-                        Enabled = Choose2;
+                        Enabled = ChooseAtDate;
                     }
                 }
             }
@@ -201,22 +194,22 @@ report 50104 "Member Sales History"
         trigger OnOpenPage()
         begin
             FDate := Today;
-            Choose1 := false;
-            Choose2 := true;
+            ChoosePeriod := false;
+            ChooseAtDate := true;
         end;
     }
 
     var
         CompanyInfo: Record "Company Information";
         RetailSetup: Record "LSC Retail Setup";
-        MemberSalesHistoryQ: Query "PLSR_MemberSalesHistory Q";  // Query ใหม่ที่ join ทุกตาราง
+        MemberSalesHistoryQ: Query "MemberSalesHistory Q";  // Query ใหม่ที่ join ทุกตาราง
 
         // Request Page variables
         FromDate: Date;
         ToDate: Date;
         FDate: Date;
-        Choose1: Boolean;
-        Choose2: Boolean;
+        ChoosePeriod: Boolean;
+        ChooseAtDate: Boolean;
 
         // Header display variables
         DateHeader: Text[50];
@@ -238,4 +231,5 @@ report 50104 "Member Sales History"
         CurrentUOM: Text[50];
         CurrentQty: Decimal;
         CurrentPrice: Decimal;
+    // C-AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76092) - น้องปอ
 }

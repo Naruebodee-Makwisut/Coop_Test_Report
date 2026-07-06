@@ -342,6 +342,9 @@ report 50106 "PLSR_Sales Report By Division2"
         PosSalesQry: Query "PLSR_Sales Report By DivisionQ";
         LSVIPRepFunction: Codeunit "PLSR_Report Function";
         ComInfo: Record "Company Information";
+        ItemTB: Record Item;
+        DivisonTB: Record "LSC Division";
+        TransHeaderTB: Record "LSC Transaction Header";
         RettailSetup: Record "LSC Retail Setup";
         LSCTB: Record "LSC Trans. Sales Entry" temporary;
         ShowTime: Text[50];
@@ -357,6 +360,7 @@ report 50106 "PLSR_Sales Report By Division2"
         FDateFilter: Date;
         Choose1Filter: Boolean;
         Choose2Filter: Boolean;
+        Division_TransSale: Text[250];
 
         DictItemQty: Dictionary of [Text, Decimal];
         DictItemBaseQty: Dictionary of [Text, Decimal];

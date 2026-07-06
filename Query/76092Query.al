@@ -1,10 +1,11 @@
-query 50044 "PLSR_MemberSalesHistory Q"
+query 50044 "MemberSalesHistory Q"
 {
-   
+
     Caption = 'MemberSalesHistory';
     QueryType = Normal;
     OrderBy = ascending(Member_Account_No_, Store_No_, Date, Entry_No_, Line_No_);
 
+    // AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76092) - น้องปอ
     elements
     {
         dataitem(MemberSalesEntry; "LSC Member Sales Entry")
@@ -94,4 +95,5 @@ query 50044 "PLSR_MemberSalesHistory Q"
     trigger OnBeforeOpen()
     begin
     end;
+    // C-AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76092) - น้องปอ
 }

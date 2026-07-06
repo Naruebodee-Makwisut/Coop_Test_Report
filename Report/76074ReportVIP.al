@@ -77,7 +77,7 @@ report 50115 "PLSR_Sales_Report by Item"
                 PrecomputeRowData();
 
                 if RenderItemNo.Count = 0 then
-                    SetRange(Number, 1, 0)
+                    SetRange(Number, 0, 0)
                 else
                     SetRange(Number, 1, RenderItemNo.Count);
             end;

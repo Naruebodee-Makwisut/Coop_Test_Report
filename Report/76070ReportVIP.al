@@ -115,8 +115,8 @@ report 50106 "PLSR_Sales Report By Division2"
 
                 while PosSalesQry.Read() do begin
 
-                    ItemKey := PosSalesQry.LSC_Division_Code + '_' + PosSalesQry.Item_No;
-                    DivKey := PosSalesQry.LSC_Division_Code;
+                    ItemKey := PosSalesQry.Store_No + '_' + PosSalesQry.LSC_Division_Code + '_' + PosSalesQry.Item_No;
+                    DivKey := PosSalesQry.Store_No + '_' + PosSalesQry.LSC_Division_Code;
 
                     if PosSalesQry.UOM_Quantity <> 0 then
                         Qty := -PosSalesQry.UOM_Quantity
@@ -135,28 +135,28 @@ report 50106 "PLSR_Sales Report By Division2"
                     if DictItemQty.ContainsKey(ItemKey) then begin
                         DictItemQty.Set(ItemKey, DictItemQty.Get(ItemKey) + Qty);
                         DictItemBaseQty.Set(ItemKey, DictItemBaseQty.Get(ItemKey) + BaseQty);
-                        DictItemAmt.Set(ItemKey, DictItemAmt.Get(ItemKey) + CalcAmount);
+                        DictItemAmt.Set(ItemKey, DictItemAmt.Get(ItemKey) + (UnitPrice * Qty));
                         DictItemDisc.Set(ItemKey, DictItemDisc.Get(ItemKey) + PosSalesQry.Discount_Amount);
                     end else begin
                         DictItemQty.Add(ItemKey, Qty);
                         DictItemBaseQty.Add(ItemKey, BaseQty);
-                        DictItemAmt.Add(ItemKey, CalcAmount);
+                        DictItemAmt.Add(ItemKey, (UnitPrice * Qty));
                         DictItemDisc.Add(ItemKey, PosSalesQry.Discount_Amount);
                     end;
 
                     if DictDivQty.ContainsKey(DivKey) then begin
                         DictDivQty.Set(DivKey, DictDivQty.Get(DivKey) + Qty);
-                        DictDivAmt.Set(DivKey, DictDivAmt.Get(DivKey) + CalcAmount);
+                        DictDivAmt.Set(DivKey, DictDivAmt.Get(DivKey) + (UnitPrice * Qty));
                         DictDivDisc.Set(DivKey, DictDivDisc.Get(DivKey) + PosSalesQry.Discount_Amount);
                     end else begin
                         DictDivQty.Add(DivKey, Qty);
-                        DictDivAmt.Add(DivKey, CalcAmount);
+                        DictDivAmt.Add(DivKey, (UnitPrice * Qty));
                         DictDivDisc.Add(DivKey, PosSalesQry.Discount_Amount);
                     end;
 
 
                     GrandTotal_Qty += Qty;
-                    GrandTotal_Amount += CalcAmount;
+                    GrandTotal_Amount += (UnitPrice * Qty);
                     GrandTotal_Discount += PosSalesQry.Discount_Amount;
 
                     LSCTB.Init();
@@ -168,7 +168,7 @@ report 50106 "PLSR_Sales Report By Division2"
                     LSCTB."Receipt No." := PosSalesQry.Receipt_No;
                     LSCTB.Date := PosSalesQry.Date;
                     LSCTB."Item No." := PosSalesQry.Item_No;
-                    LSCTB.Epc := PosSalesQry.Item_Description + ' ' + PosSalesQry.Item_Description_2;
+                    LSCTB.Epc := Format(PosSalesQry.Item_Description + ' ' + PosSalesQry.Item_Description_2);
                     LSCTB."Division Code" := PosSalesQry.LSC_Division_Code;
                     LSCTB."Posting Exception Key" := Format(PosSalesQry.LSC_Division_Code + ' - ' + PosSalesQry.Division_Description);
                     LSCTB.Quantity := Qty;
@@ -187,7 +187,7 @@ report 50106 "PLSR_Sales Report By Division2"
                     LSCTB.Insert();
                 end;
                 PosSalesQry.Close();
-
+                LSCTB.SetCurrentKey("Store No.", "Division Code", "Item No.", "POS Terminal No.", "Transaction No.", "Line No.");
                 TransSale.SetRange(Number, 1, LSCTB.Count());
             end;
 
@@ -204,8 +204,8 @@ report 50106 "PLSR_Sales Report By Division2"
                         CurrReport.Break();
                 end;
 
-                ItemKey := LSCTB."Division Code" + '_' + LSCTB."Item No.";
-                DivKey := LSCTB."Division Code";
+                ItemKey := LSCTB."Store No." + '_' + LSCTB."Division Code" + '_' + LSCTB."Item No.";
+                DivKey := LSCTB."Store No." + '_' + LSCTB."Division Code";
 
                 // ดึงยอดรวมกลุ่มสินค้า (Item Group) ออกมาใส่คอลัมน์
                 if DictItemQty.ContainsKey(ItemKey) then begin
@@ -342,9 +342,6 @@ report 50106 "PLSR_Sales Report By Division2"
         PosSalesQry: Query "PLSR_Sales Report By DivisionQ";
         LSVIPRepFunction: Codeunit "PLSR_Report Function";
         ComInfo: Record "Company Information";
-        ItemTB: Record Item;
-        DivisonTB: Record "LSC Division";
-        TransHeaderTB: Record "LSC Transaction Header";
         RettailSetup: Record "LSC Retail Setup";
         LSCTB: Record "LSC Trans. Sales Entry" temporary;
         ShowTime: Text[50];

@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+    </DataSource>
+  </DataSources>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <Height>2in</Height>
+        <Style />
+      </Body>
+      <Width>6.5in</Width>
+      <Page>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="StoreNo_Name_StoreTB">
+          <DataField>StoreNo_Name_StoreTB</DataField>
+        </Field>
+        <Field Name="ReportFilterText">
+          <DataField>ReportFilterText</DataField>
+        </Field>
+        <Field Name="ShowDate">
+          <DataField>ShowDate</DataField>
+        </Field>
+        <Field Name="ShowTime">
+          <DataField>ShowTime</DataField>
+        </Field>
+        <Field Name="ItemNo">
+          <DataField>ItemNo</DataField>
+        </Field>
+        <Field Name="Description_Item">
+          <DataField>Description_Item</DataField>
+        </Field>
+        <Field Name="BaseUOM_Item">
+          <DataField>BaseUOM_Item</DataField>
+        </Field>
+        <Field Name="Variant_Code">
+          <DataField>Variant_Code</DataField>
+        </Field>
+        <Field Name="ItemInventoryQty">
+          <DataField>ItemInventoryQty</DataField>
+        </Field>
+        <Field Name="ItemSoldNotPostedQty">
+          <DataField>ItemSoldNotPostedQty</DataField>
+        </Field>
+        <Field Name="ItemSoldTodayQty">
+          <DataField>ItemSoldTodayQty</DataField>
+        </Field>
+        <Field Name="NetInventoryQty">
+          <DataField>NetInventoryQty</DataField>
+        </Field>
+        <Field Name="ItemWaitedTransferQty">
+          <DataField>ItemWaitedTransferQty</DataField>
+        </Field>
+        <Field Name="ItemWaitedTransferQtyFormat">
+          <DataField>ItemWaitedTransferQtyFormat</DataField>
+        </Field>
+        <Field Name="ShowLot">
+          <DataField>ShowLot</DataField>
+        </Field>
+        <Field Name="ShowVariant">
+          <DataField>ShowVariant</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
+</Report>

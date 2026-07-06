@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+  <AutoRefresh>0</AutoRefresh>
+  <DataSources>
+    <DataSource Name="DataSource">
+      <ConnectionProperties>
+        <DataProvider>SQL</DataProvider>
+        <ConnectString />
+      </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
+    </DataSource>
+  </DataSources>
+  <ReportSections>
+    <ReportSection>
+      <Body>
+        <Height>2in</Height>
+        <Style />
+      </Body>
+      <Width>6.5in</Width>
+      <Page>
+        <Style />
+      </Page>
+    </ReportSection>
+  </ReportSections>
+  <Code>Public Function BlankZero(ByVal Value As Decimal)
+    if Value = 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankPos(ByVal Value As Decimal)
+    if Value &gt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankZeroAndPos(ByVal Value As Decimal)
+    if Value &gt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNeg(ByVal Value As Decimal)
+    if Value &lt; 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+
+Public Function BlankNegAndZero(ByVal Value As Decimal)
+    if Value &lt;= 0 then
+        Return ""
+    end if
+    Return Value
+End Function
+</Code>
+  <Language>=User!Language</Language>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
+  <DataSets>
+    <DataSet Name="DataSet_Result">
+      <Fields>
+        <Field Name="Variant_Code">
+          <DataField>Variant_Code</DataField>
+        </Field>
+        <Field Name="Name_ComInfo">
+          <DataField>Name_ComInfo</DataField>
+        </Field>
+        <Field Name="ShowDate">
+          <DataField>ShowDate</DataField>
+        </Field>
+        <Field Name="ShowTime">
+          <DataField>ShowTime</DataField>
+        </Field>
+        <Field Name="PeriodDate">
+          <DataField>PeriodDate</DataField>
+        </Field>
+        <Field Name="ReportFilterText">
+          <DataField>ReportFilterText</DataField>
+        </Field>
+        <Field Name="Store_No_TransSale">
+          <DataField>Store_No_TransSale</DataField>
+        </Field>
+        <Field Name="Division_Code_TransSale">
+          <DataField>Division_Code_TransSale</DataField>
+        </Field>
+        <Field Name="Division_TransSale">
+          <DataField>Division_TransSale</DataField>
+        </Field>
+        <Field Name="Receipt_No_TransSale">
+          <DataField>Receipt_No_TransSale</DataField>
+        </Field>
+        <Field Name="Date_TransSale">
+          <DataField>Date_TransSale</DataField>
+        </Field>
+        <Field Name="TransType">
+          <DataField>TransType</DataField>
+        </Field>
+        <Field Name="Item_No_TransSale">
+          <DataField>Item_No_TransSale</DataField>
+        </Field>
+        <Field Name="Item_Name_ItemTB">
+          <DataField>Item_Name_ItemTB</DataField>
+        </Field>
+        <Field Name="Unit_of_Measure_TransSale">
+          <DataField>Unit_of_Measure_TransSale</DataField>
+        </Field>
+        <Field Name="Qty">
+          <DataField>Qty</DataField>
+        </Field>
+        <Field Name="QtyFormat">
+          <DataField>QtyFormat</DataField>
+        </Field>
+        <Field Name="BaseQty">
+          <DataField>BaseQty</DataField>
+        </Field>
+        <Field Name="BaseQtyFormat">
+          <DataField>BaseQtyFormat</DataField>
+        </Field>
+        <Field Name="UnitPrice">
+          <DataField>UnitPrice</DataField>
+        </Field>
+        <Field Name="UnitPriceFormat">
+          <DataField>UnitPriceFormat</DataField>
+        </Field>
+        <Field Name="Amount">
+          <DataField>Amount</DataField>
+        </Field>
+        <Field Name="AmountFormat">
+          <DataField>AmountFormat</DataField>
+        </Field>
+        <Field Name="Discount_Amount_TransSale">
+          <DataField>Discount_Amount_TransSale</DataField>
+        </Field>
+        <Field Name="Discount_Amount_TransSaleFormat">
+          <DataField>Discount_Amount_TransSaleFormat</DataField>
+        </Field>
+        <Field Name="TotalAmt">
+          <DataField>TotalAmt</DataField>
+        </Field>
+        <Field Name="TotalAmtFormat">
+          <DataField>TotalAmtFormat</DataField>
+        </Field>
+        <Field Name="ShowVariant">
+          <DataField>ShowVariant</DataField>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>DataSource</DataSourceName>
+        <CommandText />
+      </Query>
+    </DataSet>
+  </DataSets>
+</Report>

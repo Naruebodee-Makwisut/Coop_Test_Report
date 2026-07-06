@@ -12,9 +12,9 @@ query 50040 "PLSR Sales By Prod Query"
         {
             filter(DateFilter; Date) { }
             filter(StoreNoFilter; "Store No.") { }
+
             filter(ItemNoFilter; "Item No.") { }
             filter(ProductGroupFilter; "Retail Product Code") { }
-
             column(Store_No_; "Store No.") { }
             column(POS_Terminal_No_; "POS Terminal No.") { }
             column(Transaction_No_; "Transaction No.") { }

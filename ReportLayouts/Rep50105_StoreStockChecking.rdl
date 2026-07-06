@@ -1174,11 +1174,11 @@ End Function
         <Field Name="ItemInventoryQty">
           <DataField>ItemInventoryQty</DataField>
         </Field>
-        <Field Name="ItemSoldTodayQty">
-          <DataField>ItemSoldTodayQty</DataField>
-        </Field>
         <Field Name="ItemSoldNotPostedQty">
           <DataField>ItemSoldNotPostedQty</DataField>
+        </Field>
+        <Field Name="ItemSoldTodayQty">
+          <DataField>ItemSoldTodayQty</DataField>
         </Field>
         <Field Name="NetInventoryQty">
           <DataField>NetInventoryQty</DataField>

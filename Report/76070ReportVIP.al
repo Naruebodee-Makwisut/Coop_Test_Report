@@ -2,7 +2,7 @@ report 50106 "PLSR_Sales Report By Division2"
 {
     Caption = 'POS Sales Report By Division';
     DefaultLayout = RDLC;
-    RDLCLayout = './ReportLayouts/Rep50106_POSSalesReportByDivision.rdl';
+    RDLCLayout = './ReportLayouts/Rep76070_POSSalesReportByDivision.rdl';
     PreviewMode = PrintLayout;
 
     dataset
@@ -28,14 +28,14 @@ report 50106 "PLSR_Sales Report By Division2"
             column(Date_TransSale; Format(LSCTB.Date, 0, '<Closing><Day,2>/<Month,2>/<Year4>')) { }
             column(TransType; LSCTB."POS Line Description") { }
             column(Item_No_TransSale; LSCTB."Item No.") { }
-            column(Item_Name_ItemTB; LSCTB."Item Description") { }
+            column(Item_Name_ItemTB; LSCTB.Epc) { }
             column(Qty; LSCTB.Quantity) { }
             column(Unit_of_Measure_TransSale; LSCTB."Unit of Measure") { }
             column(BaseQty; LSCTB."UOM Quantity") { }
             column(UnitPrice; LSCTB.Price) { }
             column(Amount; LSCTB.Price * LSCTB.Quantity) { }
             column(Discount_Amount_TransSale; LSCTB."Discount Amount") { }
-            column(TotalAmt; (LSCTB.Price * LSCTB.Quantity) - LSCTB."Discount Amount") { }
+            column(TotalAmt; LSCTB."Net Amount") { }
             column(ShowVariant; not RettailSetup."PLSPOS_Show Var for Report VIP") { }
 
             // ==========================================
@@ -65,11 +65,12 @@ report 50106 "PLSR_Sales Report By Division2"
                 ItemKey: Text;
                 DivKey: Text;
                 CalcAmount: Decimal;
+                Qty: Decimal;
+                BaseQty: Decimal;
+                UnitPrice: Decimal;
             begin
                 LSCTB.Reset();
                 LSCTB.DeleteAll();
-
-                // เคลียร์ค่าในกล่อง Dictionary ทั้งหมด
                 Clear(DictItemQty);
                 Clear(DictItemBaseQty);
                 Clear(DictItemAmt);
@@ -113,37 +114,48 @@ report 50106 "PLSR_Sales Report By Division2"
                 PosSalesQry.Open();
 
                 while PosSalesQry.Read() do begin
-                    // สร้างคีย์แยกกลุ่ม (แผนก + รหัสสินค้า)
-                    ItemKey := PosSalesQry.Division_Code + '_' + PosSalesQry.Item_No;
-                    DivKey := PosSalesQry.Division_Code;
-                    CalcAmount := PosSalesQry.Price * PosSalesQry.Quantity;
 
-                    // 1. บวกสะสมระดับรายสินค้า (Item Group)
+                    ItemKey := PosSalesQry.LSC_Division_Code + '_' + PosSalesQry.Item_No;
+                    DivKey := PosSalesQry.LSC_Division_Code;
+
+                    if PosSalesQry.UOM_Quantity <> 0 then
+                        Qty := -PosSalesQry.UOM_Quantity
+                    else
+                        Qty := -PosSalesQry.Quantity;
+
+                    BaseQty := -PosSalesQry.Quantity;
+
+                    if PosSalesQry.UOM_Price <> 0 then
+                        UnitPrice := PosSalesQry.UOM_Price
+                    else
+                        UnitPrice := PosSalesQry.Price;
+
+                    CalcAmount := (UnitPrice * Qty) - PosSalesQry.Discount_Amount;
+
                     if DictItemQty.ContainsKey(ItemKey) then begin
-                        DictItemQty.Set(ItemKey, DictItemQty.Get(ItemKey) + PosSalesQry.Quantity);
-                        DictItemBaseQty.Set(ItemKey, DictItemBaseQty.Get(ItemKey) + PosSalesQry.UOM_Quantity);
+                        DictItemQty.Set(ItemKey, DictItemQty.Get(ItemKey) + Qty);
+                        DictItemBaseQty.Set(ItemKey, DictItemBaseQty.Get(ItemKey) + BaseQty);
                         DictItemAmt.Set(ItemKey, DictItemAmt.Get(ItemKey) + CalcAmount);
                         DictItemDisc.Set(ItemKey, DictItemDisc.Get(ItemKey) + PosSalesQry.Discount_Amount);
                     end else begin
-                        DictItemQty.Add(ItemKey, PosSalesQry.Quantity);
-                        DictItemBaseQty.Add(ItemKey, PosSalesQry.UOM_Quantity);
+                        DictItemQty.Add(ItemKey, Qty);
+                        DictItemBaseQty.Add(ItemKey, BaseQty);
                         DictItemAmt.Add(ItemKey, CalcAmount);
                         DictItemDisc.Add(ItemKey, PosSalesQry.Discount_Amount);
                     end;
 
-                    // 2. บวกสะสมระดับรายแผนก (Division Group)
                     if DictDivQty.ContainsKey(DivKey) then begin
-                        DictDivQty.Set(DivKey, DictDivQty.Get(DivKey) + PosSalesQry.Quantity);
+                        DictDivQty.Set(DivKey, DictDivQty.Get(DivKey) + Qty);
                         DictDivAmt.Set(DivKey, DictDivAmt.Get(DivKey) + CalcAmount);
                         DictDivDisc.Set(DivKey, DictDivDisc.Get(DivKey) + PosSalesQry.Discount_Amount);
                     end else begin
-                        DictDivQty.Add(DivKey, PosSalesQry.Quantity);
+                        DictDivQty.Add(DivKey, Qty);
                         DictDivAmt.Add(DivKey, CalcAmount);
                         DictDivDisc.Add(DivKey, PosSalesQry.Discount_Amount);
                     end;
 
-                    // 3. บวกสะสมยอดรวมสุทธิท้ายรายงาน (Grand Totals) 
-                    GrandTotal_Qty += PosSalesQry.Quantity;
+
+                    GrandTotal_Qty += Qty;
                     GrandTotal_Amount += CalcAmount;
                     GrandTotal_Discount += PosSalesQry.Discount_Amount;
 
@@ -156,18 +168,22 @@ report 50106 "PLSR_Sales Report By Division2"
                     LSCTB."Receipt No." := PosSalesQry.Receipt_No;
                     LSCTB.Date := PosSalesQry.Date;
                     LSCTB."Item No." := PosSalesQry.Item_No;
-                    LSCTB."Item Description" := PosSalesQry.Item_Description + ' ' + PosSalesQry.Item_Description_2;
-                    LSCTB."Division Code" := PosSalesQry.Division_Code;
-                    LSCTB."Posting Exception Key" := PosSalesQry.Division_Code + ' - ' + PosSalesQry.Division_Description;
-                    LSCTB.Quantity := PosSalesQry.Quantity;
-                    LSCTB.Price := PosSalesQry.Price;
+                    LSCTB.Epc := PosSalesQry.Item_Description + ' ' + PosSalesQry.Item_Description_2;
+                    LSCTB."Division Code" := PosSalesQry.LSC_Division_Code;
+                    LSCTB."Posting Exception Key" := Format(PosSalesQry.LSC_Division_Code + ' - ' + PosSalesQry.Division_Description);
+                    LSCTB.Quantity := Qty;
+                    LSCTB.Price := UnitPrice;
                     LSCTB."Discount Amount" := PosSalesQry.Discount_Amount;
                     LSCTB."Unit of Measure" := PosSalesQry.Unit_of_Measure;
-                    LSCTB."UOM Quantity" := PosSalesQry.UOM_Quantity;
+                    LSCTB."UOM Quantity" := BaseQty;
+
                     TransType := Format(PosSalesQry.Transaction_Type);
                     if PosSalesQry.Return_No_Sale then
                         TransType := 'Refund';
                     LSCTB."POS Line Description" := TransType;
+
+                    LSCTB."Net Amount" := CalcAmount;
+
                     LSCTB.Insert();
                 end;
                 PosSalesQry.Close();
@@ -323,12 +339,12 @@ report 50106 "PLSR_Sales Report By Division2"
     end;
 
     var
-        PosSalesQry: Query "PLSR_Sales Report By DivisionQ";
+        PosSalesQry: Query "PLSR_Sales Report By DivisionQ"; //ตัวแปรรับคิวรี่มาใช้งาน ไม่ต้องดึง table เยอะ
         LSVIPRepFunction: Codeunit "PLSR_Report Function";
         ComInfo: Record "Company Information";
-        ItemTB: Record Item;
-        DivisonTB: Record "LSC Division";
-        TransHeaderTB: Record "LSC Transaction Header";
+        // ItemTB: Record Item; ไปอยู่ในคิวรี่แทนแล้ว
+        //  DivisonTB: Record "LSC Division";
+        // TransHeaderTB: Record "LSC Transaction Header";
         RettailSetup: Record "LSC Retail Setup";
         LSCTB: Record "LSC Trans. Sales Entry" temporary;
         ShowTime: Text[50];
@@ -342,12 +358,8 @@ report 50106 "PLSR_Sales Report By Division2"
         FromDateFilter: Date;
         TodateFilter: Date;
         FDateFilter: Date;
-        Qty: Decimal;
-        BaseQty: Decimal;
-        UnitPrice: Decimal;
         Choose1Filter: Boolean;
         Choose2Filter: Boolean;
-        Division_TransSale: Text[250];
 
         DictItemQty: Dictionary of [Text, Decimal];
         DictItemBaseQty: Dictionary of [Text, Decimal];

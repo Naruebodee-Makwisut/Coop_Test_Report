@@ -1,7 +1,7 @@
 {
   "id": "b475e8ea-5854-4d04-94f7-120a11686f4d",
   "name": "Coop_Test_Report",
-  "publisher": "Tiwter",
+  "publisher": "COOP_Por",
   "version": "26.0.0.0",
   "brief": "",
   "description": "",
@@ -11,6 +11,12 @@
   "url": "",
   "logo": "",
   "dependencies": [
+    {
+      "id": "39aee12a-6147-40fa-862c-94295dd8246b",
+      "publisher": "AVISIONTH",
+      "name": "VAT and Withholding Tax Localization for Thailand",
+      "version": "1.0.0.18"
+    },
     {
       "id": "5ecfc871-5d82-43f1-9c54-59685e82318d",
       "publisher": "LS Retail",
@@ -43,8 +49,8 @@
     }
   ],
   "screenshots": [],
-  "platform": "26.0.0.0",
-  "application": "26.0.0.0",
+  "platform": "1.0.0.0",
+  "application": "24.0.0.0",
   "idRanges": [
     {
       "from": 50000,
@@ -56,7 +62,7 @@
     "allowDownloadingSource": true,
     "includeSourceInSymbolFile": true
   },
-  "runtime": "15.0",
+  "runtime": "13.0",
   "features": [
     "NoImplicitWith"
   ]

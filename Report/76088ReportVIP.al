@@ -1,11 +1,11 @@
-report 50108 "Tot Offer Sales Item Pro"
+report 50108 "PLSR_Tot_Offer Sales Item Pro"
 {
     Caption = 'Total Offer Sales Item By Promotion';
     DefaultLayout = RDLC;
-    RDLCLayout = './ReportLayouts/Rep50108_TotalOfferSalesItemByPromotion.rdl';
+    RDLCLayout = './ReportLayouts/Rep76088_TotalOfferSalesItemByPromotion.rdl';
     PreviewMode = PrintLayout;
 
-     // AVPWDLSVIP 01/07/2026 > Improve Performance of VIP Report(76088) - น้องปอ
+    // AVPWDLSVIP 01/07/2026 > Improve Performance of VIP Report(76088) - น้องปอ
     dataset
     {
         dataitem(Integer; Integer)

@@ -170,7 +170,7 @@ report 50106 "PLSR_Sales Report By Division2"
                     LSCTB."Item No." := PosSalesQry.Item_No;
                     LSCTB.Epc := PosSalesQry.Item_Description + ' ' + PosSalesQry.Item_Description_2;
                     LSCTB."Division Code" := PosSalesQry.LSC_Division_Code;
-                    LSCTB."Posting Exception Key" := PosSalesQry.LSC_Division_Code + ' - ' + PosSalesQry.Division_Description;
+                    LSCTB."Posting Exception Key" := Format(PosSalesQry.LSC_Division_Code + ' - ' + PosSalesQry.Division_Description);
                     LSCTB.Quantity := Qty;
                     LSCTB.Price := UnitPrice;
                     LSCTB."Discount Amount" := PosSalesQry.Discount_Amount;
@@ -360,7 +360,6 @@ report 50106 "PLSR_Sales Report By Division2"
         FDateFilter: Date;
         Choose1Filter: Boolean;
         Choose2Filter: Boolean;
-        Division_TransSale: Text[250];
 
         DictItemQty: Dictionary of [Text, Decimal];
         DictItemBaseQty: Dictionary of [Text, Decimal];

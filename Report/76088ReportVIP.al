@@ -5,11 +5,7 @@ report 50108 "PLSR_Tot_Offer Sales Item Pro"
     RDLCLayout = './ReportLayouts/Rep76088_TotalOfferSalesItemByPromotion.rdl';
     PreviewMode = PrintLayout;
 
-<<<<<<< HEAD
     // AVPWDLSVIP 01/07/2026 > Improve Performance of VIP Report(76088) - น้องปอ
-=======
-     // AVPWDLSVIP 01/07/2026 > Improve Performance of VIP Report(76088) - น้องปอ
->>>>>>> 26573dd2fcdcdc95f4ab0b297747099290232907
     dataset
     {
         dataitem(Integer; Integer)

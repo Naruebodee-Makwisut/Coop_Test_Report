@@ -1,12 +1,8 @@
 query 50045 "PLSR_StoreStockILE_Q"
 {
     Caption = 'Store Stock ILE';
-<<<<<<< HEAD
-    QueryType = Normal;
-=======
     DataAccessIntent = ReadOnly;
     OrderBy = ascending(Q_Item_No, Posting_DateF, Location_CodeF);
->>>>>>> 26573dd2fcdcdc95f4ab0b297747099290232907
     elements
     {
         dataitem(ItemLedgerEntry; "Item Ledger Entry")

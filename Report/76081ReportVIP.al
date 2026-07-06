@@ -194,18 +194,6 @@ report 50105 "Store Stock Checking"
             ItemRecord.Reset();
             ItemRecord.SetRange(Type, ItemRecord.Type::Inventory);
             if not ShowItemBlock then ItemRecord.SetRange(Blocked, false);
-<<<<<<< HEAD
-            if ItemNoFilter <> '' then ItemRecord.SetFilter("No.", ItemNoFilter);
-            if DivisionFilter <> '' then ItemRecord.SetFilter("LSC Division Code", DivisionFilter);
-            if ItemCategoryFilter <> '' then ItemRecord.SetFilter("Item Category Code", ItemCategoryFilter);
-            if ProductGroupFilter <> '' then ItemRecord.SetFilter("LSC Retail Product Code", ProductGroupFilter);
-
-            if ItemRecord.FindSet() then
-                repeat
-                    if ShowVar then begin
-                        FindOrCreateItemTB(ItemRecord."No.", '', ItemTB, EntryNo, ShowVar); // Blank Variant
-
-=======
             if ItemNoFilter <> '' then ItemRecord.SetRange("No.", ItemNoFilter);
             if DivisionFilter <> '' then ItemRecord.SetRange("LSC Division Code", DivisionFilter);
             if ItemCategoryFilter <> '' then ItemRecord.SetRange("Item Category Code", ItemCategoryFilter);
@@ -214,36 +202,20 @@ report 50105 "Store Stock Checking"
                 repeat
                     if RetailSetup."PLSPOS_Show Var for Report VIP" then begin
                         FindOrCreateItemTB(ItemRecord."No.", '', ItemRecord.Description, ItemRecord."Base Unit of Measure", ItemTB, EntryNo, RetailSetup."PLSPOS_Show Var for Report VIP");
->>>>>>> 26573dd2fcdcdc95f4ab0b297747099290232907
                         ItemVariant.Reset();
                         ItemVariant.SetRange("Item No.", ItemRecord."No.");
                         if ItemVariant.FindSet() then
                             repeat
-<<<<<<< HEAD
-                                FindOrCreateItemTB(ItemRecord."No.", ItemVariant.Code, ItemTB, EntryNo, ShowVar);
-                            until ItemVariant.Next() = 0;
-                    end else begin
-                        FindOrCreateItemTB(ItemRecord."No.", '', ItemTB, EntryNo, ShowVar);
-=======
                                 FindOrCreateItemTB(ItemRecord."No.", ItemVariant.Code, ItemRecord.Description, ItemRecord."Base Unit of Measure", ItemTB, EntryNo, RetailSetup."PLSPOS_Show Var for Report VIP");
                             until ItemVariant.Next() = 0;
                     end else begin
                         FindOrCreateItemTB(ItemRecord."No.", '', ItemRecord.Description, ItemRecord."Base Unit of Measure", ItemTB, EntryNo, RetailSetup."PLSPOS_Show Var for Report VIP");
->>>>>>> 26573dd2fcdcdc95f4ab0b297747099290232907
                     end;
                 until ItemRecord.Next() = 0;
         end;
 
         // ---  STEP 2: ดึงยอดคงคลังสุทธิ (ILE) ---
         Clear(ILEQuery);
-<<<<<<< HEAD
-        if ItemNoFilter <> '' then ILEQuery.SetFilter(Item_No, ItemNoFilter);
-        if LocationFilter <> '' then ILEQuery.SetFilter(Location_Code, LocationFilter);
-        ILEQuery.SetFilter(Posting_Date, '<=%1', AsOfDateFilter);
-        if ILEQuery.Open() then begin
-            while ILEQuery.Read() do begin
-                if FindOrCreateItemTB(ILEQuery.Q_Item_No, ILEQuery.Q_Variant_Code, ItemTB, EntryNo, ShowVar) then begin
-=======
         if ItemNoFilter <> '' then ILEQuery.SetRange(Item_No, ItemNoFilter);
         if LocationFilter <> '' then ILEQuery.SetRange(Location_Code, LocationFilter);
         ILEQuery.SetRange(Posting_Date, 0D, Today - 1);
@@ -255,7 +227,6 @@ report 50105 "Store Stock Checking"
         if ILEQuery.Open() then begin
             while ILEQuery.Read() do begin
                 if FindOrCreateItemTB(ILEQuery.Q_Item_No, ILEQuery.Q_Variant_Code, ILEQuery.Item_Desc, ILEQuery.Base_UOM, ItemTB, EntryNo, RetailSetup."PLSPOS_Show Var for Report VIP") then begin
->>>>>>> 26573dd2fcdcdc95f4ab0b297747099290232907
                     ItemTB."Unit Price" += ILEQuery.Sum_Remaining_Qty;
                     ItemTB.Modify();
                 end;
@@ -263,47 +234,10 @@ report 50105 "Store Stock Checking"
             ILEQuery.Close();
         end;
 
-<<<<<<< HEAD
-        // ---  STEP 3: ดึงยอดขายของวันนี้ ---
-        Clear(SalesQuery);
-        SalesQuery.SetRange(Date_Filter, Today);
-        SalesQuery.SetFilter(Store_No, StoreFilterString);
-        if ItemNoFilter <> '' then SalesQuery.SetFilter(Item_No, ItemNoFilter);
-        if SalesQuery.Open() then begin
-            while SalesQuery.Read() do begin
-                if FindOrCreateItemTB(SalesQuery.Q_Item_No, SalesQuery.Q_Variant_Code, ItemTB, EntryNo, ShowVar) then begin
-                    ItemTB."Unit Cost" += SalesQuery.Sum_Quantity;
-                    ItemTB.Modify();
-                end;
-            end;
-            SalesQuery.Close();
-        end;
-
-        Clear(StatusQuery);
-        StatusQuery.SetRange(Date_Filter, Today);
-        StatusQuery.SetFilter(Status, '%1|%2', 1, 2);
-        StatusQuery.SetFilter(Store_No, StoreFilterString);
-        if ItemNoFilter <> '' then StatusQuery.SetFilter(Item_No, ItemNoFilter);
-        if StatusQuery.Open() then begin
-            while StatusQuery.Read() do begin
-                if FindOrCreateItemTB(StatusQuery.Q_Item_No, StatusQuery.Q_Variant_Code, ItemTB, EntryNo, ShowVar) then begin
-                    ItemTB."Unit Cost" -= StatusQuery.Sum_Quantity;
-                    ItemTB.Modify();
-                end;
-            end;
-            StatusQuery.Close();
-        end;
-
-        // ---  STEP 4: ดึงยอดขายในอดีต ---
-        // ทำแบบเดียวกับ Step 3 แต่เปลี่ยน Date_Filter เป็น 0D .. Today - 1 แล้วหยอดยอดเข้า ItemTB."Standard Cost"
-
-        // --- STEP 5: เติม Description และคัดกรองขยะทิ้ง ---
-=======
         // ---  STEP 3: ดึงยอดขายของวันนี้ STEP 4: ดึงยอดขายในอดีต ---
         ProcessSalesAndStatusData(true, StoreFilterString, EntryNo);  // ยอดวันนี้
         ProcessSalesAndStatusData(false, StoreFilterString, EntryNo); // ยอดอดีต
         // ---  STEP 5: คำนวณยอดสุทธิใน Memory (ข้อมูลคลีนหมดจดแล้ว ไม่มีการยิง SQL GET อีกต่อไป!) ---
->>>>>>> 26573dd2fcdcdc95f4ab0b297747099290232907
         ItemTB.Reset();
         if ItemTB.FindSet() then
             repeat
@@ -347,10 +281,6 @@ report 50105 "Store Stock Checking"
         ItemTB.Reset();
     end;
 
-<<<<<<< HEAD
-    // ฟังก์ชันทำหน้าที่ยัดรหัสลง Index เพื่อความไวแสงและเอาไว้ Sort ออกรายงาน
-    local procedure FindOrCreateItemTB(ItemNo: Code[20]; VariantCode: Code[20]; var ItemTB: Record Item temporary; var EntryNo: Integer; ShowVar: Boolean): Boolean
-=======
     local procedure ProcessSalesAndStatusData(IsToday: Boolean; StoreFilterStr: Text; var CurrentEntryNo: Integer)
     var
         SalesQuery: Query "PLSR_StoreStockTSE_Q";
@@ -411,7 +341,6 @@ report 50105 "Store Stock Checking"
     end;
     // แก้ไขฟังก์ชันให้รับชื่อและหน่วยนับมาหยอดเข้า Temporary Table ทันทีที่ถูกสร้าง
     local procedure FindOrCreateItemTB(ItemNo: Code[20]; VariantCode: Code[20]; ItemDesc: Text[100]; BaseUOM: Code[10]; var ItemTB: Record Item temporary; var EntryNo: Integer; ShowVar: Boolean): Boolean
->>>>>>> 26573dd2fcdcdc95f4ab0b297747099290232907
     var
         SearchKey: Code[100];
     begin

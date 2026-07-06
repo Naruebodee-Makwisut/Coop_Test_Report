@@ -10,6 +10,7 @@ report 50105 "Store Stock Checking"
         dataitem(ReportHeader; Integer)
         {
             DataItemTableView = sorting(Number) where(Number = const(1));
+
             trigger OnPreDataItem()
             begin
                 BuildTempData();
@@ -19,6 +20,7 @@ report 50105 "Store Stock Checking"
         dataitem(BufferLoop; Integer)
         {
             DataItemTableView = sorting(Number) where(Number = filter(1 ..));
+
             column(StoreNo_Name_StoreTB; StoreFilterText) { }
             column(ReportFilterText; ReportFilterText) { }
             column(ShowDate; ShowDate) { }
@@ -38,6 +40,7 @@ report 50105 "Store Stock Checking"
             trigger OnPreDataItem()
             begin
                 ItemTB.Reset();
+                // หัวใจสำคัญ: สั่งเรียงลำดับด้วย Key มาตรฐานที่เรายัดค่า Item|Variant ไว้
                 ItemTB.SetCurrentKey("Search Description");
                 ItemTB.Ascending(true);
                 SetRange(Number, 1, ItemTB.Count());
@@ -47,6 +50,7 @@ report 50105 "Store Stock Checking"
 
             trigger OnAfterGetRecord()
             begin
+                // วนลูปอ่านข้อมูล ซึ่งตอนนี้มันจะออกมาเรียงสวยงามเป๊ะๆ ตาม Item No. และ Variant 
                 if Number = 1 then begin
                     if not ItemTB.FindSet() then
                         CurrReport.Break();
@@ -122,6 +126,7 @@ report 50105 "Store Stock Checking"
         }
     }
 
+
     trigger OnPreReport()
     begin
         SelectLatestVersion();
@@ -154,7 +159,7 @@ report 50105 "Store Stock Checking"
         if LocationFilter = '' then
             Error('Please input Location filter!');
 
-        // --- เตรียม Report Filter Text ---
+        // --- เตรียม Report Filter Text และแปลงรหัส Location เป็น Store ---
         Clear(ReportFilterText);
         if (ItemNoFilter <> '') then ReportFilterText += 'Item No. : ' + FORMAT(ItemNoFilter + ' ');
         if (LocationFilter <> '') then ReportFilterText += ' Location : ' + FORMAT(LocationFilter + ' ');
@@ -184,7 +189,7 @@ report 50105 "Store Stock Checking"
             until StoreTB.Next() = 0;
         if StoreFilterString = '' then StoreFilterString := '___NONE___';
 
-        // ---  STEP 1: กวาดสินค้ากรณีเปิด Show Zero (กรองละเอียดตั้งแต่รอบแรก) ---
+        // ---  STEP 1: กวาดสินค้ากรณีเปิด Show Zero ---
         if ShowZeroFilter then begin
             ItemRecord.Reset();
             ItemRecord.SetRange(Type, ItemRecord.Type::Inventory);
@@ -209,7 +214,7 @@ report 50105 "Store Stock Checking"
                 until ItemRecord.Next() = 0;
         end;
 
-        // ---  STEP 2: ดึงยอดคงคลังสุทธิ (ILE) + ยัดฟิลเตอร์เข้าตัว Query ตรงๆ เพื่อความเร็วระดับ SQL ---
+        // ---  STEP 2: ดึงยอดคงคลังสุทธิ (ILE) ---
         Clear(ILEQuery);
         if ItemNoFilter <> '' then ILEQuery.SetRange(Item_No, ItemNoFilter);
         if LocationFilter <> '' then ILEQuery.SetRange(Location_Code, LocationFilter);
@@ -236,9 +241,30 @@ report 50105 "Store Stock Checking"
         ItemTB.Reset();
         if ItemTB.FindSet() then
             repeat
-                ItemTB."Last Direct Cost" := ItemTB."Unit Price" + ItemTB."Unit Cost" + ItemTB."Standard Cost";
-                ItemTB.Modify();
+                if ItemRecord.Get(ItemTB."No. 2") then begin
+                    if (not ShowZeroFilter) and
+                       ((ItemRecord.Type <> ItemRecord.Type::Inventory) or
+                        ((not ShowItemBlock) and ItemRecord.Blocked) or
+                        ((DivisionFilter <> '') and (ItemRecord."LSC Division Code" <> DivisionFilter)) or
+                        ((ItemCategoryFilter <> '') and (ItemRecord."Item Category Code" <> ItemCategoryFilter)) or
+                        ((ProductGroupFilter <> '') and (ItemRecord."LSC Retail Product Code" <> ProductGroupFilter)))
+                    then begin
+                        ItemTB.Mark(true);
+                    end else begin
+                        ItemTB.Description := ItemRecord.Description;
+                        ItemTB."Base Unit of Measure" := ItemRecord."Base Unit of Measure";
+                        ItemTB."Last Direct Cost" := ItemTB."Unit Price" + ItemTB."Unit Cost" + ItemTB."Standard Cost";
+                        ItemTB.Modify();
+                    end;
+                end else begin
+                    ItemTB.Mark(true);
+                end;
             until ItemTB.Next() = 0;
+
+        ItemTB.MarkedOnly(true);
+        if not ItemTB.IsEmpty() then
+            ItemTB.DeleteAll();
+        ItemTB.Reset();
 
         // --- STEP 6: กรองค่าศูนย์และค่าติดลบ ---
         if not ShowZeroFilter then begin
@@ -321,28 +347,22 @@ report 50105 "Store Stock Checking"
         if not ShowVar then
             VariantCode := '';
 
+        // แปลงร่าง: เอา Item ต่อด้วย Variant คั่นด้วย | เช่น (1000|V1) เพื่อกันการจัดเรียงเพี้ยน
         SearchKey := CopyStr(ItemNo + '|' + VariantCode, 1, 100);
+
         ItemTB.Reset();
+        // ใช้ Index Key ในการค้นหา ข้อมูลล้านบรรทัดก็หาเจอในเสี้ยววินาที!
         ItemTB.SetCurrentKey("Search Description");
         ItemTB.SetRange("Search Description", SearchKey);
-        if ItemTB.FindFirst() then begin
-            // กรณีมีความจำเป็นต้องอัปเดตข้อมูลรายละเอียดเพิ่มเติม
-            if (ItemTB.Description = '') and (ItemDesc <> '') then begin
-                ItemTB.Description := ItemDesc;
-                ItemTB."Base Unit of Measure" := BaseUOM;
-                ItemTB.Modify();
-            end;
+        if ItemTB.FindFirst() then
             exit(true);
-        end;
 
         EntryNo += 1;
         ItemTB.Init();
         ItemTB."No." := Format(EntryNo);
         ItemTB."No. 2" := ItemNo;
         ItemTB."Vendor Item No." := VariantCode;
-        ItemTB."Search Description" := SearchKey;
-        ItemTB.Description := ItemDesc;
-        ItemTB."Base Unit of Measure" := BaseUOM;
+        ItemTB."Search Description" := SearchKey; // เก็บกุญแจไว้
         ItemTB.Insert();
         exit(true);
     end;

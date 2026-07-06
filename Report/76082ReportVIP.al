@@ -34,20 +34,20 @@ report 50112 "PLSR_Store_Sales_VAT"
 
                 TransHeader.SetCurrentKey("Store No.", "POS Terminal No.", Date);
 
-                CLEAR(OldStoreNo);
-                CLEAR(OldBranch);
-                CLEAR(OldPOSNo);
-                CLEAR(OldTransDate);
-                CLEAR(Description);
-                CLEAR(Running);
-                CLEAR(GroupRunning);
-                CLEAR(GroupNetAmt);
-                CLEAR(GroupGrossAmt);
-                CLEAR(GroupVATAmt);
-                CLEAR(FullVATNo);
-                CLEAR(VATAmt);
-                CLEAR(TransType);
-                CLEAR(StoreBranch);
+                clear(OldStoreNo);
+                clear(OldBranch);
+                clear(OldPOSNo);
+                clear(OldTransDate);
+                clear(Description);
+                clear(Running);
+                clear(GroupRunning);
+                clear(GroupNetAmt);
+                clear(GroupGrossAmt);
+                clear(GroupVATAmt);
+                clear(FullVATNo);
+                clear(VATAmt);
+                clear(TransType);
+                clear(StoreBranch);
 
                 TempTransactionHeaderTemp.Reset();
                 TempTransactionHeaderTemp.DeleteAll();
@@ -56,14 +56,14 @@ report 50112 "PLSR_Store_Sales_VAT"
 
             trigger OnAfterGetRecord()
             begin
-                Clear(StoreBranch);
-                Clear(StoreTB);
+                clear(StoreBranch);
+                clear(StoreTB);
 
                 if StoreTB.Get(TransHeader."Store No.") then;
                 StoreBranch := StoreTB."PLSLC_Branch No.";
 
                 GroupRunning := Running;
-                Clear(FullVATNo);
+                clear(FullVATNo);
                 if TransHeader."PLSLC_Full VAT No." <> '' then
                     FullVATNo := TransHeader."PLSLC_Full VAT No."
                 else
@@ -79,23 +79,23 @@ report 50112 "PLSR_Store_Sales_VAT"
                             GroupRunning += 1;
                             Running += 1;
                         end;
-                    CLEAR(POSTerminalTB);
+                    clear(POSTerminalTB);
                     IF POSTerminalTB.GET(TransHeader."POS Terminal No.") THEN;
 
-                    CLEAR(GroupNetAmt);
-                    CLEAR(GroupGrossAmt);
-                    CLEAR(GroupVATAmt);
+                    clear(GroupNetAmt);
+                    clear(GroupGrossAmt);
+                    clear(GroupVATAmt);
                     OldBranch := StoreBranch;
                     OldPOSNo := TransHeader."POS Terminal No.";
                     OldTransDate := TransHeader.Date;
-                    CLEAR(Description);
+                    clear(Description);
                     Description := AVGetFirstLastReceiptNo(TransHeader."Store No.", TransHeader."POS Terminal No.", TransHeader.Date);
                 end;
 
 
                 if FullVATNo <> '' then
                     Running += 1;
-                CLEAR(VATAmt);
+                clear(VATAmt);
                 VATAmt := ROUND((TransHeader."Gross Amount" * -1) - (TransHeader."Net Amount" * -1), 0.01, '=');
                 TransType := 'รายได้จากการขาย';
                 TempTransactionHeaderTemp.Reset();
@@ -248,10 +248,10 @@ report 50112 "PLSR_Store_Sales_VAT"
             trigger OnPreDataItem()
             begin
                 ComInfo.Get();
-                Clear(TempTransactionHeaderTemp);
+                clear(TempTransactionHeaderTemp);
                 TempTransactionHeaderTemp.SetCurrentKey("No. of Recomm. Calls", "Store No.");
                 TempTransactionHeaderTemp.Ascending(true);
-                Clear(sum);
+                clear(sum);
 
             end;
 
@@ -411,7 +411,7 @@ report 50112 "PLSR_Store_Sales_VAT"
     var
         i: Integer;
     begin
-        Clear(VATRegsNo);
+        clear(VATRegsNo);
         repeat
             i += 1;
             VATRegsNo[i] := CopyStr(ComInfo."VAT Registration No.", i, 1);
@@ -420,9 +420,9 @@ report 50112 "PLSR_Store_Sales_VAT"
 
     local procedure MarkBrach(TempTransH: Record "LSC Transaction Header" temporary)
     begin
-        Clear(VATBussPostTB);
-        Clear(BranchNo);
-        Clear(StoreTB);
+        clear(VATBussPostTB);
+        clear(BranchNo);
+        clear(StoreTB);
         if StoreTB.Get(TempTransH."Store No.") then
             if VATBussPostTB.Get(StoreTB."Store VAT Bus. Post. Gr.") then
                 if (VATBussPostTB."AVF_Branch No." = '00000') or (VATBussPostTB."AVF_Branch No." = '0000') then
@@ -439,17 +439,17 @@ report 50112 "PLSR_Store_Sales_VAT"
         TransHeadTB: Record "LSC Transaction Header";
         Store: Record "LSC Store";
     begin
-        CLEAR(SumNetAmt);
-        CLEAR(SumGrossAmt);
-        CLEAR(SumVATAmt);
-        Clear(Store);
+        clear(SumNetAmt);
+        clear(SumGrossAmt);
+        clear(SumVATAmt);
+        clear(Store);
         Store.SetCurrentKey("No.", "PLSLC_Branch No.");
         if StoreFilter <> '' then
             Store.SetFilter("No.", StoreFilter);
         Store.SetRange("PLSLC_Branch No.", pStoreBranch);
         if Store.FindSet() then
             repeat
-                CLEAR(TransHeadTB);
+                clear(TransHeadTB);
                 TransHeadTB.COPYFILTERS(TempTransH);
                 TransHeadTB.SETRANGE("Store No.", Store."No.");
                 IF TransHeadTB.FindSet() THEN BEGIN
@@ -471,8 +471,8 @@ report 50112 "PLSR_Store_Sales_VAT"
         TransHTB: Record "LSC Transaction Header";
         SalesVATAmtQuery: Query "PLSR_StoreSalesVATAmt_Q";
     begin
-        CLEAR(ReceiptTxt);
-        CLEAR(TransHTB);
+        clear(ReceiptTxt);
+        clear(TransHTB);
         TransHTB.SETCURRENTKEY("Store No.", "POS Terminal No.", "Transaction No.");
         TransHTB.SETRANGE("Store No.", StoreNo);
         TransHTB.SETRANGE("POS Terminal No.", POSTerminalNo);
@@ -485,7 +485,7 @@ report 50112 "PLSR_Store_Sales_VAT"
         IF TransHTB.FINDLAST() THEN
             ReceiptTxt := ReceiptTxt + ' - ' + TransHTB."Receipt No.";
 
-        Clear(SalesVATAmtQuery);
+        clear(SalesVATAmtQuery);
         SalesVATAmtQuery.SetRange(Store_No, StoreNo);
         SalesVATAmtQuery.SetRange(POS_Terminal_No, POSTerminalNo);
         SalesVATAmtQuery.SetRange(Date_Filter, TransDate);
@@ -507,8 +507,8 @@ report 50112 "PLSR_Store_Sales_VAT"
 
     local procedure AVGetStoreDetail(TempTransactionHeaderTemp: Record "LSC Transaction Header" temporary)
     begin
-        Clear(Addr);
-        Clear(StoreTB);
+        clear(Addr);
+        clear(StoreTB);
         if StoreTB.Get(TempTransactionHeaderTemp."Store No.") then
             if StoreTB."PLSLC_Show Full Vat At HQ" then begin
                 Addr[1] := ComInfo.Address;

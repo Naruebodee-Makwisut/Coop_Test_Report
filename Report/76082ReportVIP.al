@@ -6,7 +6,7 @@ report 50112 "PLSR_Store_Sales_VAT"
     PreviewMode = PrintLayout;
 
     // AVPWDLSVIP 30/06/2026 > Improve Performance of VIP Report(76082) - น้องปอ
-    dataset
+      dataset
     {
         dataitem(TransHeader; "LSC Transaction Header")
         {

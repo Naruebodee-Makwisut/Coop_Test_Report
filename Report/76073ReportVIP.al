@@ -5,6 +5,7 @@ report 50111 "TEST_Sales Rep by Special Gr"
     RDLCLayout = './ReportLayouts/Rep50111_POSSalesReportBySpecialGroup.rdl';
     PreviewMode = PrintLayout;
 
+    // AVNMTLSVIP 30/06/2026 > Improve Performance of VIP Report(76073)
     dataset
     {
         dataitem("Item Special Groups"; "LSC Item Special Groups")
@@ -254,4 +255,6 @@ report 50111 "TEST_Sales Rep by Special Gr"
         Sale_LCYCaptionLbl: Label 'ยอดขายสุทธิ (Inc. VAT)';
         Special_GroupCaptionLbl: Label 'Special Group';
         TotalCaptionLbl: Label 'Total';
+
+    // C-AVNMTLSVIP 30/06/2026 > Improve Performance of VIP Report(76073)
 }

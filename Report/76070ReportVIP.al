@@ -28,14 +28,22 @@ report 50106 "PLSR_Sales Report By Division2"
             column(Date_TransSale; Format(LSCTB.Date, 0, '<Closing><Day,2>/<Month,2>/<Year4>')) { }
             column(TransType; LSCTB."POS Line Description") { }
             column(Item_No_TransSale; LSCTB."Item No.") { }
+<<<<<<< HEAD
             column(Item_Name_ItemTB; LSCTB.Epc) { }
+=======
+            column(Item_Name_ItemTB; LSCTB."Item Description") { }
+>>>>>>> 82046be983b4f2a85c27b400a85f2f7140766f3e
             column(Qty; LSCTB.Quantity) { }
             column(Unit_of_Measure_TransSale; LSCTB."Unit of Measure") { }
             column(BaseQty; LSCTB."UOM Quantity") { }
             column(UnitPrice; LSCTB.Price) { }
             column(Amount; LSCTB.Price * LSCTB.Quantity) { }
             column(Discount_Amount_TransSale; LSCTB."Discount Amount") { }
+<<<<<<< HEAD
             column(TotalAmt; LSCTB."Net Amount") { }
+=======
+            column(TotalAmt; (LSCTB.Price * LSCTB.Quantity) - LSCTB."Discount Amount") { }
+>>>>>>> 82046be983b4f2a85c27b400a85f2f7140766f3e
             column(ShowVariant; not RettailSetup."PLSPOS_Show Var for Report VIP") { }
 
             // ==========================================
@@ -65,12 +73,20 @@ report 50106 "PLSR_Sales Report By Division2"
                 ItemKey: Text;
                 DivKey: Text;
                 CalcAmount: Decimal;
+<<<<<<< HEAD
                 Qty: Decimal;
                 BaseQty: Decimal;
                 UnitPrice: Decimal;
             begin
                 LSCTB.Reset();
                 LSCTB.DeleteAll();
+=======
+            begin
+                LSCTB.Reset();
+                LSCTB.DeleteAll();
+
+                // เคลียร์ค่าในกล่อง Dictionary ทั้งหมด
+>>>>>>> 82046be983b4f2a85c27b400a85f2f7140766f3e
                 Clear(DictItemQty);
                 Clear(DictItemBaseQty);
                 Clear(DictItemAmt);
@@ -114,6 +130,7 @@ report 50106 "PLSR_Sales Report By Division2"
                 PosSalesQry.Open();
 
                 while PosSalesQry.Read() do begin
+<<<<<<< HEAD
 
                     ItemKey := PosSalesQry.Store_No + '_' + PosSalesQry.LSC_Division_Code + '_' + PosSalesQry.Item_No;
                     DivKey := PosSalesQry.Store_No + '_' + PosSalesQry.LSC_Division_Code;
@@ -157,6 +174,40 @@ report 50106 "PLSR_Sales Report By Division2"
 
                     GrandTotal_Qty += Qty;
                     GrandTotal_Amount += (UnitPrice * Qty);
+=======
+                    // สร้างคีย์แยกกลุ่ม (แผนก + รหัสสินค้า)
+                    ItemKey := PosSalesQry.Division_Code + '_' + PosSalesQry.Item_No;
+                    DivKey := PosSalesQry.Division_Code;
+                    CalcAmount := PosSalesQry.Price * PosSalesQry.Quantity;
+
+                    // 1. บวกสะสมระดับรายสินค้า (Item Group)
+                    if DictItemQty.ContainsKey(ItemKey) then begin
+                        DictItemQty.Set(ItemKey, DictItemQty.Get(ItemKey) + PosSalesQry.Quantity);
+                        DictItemBaseQty.Set(ItemKey, DictItemBaseQty.Get(ItemKey) + PosSalesQry.UOM_Quantity);
+                        DictItemAmt.Set(ItemKey, DictItemAmt.Get(ItemKey) + CalcAmount);
+                        DictItemDisc.Set(ItemKey, DictItemDisc.Get(ItemKey) + PosSalesQry.Discount_Amount);
+                    end else begin
+                        DictItemQty.Add(ItemKey, PosSalesQry.Quantity);
+                        DictItemBaseQty.Add(ItemKey, PosSalesQry.UOM_Quantity);
+                        DictItemAmt.Add(ItemKey, CalcAmount);
+                        DictItemDisc.Add(ItemKey, PosSalesQry.Discount_Amount);
+                    end;
+
+                    // 2. บวกสะสมระดับรายแผนก (Division Group)
+                    if DictDivQty.ContainsKey(DivKey) then begin
+                        DictDivQty.Set(DivKey, DictDivQty.Get(DivKey) + PosSalesQry.Quantity);
+                        DictDivAmt.Set(DivKey, DictDivAmt.Get(DivKey) + CalcAmount);
+                        DictDivDisc.Set(DivKey, DictDivDisc.Get(DivKey) + PosSalesQry.Discount_Amount);
+                    end else begin
+                        DictDivQty.Add(DivKey, PosSalesQry.Quantity);
+                        DictDivAmt.Add(DivKey, CalcAmount);
+                        DictDivDisc.Add(DivKey, PosSalesQry.Discount_Amount);
+                    end;
+
+                    // 3. บวกสะสมยอดรวมสุทธิท้ายรายงาน (Grand Totals) 
+                    GrandTotal_Qty += PosSalesQry.Quantity;
+                    GrandTotal_Amount += CalcAmount;
+>>>>>>> 82046be983b4f2a85c27b400a85f2f7140766f3e
                     GrandTotal_Discount += PosSalesQry.Discount_Amount;
 
                     LSCTB.Init();
@@ -168,6 +219,7 @@ report 50106 "PLSR_Sales Report By Division2"
                     LSCTB."Receipt No." := PosSalesQry.Receipt_No;
                     LSCTB.Date := PosSalesQry.Date;
                     LSCTB."Item No." := PosSalesQry.Item_No;
+<<<<<<< HEAD
                     LSCTB.Epc := Format(PosSalesQry.Item_Description + ' ' + PosSalesQry.Item_Description_2);
                     LSCTB."Division Code" := PosSalesQry.LSC_Division_Code;
                     LSCTB."Posting Exception Key" := Format(PosSalesQry.LSC_Division_Code + ' - ' + PosSalesQry.Division_Description);
@@ -177,10 +229,21 @@ report 50106 "PLSR_Sales Report By Division2"
                     LSCTB."Unit of Measure" := PosSalesQry.Unit_of_Measure;
                     LSCTB."UOM Quantity" := BaseQty;
 
+=======
+                    LSCTB."Item Description" := PosSalesQry.Item_Description + ' ' + PosSalesQry.Item_Description_2;
+                    LSCTB."Division Code" := PosSalesQry.Division_Code;
+                    LSCTB."Posting Exception Key" := PosSalesQry.Division_Code + ' - ' + PosSalesQry.Division_Description;
+                    LSCTB.Quantity := PosSalesQry.Quantity;
+                    LSCTB.Price := PosSalesQry.Price;
+                    LSCTB."Discount Amount" := PosSalesQry.Discount_Amount;
+                    LSCTB."Unit of Measure" := PosSalesQry.Unit_of_Measure;
+                    LSCTB."UOM Quantity" := PosSalesQry.UOM_Quantity;
+>>>>>>> 82046be983b4f2a85c27b400a85f2f7140766f3e
                     TransType := Format(PosSalesQry.Transaction_Type);
                     if PosSalesQry.Return_No_Sale then
                         TransType := 'Refund';
                     LSCTB."POS Line Description" := TransType;
+<<<<<<< HEAD
 
                     LSCTB."Net Amount" := CalcAmount;
 
@@ -188,6 +251,12 @@ report 50106 "PLSR_Sales Report By Division2"
                 end;
                 PosSalesQry.Close();
                 LSCTB.SetCurrentKey("Store No.", "Division Code", "Item No.", "POS Terminal No.", "Transaction No.", "Line No.");
+=======
+                    LSCTB.Insert();
+                end;
+                PosSalesQry.Close();
+
+>>>>>>> 82046be983b4f2a85c27b400a85f2f7140766f3e
                 TransSale.SetRange(Number, 1, LSCTB.Count());
             end;
 
@@ -204,8 +273,13 @@ report 50106 "PLSR_Sales Report By Division2"
                         CurrReport.Break();
                 end;
 
+<<<<<<< HEAD
                 ItemKey := LSCTB."Store No." + '_' + LSCTB."Division Code" + '_' + LSCTB."Item No.";
                 DivKey := LSCTB."Store No." + '_' + LSCTB."Division Code";
+=======
+                ItemKey := LSCTB."Division Code" + '_' + LSCTB."Item No.";
+                DivKey := LSCTB."Division Code";
+>>>>>>> 82046be983b4f2a85c27b400a85f2f7140766f3e
 
                 // ดึงยอดรวมกลุ่มสินค้า (Item Group) ออกมาใส่คอลัมน์
                 if DictItemQty.ContainsKey(ItemKey) then begin
@@ -342,9 +416,12 @@ report 50106 "PLSR_Sales Report By Division2"
         PosSalesQry: Query "PLSR_Sales Report By DivisionQ"; //ตัวแปรรับคิวรี่มาใช้งาน ไม่ต้องดึง table เยอะ
         LSVIPRepFunction: Codeunit "PLSR_Report Function";
         ComInfo: Record "Company Information";
+<<<<<<< HEAD
         // ItemTB: Record Item; ไปอยู่ในคิวรี่แทนแล้ว
         //  DivisonTB: Record "LSC Division";
         // TransHeaderTB: Record "LSC Transaction Header";
+=======
+>>>>>>> 82046be983b4f2a85c27b400a85f2f7140766f3e
         RettailSetup: Record "LSC Retail Setup";
         LSCTB: Record "LSC Trans. Sales Entry" temporary;
         ShowTime: Text[50];

@@ -1,8 +1,16 @@
+<<<<<<< HEAD
 report 50117 "100 Top Spender"
 {
     Caption = '100 Top Spender';
     DefaultLayout = RDLC;
     RDLCLayout = './ReportLayouts/Rep76091_100TopSpender.rdl';
+=======
+report 50118 "100 Top Spender"
+{
+    Caption = '100 Top Spender';
+    DefaultLayout = RDLC;
+    RDLCLayout = './ReportLayouts/Rep50118_100TopSpender.rdl';
+>>>>>>> 82046be983b4f2a85c27b400a85f2f7140766f3e
     PreviewMode = PrintLayout;
 
     dataset
@@ -35,10 +43,17 @@ report 50117 "100 Top Spender"
             column(TopSpent; TempInsMemberSalesEntryTemp."Gross Amount")
             { }
             // AVNMTLSVIP.27 25/11/25 Update Code for BC27
+<<<<<<< HEAD
             // column(BalancePoint; MemberAccountTB.Balance)
             column(BalancePoint; Points[6])
             //C-AVNMTLSVIP.27 25/11/25 Update Code for BC27     
             { }
+=======
+            column(BalancePoint; MemberAccountTB.Balance){}
+            // column(BalancePoint; Points[6])
+            // { }
+            //C-AVNMTLSVIP.27 25/11/25 Update Code for BC27     
+>>>>>>> 82046be983b4f2a85c27b400a85f2f7140766f3e
             column(LastPurDate; format(FilterMemberSalesEntryTB.Date, 0, '<Closing><Day,2>/<Month,2>/<Year4>'))
             { }
 
@@ -65,6 +80,7 @@ report 50117 "100 Top Spender"
 
                 //AVNMTLSVIP.27 25/11/25 Update Code for BC27
                 Clear(MemberAccountTB);
+<<<<<<< HEAD
                 // MemberAccountTB.SetRange("No.", TempInsMemberSalesEntryTemp."Member Account No.");
                 // MemberAccountTB.SetLoadFields(Balance);
                 // if MemberAccountTB.FindSet() then
@@ -72,6 +88,15 @@ report 50117 "100 Top Spender"
 
                 IF MemberAccountTB.Get(TempInsMemberSalesEntryTemp."Member Account No.") then
                     MemberAccountTB.CalculateMemberPoints(Points);
+=======
+                MemberAccountTB.SetRange("No.", TempInsMemberSalesEntryTemp."Member Account No.");
+                MemberAccountTB.SetLoadFields(Balance);
+                if MemberAccountTB.FindSet() then
+                    MemberAccountTB.CalcFields(Balance);
+
+                // IF MemberAccountTB.Get(TempInsMemberSalesEntryTemp."Member Account No.") then
+                //     MemberAccountTB.CalculateMemberPoints(Points);
+>>>>>>> 82046be983b4f2a85c27b400a85f2f7140766f3e
                 //C-AVNMTLSVIP.27 25/11/25 Update Code for BC27
 
                 Clear(FilterMemberSalesEntryTB);

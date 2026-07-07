@@ -13,7 +13,7 @@ report 50113 "TEST_Sale VAT by Rec_Test"
 
             column(Name_ComInfo; ComInfo.Name)
             { }
-            column(Branch_No_Store; StoreTB."PLSLC_Branch No.")
+            column(Branch_No_Store; TempStore."PLSLC_Branch No.")
             { }
             column(Addr1_Store; AddrText[1])
             { }
@@ -44,7 +44,7 @@ report 50113 "TEST_Sale VAT by Rec_Test"
             { }
             column(Full_VAT_No_TransHeader; FullVATNo)
             { }
-            column(POSNo_POSTerminalTB; POSTerminalTB."PLSLC_POS No.")
+            column(POSNo_POSTerminalTB; TempPOSTerminal."PLSLC_POS No.")
             { }
             column(TransType; TransType)
             { }
@@ -71,6 +71,9 @@ report 50113 "TEST_Sale VAT by Rec_Test"
 
             trigger OnPreDataItem()
             begin
+                Clear(OldStoreNo);
+                Clear(PeriodDate);
+                Clear(DateFilter);
                 IF Choose1Filter THEN BEGIN
                     DateFilter := FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + '..' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                     PeriodDate := 'ประจำงวดวันที่ ' + FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + ' ถึง ' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
@@ -92,6 +95,7 @@ report 50113 "TEST_Sale VAT by Rec_Test"
 
                 StoreVATQry.SetFilter(Receipt_No_Filter, '<>%1', '');
                 StoreVATQry.SetFilter(Entry_Status_Filter, '<>%1', StoreVATQry.Entry_Status_Filter::Voided);
+
                 if DateFilter <> '' then
                     StoreVATQry.SetFilter(Date_Filter, DateFilter);
                 if StoreFilter <> '' then
@@ -155,11 +159,12 @@ report 50113 "TEST_Sale VAT by Rec_Test"
                         CurrReport.Break(); // ถ้าหมดข้อมูลในคลังแล้ว ให้สั่งหลุดลูป Integer ทันที
 
                 Clear(FullVATNo);
-                Clear(StoreTB);
                 Clear(AddrText);
+                TempStore.Reset();
+                TempTransHeader.Reset();
+                TempPOSTerminal.Reset();
 
                 if TempStore.Get(TempTransHeader."Store No.") then begin
-                    StoreTB := TempStore;
                     if TempStore."PLSLC_Show Full Vat At HQ" then begin
                         AddrText[1] := ComInfo.Address;
                         AddrText[2] := ComInfo."Address 2";
@@ -178,13 +183,13 @@ report 50113 "TEST_Sale VAT by Rec_Test"
                     Clear(RunningNum);
                 end;
                 RunningNum += 1;
+                // Clear(VATBussTB);
+                // if VATBussTB.Get(StoreTB."Store VAT Bus. Post. Gr.") then;
 
                 Clear(VATAmount);
                 VATAmount := Round((-TempTransHeader."Gross Amount") - (-TempTransHeader."Net Amount"), 0.01, '=');
 
-                Clear(POSTerminalTB);
-                if TempPOSTerminal.Get(TempTransHeader."POS Terminal No.") then
-                    POSTerminalTB := TempPOSTerminal;
+                if TempPOSTerminal.Get(TempTransHeader."POS Terminal No.") then;
 
                 Clear(TransType);
                 if (TempTransHeader."Sale Is Return Sale") then begin
@@ -285,12 +290,17 @@ report 50113 "TEST_Sale VAT by Rec_Test"
             FDateFilter := Today;
             Choose1Filter := false;
             Choose2Filter := true;
+
+            Clear(StoreFilter);
+            Clear(TodateFilter);
+            Clear(FromDateFilter);
         end;
     }
 
     trigger OnPreReport()
     begin
         SelectLatestVersion();
+        Clear(ComInfo);
         ComInfo.Get();
         ShowDate := FORMAT(Today, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
         ShowTime := LSVIPRepFunction.AVTimeFormat(Time);
@@ -300,7 +310,7 @@ report 50113 "TEST_Sale VAT by Rec_Test"
         // Record
         ComInfo: Record "Company Information";
         POSTerminalTB: Record "LSC POS Terminal";
-        StoreTB: Record "LSC Store";
+        // StoreTB: Record "LSC Store";
         TempPOSTerminal: Record "LSC POS Terminal" temporary;
         TempStore: Record "LSC Store" temporary;
         TempTransHeader: Record "LSC Transaction Header" temporary;

@@ -1,26 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:am="http://schemas.microsoft.com/sqlserver/reporting/authoringmetadata">
-  <rd:ReportUnitType>Cm</rd:ReportUnitType>
-  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
   <am:AuthoringMetadata>
     <am:CreatedBy>
       <am:Name>MSRB</am:Name>
-      <am:Version>15.1.30001.02</am:Version>
+      <am:Version>15.0.20283.0</am:Version>
     </am:CreatedBy>
     <am:UpdatedBy>
       <am:Name>MSRB</am:Name>
-      <am:Version>15.1.30001.02</am:Version>
+      <am:Version>15.0.20283.0</am:Version>
     </am:UpdatedBy>
-    <am:LastModifiedTimestamp>2026-07-03T04:53:03.3119966Z</am:LastModifiedTimestamp>
+    <am:LastModifiedTimestamp>2026-07-03T05:02:28.5912607Z</am:LastModifiedTimestamp>
   </am:AuthoringMetadata>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
     <DataSource Name="DataSource">
-      <rd:SecurityType>None</rd:SecurityType>
       <ConnectionProperties>
         <DataProvider>SQL</DataProvider>
         <ConnectString />
       </ConnectionProperties>
+      <rd:SecurityType>None</rd:SecurityType>
       <rd:DataSourceID>772d7c45-3039-4ba7-9f20-4a6fc4430dd2</rd:DataSourceID>
     </DataSource>
   </DataSources>
@@ -35,16 +33,16 @@
                   <Width>3.81924cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.5cm</Width>
+                  <Width>1.4cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>3.29517cm</Width>
-                </TablixColumn>
-                <TablixColumn>
-                  <Width>1.6cm</Width>
+                  <Width>3.19517cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>1.7cm</Width>
+                </TablixColumn>
+                <TablixColumn>
+                  <Width>1.65cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>1.85168cm</Width>
@@ -56,10 +54,10 @@
                   <Width>3.35133cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.8101cm</Width>
+                  <Width>1.80431cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.08071cm</Width>
+                  <Width>1.13071cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>1.83416cm</Width>
@@ -68,10 +66,10 @@
                   <Width>2.06195cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.7cm</Width>
+                  <Width>1.75067cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>2.01495cm</Width>
+                  <Width>2.07009cm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -81,13 +79,12 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox3">
-                          <rd:DefaultName>Textbox3</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Division</Value>
+                                  <Value>Product Group</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -100,6 +97,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox3</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -127,7 +125,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox5">
-                          <rd:DefaultName>Textbox5</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -146,6 +143,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox5</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -173,13 +171,27 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox32">
-                          <rd:DefaultName>Textbox32</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>เลขที่ใบกำกับฯ อย่างย่อ</Value>
+                                  <Value>เลขที่ใบกำกับฯ </Value>
+                                  <Style>
+                                    <FontFamily>Browallia New</FontFamily>
+                                    <FontSize>12pt</FontSize>
+                                    <FontWeight>Bold</FontWeight>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>อย่างย่อ</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -192,6 +204,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox32</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -219,7 +232,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox38">
-                          <rd:DefaultName>Textbox38</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -238,6 +250,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox38</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -265,7 +278,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox44">
-                          <rd:DefaultName>Textbox44</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -284,6 +296,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox44</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -311,7 +324,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox50">
-                          <rd:DefaultName>Textbox50</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -330,6 +342,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox50</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -357,7 +370,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox1">
-                          <rd:DefaultName>Textbox1</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -365,11 +377,9 @@
                                 <TextRun>
                                   <Value>Variant</Value>
                                   <Style>
-                                    <FontStyle>Normal</FontStyle>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
-                                    <TextDecoration>None</TextDecoration>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -378,6 +388,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox1</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -405,7 +416,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox56">
-                          <rd:DefaultName>Textbox56</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -424,6 +434,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox56</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -451,7 +462,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox62">
-                          <rd:DefaultName>Textbox62</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -471,6 +481,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox62</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -498,7 +509,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox68">
-                          <rd:DefaultName>Textbox68</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -517,6 +527,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox68</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -544,7 +555,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox74">
-                          <rd:DefaultName>Textbox74</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -563,6 +573,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox74</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -590,7 +601,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox80">
-                          <rd:DefaultName>Textbox80</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -609,6 +619,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox80</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -636,7 +647,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox86">
-                          <rd:DefaultName>Textbox86</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -656,6 +666,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox86</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -683,7 +694,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox92">
-                          <rd:DefaultName>Textbox92</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -703,6 +713,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox92</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -740,14 +751,13 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox22">
-                          <rd:DefaultName>Textbox22</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Division_TransSale.Value</Value>
+                                  <Value>=Fields!Retail_Product_TransSale.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -759,6 +769,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox22</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -780,12 +791,13 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox23">
-                          <rd:DefaultName>Textbox23</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -803,6 +815,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox23</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -829,7 +842,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox35">
-                          <rd:DefaultName>Textbox35</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -847,6 +860,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox35</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -873,7 +887,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox41">
-                          <rd:DefaultName>Textbox41</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -892,6 +906,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox41</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -918,7 +933,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox47">
-                          <rd:DefaultName>Textbox47</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -936,6 +951,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox47</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -962,7 +978,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox53">
-                          <rd:DefaultName>Textbox53</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -980,6 +996,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox53</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1006,7 +1023,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Variant_Code">
-                          <rd:DefaultName>Variant_Code</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1024,6 +1041,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Variant_Code</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1050,7 +1068,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox59">
-                          <rd:DefaultName>Textbox59</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -1069,6 +1086,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox59</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1095,7 +1113,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox65">
-                          <rd:DefaultName>Textbox65</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1113,6 +1131,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox65</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1139,7 +1158,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox71">
-                          <rd:DefaultName>Textbox71</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1158,6 +1177,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox71</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1184,7 +1204,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox77">
-                          <rd:DefaultName>Textbox77</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1203,6 +1223,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox77</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1229,7 +1250,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox81">
-                          <rd:DefaultName>Textbox77</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1248,6 +1269,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox77</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1274,7 +1296,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox82">
-                          <rd:DefaultName>Textbox77</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1293,6 +1315,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox77</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1319,7 +1342,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox83">
-                          <rd:DefaultName>Textbox77</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1329,7 +1352,7 @@
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
-                                    <Format>#,0.00;-#,0.00;'0.00'</Format>
+                                    <Format>#,0.00</Format>
                                   </Style>
                                 </TextRun>
                               </TextRuns>
@@ -1338,6 +1361,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox77</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1374,14 +1398,13 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox29">
-                          <rd:DefaultName>Textbox28</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!Division_TransSale.Value</Value>
+                                  <Value>=Fields!Retail_Product_TransSale.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -1395,6 +1418,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox28</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1417,12 +1441,13 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox31">
-                          <rd:DefaultName>Textbox23</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1442,6 +1467,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox23</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1469,7 +1495,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox70">
-                          <rd:DefaultName>Textbox36</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1489,6 +1515,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox36</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1516,7 +1543,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox73">
-                          <rd:DefaultName>Textbox42</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1536,6 +1563,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox42</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1563,7 +1591,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox91">
-                          <rd:DefaultName>Textbox48</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1583,6 +1611,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox48</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1610,7 +1639,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox94">
-                          <rd:DefaultName>Textbox54</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -1631,6 +1659,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox54</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1658,7 +1687,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox4">
-                          <rd:DefaultName>Textbox4</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1678,6 +1707,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox4</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1705,7 +1735,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox96">
-                          <rd:DefaultName>Textbox59</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -1726,6 +1755,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox59</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1752,8 +1782,8 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox98">
-                          <rd:DefaultName>Textbox66</rd:DefaultName>
+                        <Textbox Name="Textbox97">
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1768,7 +1798,7 @@
                                   </Style>
                                 </TextRun>
                                 <TextRun>
-                                  <Value>=Fields!ItemTotal_BaseQty.Value</Value>
+                                  <Value>=Fields!ItemTotalQty.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -1783,6 +1813,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox66</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1810,13 +1841,13 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox99">
-                          <rd:DefaultName>Textbox71</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!ItemTotal_Qty.Value</Value>
+                                  <Value>=Fields!ItemTotalQty.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -1831,6 +1862,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox71</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1858,7 +1890,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox100">
-                          <rd:DefaultName>Textbox78</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -1878,6 +1910,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox78</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1905,13 +1938,13 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox101">
-                          <rd:DefaultName>Textbox77</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!ItemTotal_Amount.Value</Value>
+                                  <Value>=Fields!ItemTotalAmount.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -1926,6 +1959,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox77</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -1953,13 +1987,13 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox102">
-                          <rd:DefaultName>Textbox77</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!ItemTotal_Discount.Value</Value>
+                                  <Value>=Fields!ItemTotalDiscount.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -1974,6 +2008,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox77</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2001,13 +2036,13 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox103">
-                          <rd:DefaultName>Textbox77</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!TotalAmt.Value)</Value>
+                                  <Value>=Fields!ItemTotalAmt.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -2022,6 +2057,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox77</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2059,14 +2095,13 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox122">
-                          <rd:DefaultName>Textbox30</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>="Total " &amp; Fields!Division_TransSale.Value</Value>
+                                  <Value>="Total " &amp; Fields!Retail_Product_TransSale.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -2080,6 +2115,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox30</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2107,7 +2143,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox123">
-                          <rd:DefaultName>Textbox23</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -2127,6 +2163,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox23</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2154,7 +2191,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox124">
-                          <rd:DefaultName>Textbox37</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -2173,6 +2210,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox37</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2200,7 +2238,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox125">
-                          <rd:DefaultName>Textbox43</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -2219,6 +2257,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox43</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2246,7 +2285,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox126">
-                          <rd:DefaultName>Textbox49</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -2265,6 +2304,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox49</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2292,7 +2332,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox127">
-                          <rd:DefaultName>Textbox55</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -2311,6 +2351,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox55</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2338,7 +2379,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox6">
-                          <rd:DefaultName>Textbox6</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -2357,6 +2398,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox6</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2384,7 +2426,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox128">
-                          <rd:DefaultName>Textbox61</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -2403,6 +2445,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox61</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2429,8 +2472,8 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox214">
-                          <rd:DefaultName>Textbox214</rd:DefaultName>
+                        <Textbox Name="Textbox215">
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -2450,6 +2493,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox214</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2477,14 +2521,13 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox129">
-                          <rd:DefaultName>Textbox71</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!DivTotal_Qty.Value</Value>
+                                  <Value>=Fields!ProductTotalQty.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -2499,6 +2542,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox71</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2526,7 +2570,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox130">
-                          <rd:DefaultName>Textbox78</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -2546,6 +2590,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox78</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2573,13 +2618,13 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox131">
-                          <rd:DefaultName>Textbox77</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!DivTotal_Amount.Value</Value>
+                                  <Value>=Fields!ProductTotalAmount.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -2594,6 +2639,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox77</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2621,13 +2667,13 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox132">
-                          <rd:DefaultName>Textbox77</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!DivTotal_Discount.Value</Value>
+                                  <Value>=Fields!ProductTotalDiscount.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -2642,6 +2688,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox77</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2669,13 +2716,13 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox133">
-                          <rd:DefaultName>Textbox77</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!TotalAmt.Value)</Value>
+                                  <Value>=Fields!ProductTotalAmt.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -2690,6 +2737,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox77</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2727,7 +2775,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox24">
-                          <rd:DefaultName>Textbox24</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -2748,6 +2795,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox24</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2780,7 +2828,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox25">
-                          <rd:DefaultName>Textbox25</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -2801,6 +2848,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox25</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2833,7 +2881,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox26">
-                          <rd:DefaultName>Textbox26</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -2854,6 +2901,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox26</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2886,7 +2934,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox27">
-                          <rd:DefaultName>Textbox27</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -2907,6 +2954,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox27</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2939,7 +2987,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox28">
-                          <rd:DefaultName>Textbox28</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -2960,6 +3007,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox28</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -2992,7 +3040,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox30">
-                          <rd:DefaultName>Textbox30</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -3013,6 +3060,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox30</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -3045,7 +3093,7 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox7">
-                          <rd:DefaultName>Textbox7</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
@@ -3065,6 +3113,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox7</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -3097,7 +3146,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox33">
-                          <rd:DefaultName>Textbox33</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -3118,6 +3166,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox33</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -3150,7 +3199,6 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox34">
-                          <rd:DefaultName>Textbox34</rd:DefaultName>
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -3171,6 +3219,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox34</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -3202,15 +3251,14 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox36">
-                          <rd:DefaultName>Textbox36</rd:DefaultName>
+                        <Textbox Name="Textbox141">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!GrandTotal_Qty.Value</Value>
+                                  <Value>=Fields!GrandTotalQty.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -3225,6 +3273,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox71</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -3256,8 +3305,7 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
-                        <Textbox Name="Textbox37">
-                          <rd:DefaultName>Textbox37</rd:DefaultName>
+                        <Textbox Name="Textbox142">
                           <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
@@ -3278,6 +3326,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox78</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -3310,13 +3359,13 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox143">
-                          <rd:DefaultName>Textbox77</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!GrandTotal_Amount.Value</Value>
+                                  <Value>=Fields!GrandTotalAmount.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -3331,6 +3380,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox77</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -3363,13 +3413,13 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox144">
-                          <rd:DefaultName>Textbox77</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!GrandTotal_Discount.Value</Value>
+                                  <Value>=Fields!GrandTotalDiscount.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -3384,6 +3434,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox77</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -3416,13 +3467,13 @@
                     <TablixCell>
                       <CellContents>
                         <Textbox Name="Textbox145">
-                          <rd:DefaultName>Textbox77</rd:DefaultName>
+                          <CanGrow>true</CanGrow>
                           <KeepTogether>true</KeepTogether>
                           <Paragraphs>
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!TotalAmt.Value)</Value>
+                                  <Value>=Fields!GrandTotalAmt.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -3437,6 +3488,7 @@
                               </Style>
                             </Paragraph>
                           </Paragraphs>
+                          <rd:DefaultName>Textbox77</rd:DefaultName>
                           <Style>
                             <Border>
                               <Style>None</Style>
@@ -3511,9 +3563,9 @@
                   </Group>
                   <TablixMembers>
                     <TablixMember>
-                      <Group Name="Division_Code">
+                      <Group Name="Retail_Product">
                         <GroupExpressions>
-                          <GroupExpression>=Fields!Division_Code_TransSale.Value</GroupExpression>
+                          <GroupExpression>=Fields!Retail_Product_Code_TransSale.Value</GroupExpression>
                         </GroupExpressions>
                       </Group>
                       <TablixMembers>
@@ -3545,8 +3597,9 @@
               </TablixMembers>
             </TablixRowHierarchy>
             <DataSetName>DataSet_Result</DataSetName>
+            <Left>0.00003cm</Left>
             <Height>3.49767cm</Height>
-            <Width>28.7cm</Width>
+            <Width>28.70002cm</Width>
             <Style>
               <Border>
                 <Style>Solid</Style>
@@ -3575,24 +3628,23 @@
             </Style>
           </Tablix>
         </ReportItems>
-        <Height>3.49768cm</Height>
+        <Height>3.49767cm</Height>
         <Style />
       </Body>
-      <Width>28.7cm</Width>
+      <Width>28.70005cm</Width>
       <Page>
         <PageHeader>
-          <Height>2.78133cm</Height>
+          <Height>2.74604cm</Height>
           <PrintOnFirstPage>true</PrintOnFirstPage>
           <PrintOnLastPage>true</PrintOnLastPage>
           <ReportItems>
             <Textbox Name="Textbox8">
-              <rd:DefaultName>Textbox8</rd:DefaultName>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
                   <TextRuns>
                     <TextRun>
-                      <Value>POS Sales Report By Division</Value>
+                      <Value>POS Sales Report By Product Group</Value>
                       <Style>
                         <FontFamily>Browallia New</FontFamily>
                         <FontSize>14pt</FontSize>
@@ -3603,10 +3655,10 @@
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <Top>0.01389in</Top>
-              <Left>0.00001cm</Left>
+              <rd:DefaultName>Textbox8</rd:DefaultName>
+              <Left>0.00001in</Left>
               <Height>0.26921in</Height>
-              <Width>28.69999cm</Width>
+              <Width>28.7cm</Width>
               <Style>
                 <Border>
                   <Style>None</Style>
@@ -3614,7 +3666,6 @@
               </Style>
             </Textbox>
             <Textbox Name="Textbox9">
-              <rd:DefaultName>Textbox8</rd:DefaultName>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
@@ -3630,10 +3681,11 @@
                   <Style />
                 </Paragraph>
               </Paragraphs>
+              <rd:DefaultName>Textbox8</rd:DefaultName>
               <Top>0.26921in</Top>
-              <Left>0.00001cm</Left>
+              <Left>0.00001in</Left>
               <Height>0.20298in</Height>
-              <Width>28.69999cm</Width>
+              <Width>28.7cm</Width>
               <ZIndex>1</ZIndex>
               <Style>
                 <Border>
@@ -3642,7 +3694,6 @@
               </Style>
             </Textbox>
             <Textbox Name="Textbox10">
-              <rd:DefaultName>Textbox8</rd:DefaultName>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
@@ -3658,9 +3709,11 @@
                   <Style />
                 </Paragraph>
               </Paragraphs>
+              <rd:DefaultName>Textbox8</rd:DefaultName>
               <Top>0.47218in</Top>
+              <Left>0.00001in</Left>
               <Height>0.20298in</Height>
-              <Width>28.69999cm</Width>
+              <Width>28.7cm</Width>
               <ZIndex>2</ZIndex>
               <Style>
                 <Border>
@@ -3669,7 +3722,6 @@
               </Style>
             </Textbox>
             <Textbox Name="Textbox12">
-              <rd:DefaultName>Textbox8</rd:DefaultName>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
@@ -3685,9 +3737,10 @@
                   <Style />
                 </Paragraph>
               </Paragraphs>
-              <Top>0.89203in</Top>
+              <rd:DefaultName>Textbox8</rd:DefaultName>
+              <Top>0.87814in</Top>
               <Height>0.20298in</Height>
-              <Width>7.79852in</Width>
+              <Width>7.83562in</Width>
               <ZIndex>3</ZIndex>
               <Style>
                 <Border>
@@ -3696,7 +3749,6 @@
               </Style>
             </Textbox>
             <Textbox Name="Textbox13">
-              <rd:DefaultName>Textbox8</rd:DefaultName>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
@@ -3735,10 +3787,11 @@
                   </Style>
                 </Paragraph>
               </Paragraphs>
+              <rd:DefaultName>Textbox8</rd:DefaultName>
               <Top>0.87814in</Top>
-              <Left>7.79852in</Left>
+              <Left>7.83562in</Left>
               <Height>0.20298in</Height>
-              <Width>3.50069in</Width>
+              <Width>3.4636in</Width>
               <ZIndex>4</ZIndex>
               <Style>
                 <Border>
@@ -3747,7 +3800,6 @@
               </Style>
             </Textbox>
             <Textbox Name="Textbox11">
-              <rd:DefaultName>Textbox8</rd:DefaultName>
               <KeepTogether>true</KeepTogether>
               <Paragraphs>
                 <Paragraph>
@@ -3763,9 +3815,11 @@
                   <Style />
                 </Paragraph>
               </Paragraphs>
+              <rd:DefaultName>Textbox8</rd:DefaultName>
               <Top>0.67516in</Top>
+              <Left>0.00002in</Left>
               <Height>0.20298in</Height>
-              <Width>11.29921in</Width>
+              <Width>28.69997cm</Width>
               <ZIndex>5</ZIndex>
               <Style>
                 <Border>
@@ -3780,7 +3834,7 @@
             </Border>
           </Style>
         </PageHeader>
-        <PageHeight>18cm</PageHeight>
+        <PageHeight>21cm</PageHeight>
         <PageWidth>29.7cm</PageWidth>
         <LeftMargin>0.5cm</LeftMargin>
         <RightMargin>0.5cm</RightMargin>
@@ -3828,9 +3882,14 @@ End Function
 </Code>
   <Language>=User!Language</Language>
   <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportUnitType>Cm</rd:ReportUnitType>
+  <rd:ReportID>0eeb6585-38ae-40f1-885b-8d50088d51b4</rd:ReportID>
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
+        <Field Name="Variant_Code">
+          <DataField>Variant_Code</DataField>
+        </Field>
         <Field Name="Name_ComInfo">
           <DataField>Name_ComInfo</DataField>
         </Field>
@@ -3846,17 +3905,14 @@ End Function
         <Field Name="ReportFilterText">
           <DataField>ReportFilterText</DataField>
         </Field>
-        <Field Name="Variant_Code">
-          <DataField>Variant_Code</DataField>
-        </Field>
         <Field Name="Store_No_TransSale">
           <DataField>Store_No_TransSale</DataField>
         </Field>
-        <Field Name="Division_Code_TransSale">
-          <DataField>Division_Code_TransSale</DataField>
+        <Field Name="Retail_Product_Code_TransSale">
+          <DataField>Retail_Product_Code_TransSale</DataField>
         </Field>
-        <Field Name="Division_TransSale">
-          <DataField>Division_TransSale</DataField>
+        <Field Name="Retail_Product_TransSale">
+          <DataField>Retail_Product_TransSale</DataField>
         </Field>
         <Field Name="Receipt_No_TransSale">
           <DataField>Receipt_No_TransSale</DataField>
@@ -3873,14 +3929,14 @@ End Function
         <Field Name="Item_Name_ItemTB">
           <DataField>Item_Name_ItemTB</DataField>
         </Field>
+        <Field Name="Unit_of_Measure_TransSale">
+          <DataField>Unit_of_Measure_TransSale</DataField>
+        </Field>
         <Field Name="Qty">
           <DataField>Qty</DataField>
         </Field>
         <Field Name="QtyFormat">
           <DataField>QtyFormat</DataField>
-        </Field>
-        <Field Name="Unit_of_Measure_TransSale">
-          <DataField>Unit_of_Measure_TransSale</DataField>
         </Field>
         <Field Name="BaseQty">
           <DataField>BaseQty</DataField>
@@ -3915,65 +3971,77 @@ End Function
         <Field Name="ShowVariant">
           <DataField>ShowVariant</DataField>
         </Field>
-        <Field Name="ItemTotal_Qty">
-          <DataField>ItemTotal_Qty</DataField>
+        <Field Name="ItemTotalQty">
+          <DataField>ItemTotalQty</DataField>
         </Field>
-        <Field Name="ItemTotal_QtyFormat">
-          <DataField>ItemTotal_QtyFormat</DataField>
+        <Field Name="ItemTotalQtyFormat">
+          <DataField>ItemTotalQtyFormat</DataField>
         </Field>
-        <Field Name="ItemTotal_BaseQty">
-          <DataField>ItemTotal_BaseQty</DataField>
+        <Field Name="ItemTotalAmount">
+          <DataField>ItemTotalAmount</DataField>
         </Field>
-        <Field Name="ItemTotal_BaseQtyFormat">
-          <DataField>ItemTotal_BaseQtyFormat</DataField>
+        <Field Name="ItemTotalAmountFormat">
+          <DataField>ItemTotalAmountFormat</DataField>
         </Field>
-        <Field Name="ItemTotal_Amount">
-          <DataField>ItemTotal_Amount</DataField>
+        <Field Name="ItemTotalDiscount">
+          <DataField>ItemTotalDiscount</DataField>
         </Field>
-        <Field Name="ItemTotal_AmountFormat">
-          <DataField>ItemTotal_AmountFormat</DataField>
+        <Field Name="ItemTotalDiscountFormat">
+          <DataField>ItemTotalDiscountFormat</DataField>
         </Field>
-        <Field Name="ItemTotal_Discount">
-          <DataField>ItemTotal_Discount</DataField>
+        <Field Name="ItemTotalAmt">
+          <DataField>ItemTotalAmt</DataField>
         </Field>
-        <Field Name="ItemTotal_DiscountFormat">
-          <DataField>ItemTotal_DiscountFormat</DataField>
+        <Field Name="ItemTotalAmtFormat">
+          <DataField>ItemTotalAmtFormat</DataField>
         </Field>
-        <Field Name="DivTotal_Qty">
-          <DataField>DivTotal_Qty</DataField>
+        <Field Name="ProductTotalQty">
+          <DataField>ProductTotalQty</DataField>
         </Field>
-        <Field Name="DivTotal_QtyFormat">
-          <DataField>DivTotal_QtyFormat</DataField>
+        <Field Name="ProductTotalQtyFormat">
+          <DataField>ProductTotalQtyFormat</DataField>
         </Field>
-        <Field Name="DivTotal_Amount">
-          <DataField>DivTotal_Amount</DataField>
+        <Field Name="ProductTotalAmount">
+          <DataField>ProductTotalAmount</DataField>
         </Field>
-        <Field Name="DivTotal_AmountFormat">
-          <DataField>DivTotal_AmountFormat</DataField>
+        <Field Name="ProductTotalAmountFormat">
+          <DataField>ProductTotalAmountFormat</DataField>
         </Field>
-        <Field Name="DivTotal_Discount">
-          <DataField>DivTotal_Discount</DataField>
+        <Field Name="ProductTotalDiscount">
+          <DataField>ProductTotalDiscount</DataField>
         </Field>
-        <Field Name="DivTotal_DiscountFormat">
-          <DataField>DivTotal_DiscountFormat</DataField>
+        <Field Name="ProductTotalDiscountFormat">
+          <DataField>ProductTotalDiscountFormat</DataField>
         </Field>
-        <Field Name="GrandTotal_Qty">
-          <DataField>GrandTotal_Qty</DataField>
+        <Field Name="ProductTotalAmt">
+          <DataField>ProductTotalAmt</DataField>
         </Field>
-        <Field Name="GrandTotal_QtyFormat">
-          <DataField>GrandTotal_QtyFormat</DataField>
+        <Field Name="ProductTotalAmtFormat">
+          <DataField>ProductTotalAmtFormat</DataField>
         </Field>
-        <Field Name="GrandTotal_Amount">
-          <DataField>GrandTotal_Amount</DataField>
+        <Field Name="GrandTotalQty">
+          <DataField>GrandTotalQty</DataField>
         </Field>
-        <Field Name="GrandTotal_AmountFormat">
-          <DataField>GrandTotal_AmountFormat</DataField>
+        <Field Name="GrandTotalQtyFormat">
+          <DataField>GrandTotalQtyFormat</DataField>
         </Field>
-        <Field Name="GrandTotal_Discount">
-          <DataField>GrandTotal_Discount</DataField>
+        <Field Name="GrandTotalAmount">
+          <DataField>GrandTotalAmount</DataField>
         </Field>
-        <Field Name="GrandTotal_DiscountFormat">
-          <DataField>GrandTotal_DiscountFormat</DataField>
+        <Field Name="GrandTotalAmountFormat">
+          <DataField>GrandTotalAmountFormat</DataField>
+        </Field>
+        <Field Name="GrandTotalDiscount">
+          <DataField>GrandTotalDiscount</DataField>
+        </Field>
+        <Field Name="GrandTotalDiscountFormat">
+          <DataField>GrandTotalDiscountFormat</DataField>
+        </Field>
+        <Field Name="GrandTotalAmt">
+          <DataField>GrandTotalAmt</DataField>
+        </Field>
+        <Field Name="GrandTotalAmtFormat">
+          <DataField>GrandTotalAmtFormat</DataField>
         </Field>
       </Fields>
       <Query>

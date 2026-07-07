@@ -2,7 +2,7 @@ report 50110 "Sales Rep by Tender Type"
 {
     Caption = 'POS Sales Report by Tender Type';
     DefaultLayout = RDLC;
-    RDLCLayout = './ReportLayouts/Rep50110_POSSalesReportByTenderType.rdl';
+    RDLCLayout = './ReportLayouts/Rep50110DN_POSSalesReportByTenderType.rdl';
     PreviewMode = PrintLayout;
 
     dataset

@@ -2,7 +2,7 @@ report 50101 "Sales Report By ProdGroup"
 {
     Caption = 'POS Sales Report By Product Group_Test';
     DefaultLayout = RDLC;
-    RDLCLayout = './ReportLayouts/Rep50101_POSSalesReportByProdGroup.rdl';
+    RDLCLayout = './ReportLayouts/Rep50101DN_POSSalesReportByProdGroup.rdl';
     PreviewMode = PrintLayout;
 
     dataset

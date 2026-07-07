@@ -2,7 +2,7 @@ report 50103 "Member Balance Point"
 {
     Caption = 'Member Balance Point';
     DefaultLayout = RDLC;
-    RDLCLayout = './ReportLayouts/Rep50103_MemberBalancePoint.rdl';
+    RDLCLayout = './ReportLayouts/Rep50103DN_MemberBalancePoint.rdl';
     PreviewMode = PrintLayout;
     // MaximumDocumentCount = 500;
     // MaximumDatasetSize = 10000000;

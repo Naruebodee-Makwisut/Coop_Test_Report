@@ -64,9 +64,6 @@ End Function
   <DataSets>
     <DataSet Name="DataSet_Result">
       <Fields>
-        <Field Name="Variant_Code">
-          <DataField>Variant_Code</DataField>
-        </Field>
         <Field Name="Name_ComInfo">
           <DataField>Name_ComInfo</DataField>
         </Field>
@@ -81,6 +78,9 @@ End Function
         </Field>
         <Field Name="ReportFilterText">
           <DataField>ReportFilterText</DataField>
+        </Field>
+        <Field Name="Variant_Code">
+          <DataField>Variant_Code</DataField>
         </Field>
         <Field Name="Store_No_TransSale">
           <DataField>Store_No_TransSale</DataField>
@@ -106,14 +106,14 @@ End Function
         <Field Name="Item_Name_ItemTB">
           <DataField>Item_Name_ItemTB</DataField>
         </Field>
-        <Field Name="Unit_of_Measure_TransSale">
-          <DataField>Unit_of_Measure_TransSale</DataField>
-        </Field>
         <Field Name="Qty">
           <DataField>Qty</DataField>
         </Field>
         <Field Name="QtyFormat">
           <DataField>QtyFormat</DataField>
+        </Field>
+        <Field Name="Unit_of_Measure_TransSale">
+          <DataField>Unit_of_Measure_TransSale</DataField>
         </Field>
         <Field Name="BaseQty">
           <DataField>BaseQty</DataField>
@@ -147,6 +147,66 @@ End Function
         </Field>
         <Field Name="ShowVariant">
           <DataField>ShowVariant</DataField>
+        </Field>
+        <Field Name="ItemTotal_Qty">
+          <DataField>ItemTotal_Qty</DataField>
+        </Field>
+        <Field Name="ItemTotal_QtyFormat">
+          <DataField>ItemTotal_QtyFormat</DataField>
+        </Field>
+        <Field Name="ItemTotal_BaseQty">
+          <DataField>ItemTotal_BaseQty</DataField>
+        </Field>
+        <Field Name="ItemTotal_BaseQtyFormat">
+          <DataField>ItemTotal_BaseQtyFormat</DataField>
+        </Field>
+        <Field Name="ItemTotal_Amount">
+          <DataField>ItemTotal_Amount</DataField>
+        </Field>
+        <Field Name="ItemTotal_AmountFormat">
+          <DataField>ItemTotal_AmountFormat</DataField>
+        </Field>
+        <Field Name="ItemTotal_Discount">
+          <DataField>ItemTotal_Discount</DataField>
+        </Field>
+        <Field Name="ItemTotal_DiscountFormat">
+          <DataField>ItemTotal_DiscountFormat</DataField>
+        </Field>
+        <Field Name="DivTotal_Qty">
+          <DataField>DivTotal_Qty</DataField>
+        </Field>
+        <Field Name="DivTotal_QtyFormat">
+          <DataField>DivTotal_QtyFormat</DataField>
+        </Field>
+        <Field Name="DivTotal_Amount">
+          <DataField>DivTotal_Amount</DataField>
+        </Field>
+        <Field Name="DivTotal_AmountFormat">
+          <DataField>DivTotal_AmountFormat</DataField>
+        </Field>
+        <Field Name="DivTotal_Discount">
+          <DataField>DivTotal_Discount</DataField>
+        </Field>
+        <Field Name="DivTotal_DiscountFormat">
+          <DataField>DivTotal_DiscountFormat</DataField>
+        </Field>
+        <Field Name="GrandTotal_Qty">
+          <DataField>GrandTotal_Qty</DataField>
+        </Field>
+        <Field Name="GrandTotal_QtyFormat">
+          <DataField>GrandTotal_QtyFormat</DataField>
+        </Field>
+        <Field Name="GrandTotal_Amount">
+          <DataField>GrandTotal_Amount</DataField>
+        </Field>
+        <Field Name="GrandTotal_AmountFormat">
+          <DataField>GrandTotal_AmountFormat</DataField>
+        </Field>
+        <Field Name="GrandTotal_Discount">
+          <DataField>GrandTotal_Discount</DataField>
+        </Field>
+        <Field Name="GrandTotal_DiscountFormat">
+          <DataField>GrandTotal_DiscountFormat</DataField>
         </Field>
       </Fields>
       <Query>

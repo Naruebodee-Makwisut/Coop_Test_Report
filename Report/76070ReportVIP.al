@@ -326,9 +326,12 @@ report 50106 "PLSR_Sales Report By Division2"
         PosSalesQry: Query "PLSR_Sales Report By DivisionQ"; //ตัวแปรรับคิวรี่มาใช้งาน ไม่ต้องดึง table เยอะ
         LSVIPRepFunction: Codeunit "PLSR_Report Function";
         ComInfo: Record "Company Information";
+<<<<<<< HEAD
         // ItemTB: Record Item; ไปอยู่ในคิวรี่แทนแล้ว
         //  DivisonTB: Record "LSC Division";
         // TransHeaderTB: Record "LSC Transaction Header";
+=======
+>>>>>>> 82046be983b4f2a85c27b400a85f2f7140766f3e
         RettailSetup: Record "LSC Retail Setup";
         LSCTB: Record "LSC Trans. Sales Entry" temporary;
         ShowTime: Text[50];

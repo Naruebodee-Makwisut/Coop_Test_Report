@@ -2,7 +2,7 @@ report 50102 "Sales Rep by Sale Staff"
 {
     Caption = 'POS Sales Report by Sale Staff_Test';
     DefaultLayout = RDLC;
-    RDLCLayout = './ReportLayouts/Rep50102_POSSalesReportByStaff.rdl';
+    RDLCLayout = './ReportLayouts/Rep50102DN_POSSalesReportByStaff.rdl';
     PreviewMode = PrintLayout;
 
     dataset
@@ -61,7 +61,23 @@ report 50102 "Sales Rep by Sale Staff"
                         PeriodDate := 'ประจำงวดวันที่ ' + Format(FDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                     end;
 
+<<<<<<< HEAD:Report/76072ReportVIP.al
+                // รับ filter จาก RequestFilterFields ของ dataitem หลอก
+                // if TransSaleFilter.GetFilter("Store No.") <> '' then begin
+                //     QuerySalesProdGroup.SetFilter(StoreNoFilter, TransSaleFilter.GetFilter("Store No."));
+                //     ReportFilterText += 'Store No : ' + TransSaleFilter.GetFilter("Store No.") + ' ';
+                // end;
+                // if TransSaleFilter.GetFilter("Item No.") <> '' then begin
+                //     QuerySalesProdGroup.SetFilter(ItemNoFilter, TransSaleFilter.GetFilter("Item No."));
+                //     ReportFilterText += ' Item No: ' + TransSaleFilter.GetFilter("Item No.") + ' ';
+                // end;
+                // if TransSaleFilter.GetFilter("Retail Product Code") <> '' then begin
+                //     QuerySalesProdGroup.SetFilter(ProductGroupFilter, TransSaleFilter.GetFilter("Retail Product Code"));
+                //     ReportFilterText += ' Product Group Code : ' + TransSaleFilter.GetFilter("Retail Product Code") + ' ';
+                // end;
+=======
                 // Data filters
+>>>>>>> 82046be983b4f2a85c27b400a85f2f7140766f3e:Report/76076ReportVIP_DN.al
                 if StoreFilter <> '' then begin
                     QuerySalesStaff.SetFilter(StoreNoFilter, StoreFilter);
                     ReportFilterText += ' Store No : ' + StoreFilter + ' ';

@@ -2,7 +2,7 @@ report 50108 "PLSR_Tot_Offer Sales Item Pro"
 {
     Caption = 'Total Offer Sales Item By Promotion';
     DefaultLayout = RDLC;
-    RDLCLayout = './ReportLayouts/Rep76088_TotalOfferSalesItemByPromotion.rdl';
+    RDLCLayout = './ReportLayouts/Rep50108_TotalOfferSalesItemByPromotion.rdl';
     PreviewMode = PrintLayout;
 
     // AVPWDLSVIP 01/07/2026 > Improve Performance of VIP Report(76088) - น้องปอ
@@ -472,6 +472,16 @@ report 50108 "PLSR_Tot_Offer Sales Item Pro"
         Clear(StoreOfferOld);
         Clear(ItemCurr);
         Clear(ItemOld);
+        Clear(NewCountBill);
+        Clear(NewBenefitsQty);
+        Clear(NewLineAmount);
+        Clear(NewLineDiscAmount);
+        Clear(NewBenefitAmt);
+        Clear(NewGrCountBill);
+        Clear(NewGrBenefitsQty);
+        Clear(NewGrLineAmount);
+        Clear(NewGrLineDiscAmount);
+        Clear(NewGrBenefitAmt);
         TempTransSalesEntry.Reset();
         TempTransSalesEntry.SetCurrentKey("Store No.", "Promotion No.", "Item No.", "Item Number Scanned");
         if TempTransSalesEntry.FindSet() then

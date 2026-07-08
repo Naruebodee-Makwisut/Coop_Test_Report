@@ -9,6 +9,8 @@
             "serverInstance": "BC240_TEST",
             "port": 7069,
             "authentication": "UserPassword",
+            "startupObjectId": 50140,
+            "startupObjectType": "Report",
             "breakOnError": true,
             "launchBrowser": true,
             "enableLongRunningSqlStatements": true,

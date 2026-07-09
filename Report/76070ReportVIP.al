@@ -26,9 +26,9 @@ report 50106 "PLSR_Sales Report By Division2"
             column(Division_TransSale; LSCTB."Posting Exception Key") { }
             column(Receipt_No_TransSale; LSCTB."Receipt No.") { }
             column(Date_TransSale; Format(LSCTB.Date, 0, '<Closing><Day,2>/<Month,2>/<Year4>')) { }
-            column(TransType; LSCTB."POS Line Description") { }
+            column(TransType; TransType) { }
             column(Item_No_TransSale; LSCTB."Item No.") { }
-            column(Item_Name_ItemTB; LSCTB.Epc) { }
+            column(Item_Name_ItemTB; ItemName) { }
             column(Qty; LSCTB.Quantity) { }
             column(Unit_of_Measure_TransSale; LSCTB."Unit of Measure") { }
             column(BaseQty; LSCTB."UOM Quantity") { }
@@ -71,6 +71,7 @@ report 50106 "PLSR_Sales Report By Division2"
             begin
                 LSCTB.Reset();
                 LSCTB.DeleteAll();
+
                 Clear(DictItemQty);
                 Clear(DictItemBaseQty);
                 Clear(DictItemAmt);
@@ -78,8 +79,10 @@ report 50106 "PLSR_Sales Report By Division2"
                 Clear(DictDivQty);
                 Clear(DictDivAmt);
                 Clear(DictDivDisc);
-
+                Clear(DictItemName);
+                Clear(ItemName);
                 Clear(TransType);
+                Clear(DictTransType);
                 // เคลียร์ค่า Grand Total ท้ายรายงาน
                 GrandTotal_Qty := 0;
                 GrandTotal_Amount := 0;
@@ -117,7 +120,7 @@ report 50106 "PLSR_Sales Report By Division2"
 
                     ItemKey := PosSalesQry.Store_No + '_' + PosSalesQry.LSC_Division_Code + '_' + PosSalesQry.Item_No;
                     DivKey := PosSalesQry.Store_No + '_' + PosSalesQry.LSC_Division_Code;
-
+                    LineKey := PosSalesQry.Store_No + '_' + PosSalesQry.POS_Terminal_No + '_' + Format(PosSalesQry.Transaction_No) + '_' + Format(PosSalesQry.Line_No);
                     if PosSalesQry.UOM_Quantity <> 0 then
                         Qty := -PosSalesQry.UOM_Quantity
                     else
@@ -131,6 +134,10 @@ report 50106 "PLSR_Sales Report By Division2"
                         UnitPrice := PosSalesQry.Price;
 
                     CalcAmount := (UnitPrice * Qty) - PosSalesQry.Discount_Amount;
+
+                    TempTransType := Format(PosSalesQry.Transaction_Type);
+                    if PosSalesQry.Return_No_Sale then
+                        TempTransType := 'Refund';
 
                     if DictItemQty.ContainsKey(ItemKey) then begin
                         DictItemQty.Set(ItemKey, DictItemQty.Get(ItemKey) + Qty);
@@ -154,6 +161,10 @@ report 50106 "PLSR_Sales Report By Division2"
                         DictDivDisc.Add(DivKey, PosSalesQry.Discount_Amount);
                     end;
 
+                    if not DictItemName.ContainsKey(PosSalesQry.Item_No) then
+                        DictItemName.Add(PosSalesQry.Item_No, PosSalesQry.Item_Description + ' ' + PosSalesQry.Item_Description_2);
+                    if not DictTransType.ContainsKey(LineKey) then
+                        DictTransType.Add(LineKey, TempTransType);
 
                     GrandTotal_Qty += Qty;
                     GrandTotal_Amount += (UnitPrice * Qty);
@@ -168,22 +179,14 @@ report 50106 "PLSR_Sales Report By Division2"
                     LSCTB."Receipt No." := PosSalesQry.Receipt_No;
                     LSCTB.Date := PosSalesQry.Date;
                     LSCTB."Item No." := PosSalesQry.Item_No;
-                    LSCTB.Epc := Format(PosSalesQry.Item_Description + ' ' + PosSalesQry.Item_Description_2);
                     LSCTB."Division Code" := PosSalesQry.LSC_Division_Code;
-                    LSCTB."Posting Exception Key" := Format(PosSalesQry.LSC_Division_Code + ' - ' + PosSalesQry.Division_Description);
+                    LSCTB."Posting Exception Key" := PosSalesQry.LSC_Division_Code + ' - ' + PosSalesQry.Division_Description;
                     LSCTB.Quantity := Qty;
                     LSCTB.Price := UnitPrice;
                     LSCTB."Discount Amount" := PosSalesQry.Discount_Amount;
                     LSCTB."Unit of Measure" := PosSalesQry.Unit_of_Measure;
                     LSCTB."UOM Quantity" := BaseQty;
-
-                    TransType := Format(PosSalesQry.Transaction_Type);
-                    if PosSalesQry.Return_No_Sale then
-                        TransType := 'Refund';
-                    LSCTB."POS Line Description" := TransType;
-
                     LSCTB."Net Amount" := CalcAmount;
-
                     LSCTB.Insert();
                 end;
                 PosSalesQry.Close();
@@ -230,6 +233,17 @@ report 50106 "PLSR_Sales Report By Division2"
                     DivTotal_Amount := 0;
                     DivTotal_Discount := 0;
                 end;
+
+                if DictItemName.ContainsKey(LSCTB."Item No.") then
+                    ItemName := DictItemName.Get(LSCTB."Item No.")
+                else
+                    ItemName := '';
+
+                LineKey := LSCTB."Store No." + '_' + LSCTB."POS Terminal No." + '_' + Format(LSCTB."Transaction No.") + '_' + Format(LSCTB."Line No.");
+                if DictTransType.ContainsKey(LineKey) then
+                    TransType := DictTransType.Get(LineKey)
+                else
+                    TransType := '';
             end;
         }
     }
@@ -357,15 +371,18 @@ report 50106 "PLSR_Sales Report By Division2"
         FDateFilter: Date;
         Choose1Filter: Boolean;
         Choose2Filter: Boolean;
-
+        ItemName: Text[150];
         DictItemQty: Dictionary of [Text, Decimal];
         DictItemBaseQty: Dictionary of [Text, Decimal];
         DictItemAmt: Dictionary of [Text, Decimal];
         DictItemDisc: Dictionary of [Text, Decimal];
+        DictItemName: Dictionary of [Code[20], Text[150]];
         DictDivQty: Dictionary of [Text, Decimal];
         DictDivAmt: Dictionary of [Text, Decimal];
         DictDivDisc: Dictionary of [Text, Decimal];
-
+        DictTransType: Dictionary of [Text, Text];
+        LineKey: Text;
+        TempTransType: Text[50];
         ItemTotal_Qty: Decimal;
         ItemTotal_BaseQty: Decimal;
         ItemTotal_Amount: Decimal;

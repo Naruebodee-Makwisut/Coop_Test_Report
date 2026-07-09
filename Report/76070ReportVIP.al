@@ -146,7 +146,7 @@ report 50106 "PLSR_Sales Report By Division2"
                         DictItemBaseQty.Set(ItemKey, DictItemBaseQty.Get(ItemKey) + BaseQty);
                         DictItemAmt.Set(ItemKey, DictItemAmt.Get(ItemKey) + (UnitPrice * Qty));
                         DictItemDisc.Set(ItemKey, DictItemDisc.Get(ItemKey) + PosSalesQry.Discount_Amount);
-                        DictItemTotalAmt.Set(ItemKey, DictItemDisc.Get(ItemKey) + (UnitPrice * Qty) - PosSalesQry.Discount_Amount);
+                        DictItemTotalAmt.Set(ItemKey, DictItemTotalAmt.Get(ItemKey) + (UnitPrice * Qty) - PosSalesQry.Discount_Amount);
                     end else begin
                         DictItemQty.Add(ItemKey, Qty);
                         DictItemBaseQty.Add(ItemKey, BaseQty);

@@ -45,21 +45,21 @@ report 50106 "PLSR_Sales Report By Division2"
             column(ItemTotal_BaseQty; ItemTotal_BaseQty) { }
             column(ItemTotal_Amount; ItemTotal_Amount) { }
             column(ItemTotal_Discount; ItemTotal_Discount) { }
-
+            column(ItemTotal_TotalAmount; ItemTotal_TotalAmount) { }
             // ==========================================
             // 3. คอลัมน์รวมระดับกลุ่มแผนก (Division Group Totals)
             // ==========================================
             column(DivTotal_Qty; DivTotal_Qty) { }
             column(DivTotal_Amount; DivTotal_Amount) { }
             column(DivTotal_Discount; DivTotal_Discount) { }
-
+            column(DivTotal_TotalAmount; DivTotal_TotalAmount) { }
             // ==========================================
             // 4. คอลัมน์ยอดรวมสุทธิท้ายรายงาน (Grand Totals)
             // ==========================================
             column(GrandTotal_Qty; GrandTotal_Qty) { }
             column(GrandTotal_Amount; GrandTotal_Amount) { }
             column(GrandTotal_Discount; GrandTotal_Discount) { }
-
+            column(GrandTotal_TotalAmount; GrandTotal_TotalAmount) { }
             trigger OnPreDataItem()
             var
                 ItemKey: Text;
@@ -76,6 +76,8 @@ report 50106 "PLSR_Sales Report By Division2"
                 Clear(DictItemBaseQty);
                 Clear(DictItemAmt);
                 Clear(DictItemDisc);
+                Clear(DictItemTotalAmt);
+                Clear(DictDivTotalAmt);
                 Clear(DictDivQty);
                 Clear(DictDivAmt);
                 Clear(DictDivDisc);
@@ -87,7 +89,7 @@ report 50106 "PLSR_Sales Report By Division2"
                 GrandTotal_Qty := 0;
                 GrandTotal_Amount := 0;
                 GrandTotal_Discount := 0;
-
+                GrandTotal_TotalAmount := 0;
                 RettailSetup.Get();
 
                 ReportFilterText := '';
@@ -144,21 +146,25 @@ report 50106 "PLSR_Sales Report By Division2"
                         DictItemBaseQty.Set(ItemKey, DictItemBaseQty.Get(ItemKey) + BaseQty);
                         DictItemAmt.Set(ItemKey, DictItemAmt.Get(ItemKey) + (UnitPrice * Qty));
                         DictItemDisc.Set(ItemKey, DictItemDisc.Get(ItemKey) + PosSalesQry.Discount_Amount);
+                        DictItemTotalAmt.Set(ItemKey, DictItemDisc.Get(ItemKey) + (UnitPrice * Qty) - PosSalesQry.Discount_Amount);
                     end else begin
                         DictItemQty.Add(ItemKey, Qty);
                         DictItemBaseQty.Add(ItemKey, BaseQty);
                         DictItemAmt.Add(ItemKey, (UnitPrice * Qty));
                         DictItemDisc.Add(ItemKey, PosSalesQry.Discount_Amount);
+                        DictItemTotalAmt.Add(ItemKey, (UnitPrice * Qty) - PosSalesQry.Discount_Amount);
                     end;
 
                     if DictDivQty.ContainsKey(DivKey) then begin
                         DictDivQty.Set(DivKey, DictDivQty.Get(DivKey) + Qty);
                         DictDivAmt.Set(DivKey, DictDivAmt.Get(DivKey) + (UnitPrice * Qty));
                         DictDivDisc.Set(DivKey, DictDivDisc.Get(DivKey) + PosSalesQry.Discount_Amount);
+                        DictDivTotalAmt.Set(DivKey, DictDivTotalAmt.Get(DivKey) + (UnitPrice * Qty) - PosSalesQry.Discount_Amount);
                     end else begin
                         DictDivQty.Add(DivKey, Qty);
                         DictDivAmt.Add(DivKey, (UnitPrice * Qty));
                         DictDivDisc.Add(DivKey, PosSalesQry.Discount_Amount);
+                        DictDivTotalAmt.Add(DivKey, (UnitPrice * Qty) - PosSalesQry.Discount_Amount);
                     end;
 
                     if not DictItemName.ContainsKey(PosSalesQry.Item_No) then
@@ -169,7 +175,7 @@ report 50106 "PLSR_Sales Report By Division2"
                     GrandTotal_Qty += Qty;
                     GrandTotal_Amount += (UnitPrice * Qty);
                     GrandTotal_Discount += PosSalesQry.Discount_Amount;
-
+                    GrandTotal_TotalAmount += (UnitPrice * Qty) - PosSalesQry.Discount_Amount;
                     LSCTB.Init();
                     LSCTB."Store No." := PosSalesQry.Store_No;
                     LSCTB."POS Terminal No." := PosSalesQry.POS_Terminal_No;
@@ -216,11 +222,13 @@ report 50106 "PLSR_Sales Report By Division2"
                     ItemTotal_BaseQty := DictItemBaseQty.Get(ItemKey);
                     ItemTotal_Amount := DictItemAmt.Get(ItemKey);
                     ItemTotal_Discount := DictItemDisc.Get(ItemKey);
+                    ItemTotal_TotalAmount := DictItemTotalAmt.Get(ItemKey);
                 end else begin
                     ItemTotal_Qty := 0;
                     ItemTotal_BaseQty := 0;
                     ItemTotal_Amount := 0;
                     ItemTotal_Discount := 0;
+                    ItemTotal_TotalAmount := 0;
                 end;
 
                 // ดึงยอดรวมกลุ่มแผนก (Division Group) ออกมาใส่คอลัมน์
@@ -228,10 +236,12 @@ report 50106 "PLSR_Sales Report By Division2"
                     DivTotal_Qty := DictDivQty.Get(DivKey);
                     DivTotal_Amount := DictDivAmt.Get(DivKey);
                     DivTotal_Discount := DictDivDisc.Get(DivKey);
+                    DivTotal_TotalAmount := DictDivTotalAmt.Get(DivKey);
                 end else begin
                     DivTotal_Qty := 0;
                     DivTotal_Amount := 0;
                     DivTotal_Discount := 0;
+                    DivTotal_TotalAmount := 0;
                 end;
 
                 if DictItemName.ContainsKey(LSCTB."Item No.") then
@@ -376,10 +386,12 @@ report 50106 "PLSR_Sales Report By Division2"
         DictItemBaseQty: Dictionary of [Text, Decimal];
         DictItemAmt: Dictionary of [Text, Decimal];
         DictItemDisc: Dictionary of [Text, Decimal];
+        DictItemTotalAmt: Dictionary of [Text, Decimal];
         DictItemName: Dictionary of [Code[20], Text[150]];
         DictDivQty: Dictionary of [Text, Decimal];
         DictDivAmt: Dictionary of [Text, Decimal];
         DictDivDisc: Dictionary of [Text, Decimal];
+        DictDivTotalAmt: Dictionary of [Text, Decimal];
         DictTransType: Dictionary of [Text, Text];
         LineKey: Text;
         TempTransType: Text[50];
@@ -387,10 +399,13 @@ report 50106 "PLSR_Sales Report By Division2"
         ItemTotal_BaseQty: Decimal;
         ItemTotal_Amount: Decimal;
         ItemTotal_Discount: Decimal;
+        ItemTotal_TotalAmount: Decimal;
         DivTotal_Qty: Decimal;
         DivTotal_Amount: Decimal;
         DivTotal_Discount: Decimal;
+        DivTotal_TotalAmount: Decimal;
         GrandTotal_Qty: Decimal;
         GrandTotal_Amount: Decimal;
         GrandTotal_Discount: Decimal;
+        GrandTotal_TotalAmount: Decimal;
 }

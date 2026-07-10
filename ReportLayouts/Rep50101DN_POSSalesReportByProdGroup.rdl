@@ -1,5 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
+<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2016/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns:am="http://schemas.microsoft.com/sqlserver/reporting/authoringmetadata">
+  <am:AuthoringMetadata>
+    <am:CreatedBy>
+      <am:Name>MSRB</am:Name>
+      <am:Version>15.0.20283.0</am:Version>
+    </am:CreatedBy>
+    <am:UpdatedBy>
+      <am:Name>MSRB</am:Name>
+      <am:Version>15.0.20283.0</am:Version>
+    </am:UpdatedBy>
+    <am:LastModifiedTimestamp>2026-07-03T05:02:28.5912607Z</am:LastModifiedTimestamp>
+  </am:AuthoringMetadata>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
     <DataSource Name="DataSource">
@@ -780,6 +791,7 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -1429,6 +1441,7 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
+                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -1785,7 +1798,7 @@
                                   </Style>
                                 </TextRun>
                                 <TextRun>
-                                  <Value>=Sum(Fields!BaseQty.Value)</Value>
+                                  <Value>=Fields!ItemTotalQty.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -1834,7 +1847,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!Qty.Value)</Value>
+                                  <Value>=Fields!ItemTotalQty.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -1931,7 +1944,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!Amount.Value)</Value>
+                                  <Value>=Fields!ItemTotalAmount.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -1980,7 +1993,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!Discount_Amount_TransSale.Value)</Value>
+                                  <Value>=Fields!ItemTotalDiscount.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -2029,7 +2042,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!TotalAmt.Value)</Value>
+                                  <Value>=Fields!ItemTotalAmt.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -2514,7 +2527,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!Qty.Value)</Value>
+                                  <Value>=Fields!ProductTotalQty.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -2611,7 +2624,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!Amount.Value)</Value>
+                                  <Value>=Fields!ProductTotalAmount.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -2660,7 +2673,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!Discount_Amount_TransSale.Value)</Value>
+                                  <Value>=Fields!ProductTotalDiscount.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -2709,7 +2722,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!TotalAmt.Value)</Value>
+                                  <Value>=Fields!ProductTotalAmt.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -3245,7 +3258,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!Qty.Value)</Value>
+                                  <Value>=Fields!GrandTotalQty.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -3352,7 +3365,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!Amount.Value)</Value>
+                                  <Value>=Fields!GrandTotalAmount.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -3406,7 +3419,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!Discount_Amount_TransSale.Value)</Value>
+                                  <Value>=Fields!GrandTotalDiscount.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -3460,7 +3473,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!TotalAmt.Value)</Value>
+                                  <Value>=Fields!GrandTotalAmt.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -3548,11 +3561,6 @@
                       <GroupExpression>=Fields!Store_No_TransSale.Value</GroupExpression>
                     </GroupExpressions>
                   </Group>
-                  <SortExpressions>
-                    <SortExpression>
-                      <Value>=Fields!Store_No_TransSale.Value</Value>
-                    </SortExpression>
-                  </SortExpressions>
                   <TablixMembers>
                     <TablixMember>
                       <Group Name="Retail_Product">
@@ -3560,11 +3568,6 @@
                           <GroupExpression>=Fields!Retail_Product_Code_TransSale.Value</GroupExpression>
                         </GroupExpressions>
                       </Group>
-                      <SortExpressions>
-                        <SortExpression>
-                          <Value>=Fields!Retail_Product_Code_TransSale.Value</Value>
-                        </SortExpression>
-                      </SortExpressions>
                       <TablixMembers>
                         <TablixMember>
                           <Group Name="Item_No_TransSale">
@@ -3572,11 +3575,6 @@
                               <GroupExpression>=Fields!Item_No_TransSale.Value</GroupExpression>
                             </GroupExpressions>
                           </Group>
-                          <SortExpressions>
-                            <SortExpression>
-                              <Value>=Fields!Item_No_TransSale.Value</Value>
-                            </SortExpression>
-                          </SortExpressions>
                           <TablixMembers>
                             <TablixMember>
                               <Group Name="Details" />
@@ -3972,6 +3970,78 @@ End Function
         </Field>
         <Field Name="ShowVariant">
           <DataField>ShowVariant</DataField>
+        </Field>
+        <Field Name="ItemTotalQty">
+          <DataField>ItemTotalQty</DataField>
+        </Field>
+        <Field Name="ItemTotalQtyFormat">
+          <DataField>ItemTotalQtyFormat</DataField>
+        </Field>
+        <Field Name="ItemTotalAmount">
+          <DataField>ItemTotalAmount</DataField>
+        </Field>
+        <Field Name="ItemTotalAmountFormat">
+          <DataField>ItemTotalAmountFormat</DataField>
+        </Field>
+        <Field Name="ItemTotalDiscount">
+          <DataField>ItemTotalDiscount</DataField>
+        </Field>
+        <Field Name="ItemTotalDiscountFormat">
+          <DataField>ItemTotalDiscountFormat</DataField>
+        </Field>
+        <Field Name="ItemTotalAmt">
+          <DataField>ItemTotalAmt</DataField>
+        </Field>
+        <Field Name="ItemTotalAmtFormat">
+          <DataField>ItemTotalAmtFormat</DataField>
+        </Field>
+        <Field Name="ProductTotalQty">
+          <DataField>ProductTotalQty</DataField>
+        </Field>
+        <Field Name="ProductTotalQtyFormat">
+          <DataField>ProductTotalQtyFormat</DataField>
+        </Field>
+        <Field Name="ProductTotalAmount">
+          <DataField>ProductTotalAmount</DataField>
+        </Field>
+        <Field Name="ProductTotalAmountFormat">
+          <DataField>ProductTotalAmountFormat</DataField>
+        </Field>
+        <Field Name="ProductTotalDiscount">
+          <DataField>ProductTotalDiscount</DataField>
+        </Field>
+        <Field Name="ProductTotalDiscountFormat">
+          <DataField>ProductTotalDiscountFormat</DataField>
+        </Field>
+        <Field Name="ProductTotalAmt">
+          <DataField>ProductTotalAmt</DataField>
+        </Field>
+        <Field Name="ProductTotalAmtFormat">
+          <DataField>ProductTotalAmtFormat</DataField>
+        </Field>
+        <Field Name="GrandTotalQty">
+          <DataField>GrandTotalQty</DataField>
+        </Field>
+        <Field Name="GrandTotalQtyFormat">
+          <DataField>GrandTotalQtyFormat</DataField>
+        </Field>
+        <Field Name="GrandTotalAmount">
+          <DataField>GrandTotalAmount</DataField>
+        </Field>
+        <Field Name="GrandTotalAmountFormat">
+          <DataField>GrandTotalAmountFormat</DataField>
+        </Field>
+        <Field Name="GrandTotalDiscount">
+          <DataField>GrandTotalDiscount</DataField>
+        </Field>
+        <Field Name="GrandTotalDiscountFormat">
+          <DataField>GrandTotalDiscountFormat</DataField>
+        </Field>
+        <Field Name="GrandTotalAmt">
+          <DataField>GrandTotalAmt</DataField>
+        </Field>
+        <Field Name="GrandTotalAmtFormat">
+          <DataField>GrandTotalAmtFormat</DataField>
         </Field>
       </Fields>
       <Query>

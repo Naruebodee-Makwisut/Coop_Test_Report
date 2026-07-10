@@ -5,6 +5,7 @@ report 50111 "TEST_Sales Rep by Special Gr"
     RDLCLayout = './ReportLayouts/Rep50111_POSSalesReportBySpecialGroup.rdl';
     PreviewMode = PrintLayout;
 
+    // AVNMTLSVIP 30/06/2026 > Improve Performance of VIP Report(76073)
     dataset
     {
         dataitem("Item Special Groups"; "LSC Item Special Groups")
@@ -57,10 +58,8 @@ report 50111 "TEST_Sales Rep by Special Gr"
                     begin
                         CLEAR(SaleQty);
                         CLEAR(SaleLCY);
-
                         TempItemSum.Reset();
-                        TempItemSum.SetRange("No.", Item."No.");
-                        if TempItemSum.FindFirst() then begin
+                        if TempItemSum.Get(Item."No.") then begin
                             SaleQty := -TempItemSum."Unit Price"; // ดึงค่า Qty ที่ฝากไว้
                             SaleLCY := -TempItemSum."Profit %";   // ดึงค่า Amount ที่ฝากไว้
                         end;
@@ -74,6 +73,8 @@ report 50111 "TEST_Sales Rep by Special Gr"
 
             trigger OnPreDataItem()
             begin
+                Clear(DateFilter);
+                Clear(DateHeader);
                 IF Choose1Filter THEN BEGIN
                     DateFilter := FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + '..' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                     DateHeader := 'ประจำงวดวันที่ ' + FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + ' ถึง ' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
@@ -83,6 +84,7 @@ report 50111 "TEST_Sales Rep by Special Gr"
                         DateFilter := FORMAT(FDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                         DateHeader := 'ประจำงวดวันที่ ' + FORMAT(FDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                     END;
+                Clear(Header_txt);
                 IF (StoreFilter <> '') THEN
                     Header_txt += 'Store No : ' + FORMAT(StoreFilter + ' ');
                 IF ("Item Special Groups".GETFILTERS <> '') THEN
@@ -93,6 +95,8 @@ report 50111 "TEST_Sales Rep by Special Gr"
 
                 TempItemSum.Reset();
                 TempItemSum.DeleteAll();
+
+                Clear(POSSalesSumQry);
 
                 if DateFilter <> '' then
                     POSSalesSumQry.SetFilter(Date_Filter, DateFilter);
@@ -207,6 +211,10 @@ report 50111 "TEST_Sales Rep by Special Gr"
             Choose1Filter := false;
             Choose2Filter := true;
             ShowZeroFilter := true;
+
+            Clear(FromDateFilter);
+            Clear(TodateFilter);
+            Clear(StoreFilter);
         end;
 
     }
@@ -247,4 +255,6 @@ report 50111 "TEST_Sales Rep by Special Gr"
         Sale_LCYCaptionLbl: Label 'ยอดขายสุทธิ (Inc. VAT)';
         Special_GroupCaptionLbl: Label 'Special Group';
         TotalCaptionLbl: Label 'Total';
+
+    // C-AVNMTLSVIP 30/06/2026 > Improve Performance of VIP Report(76073)
 }

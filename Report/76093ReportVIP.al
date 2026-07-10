@@ -1,9 +1,17 @@
+<<<<<<< HEAD
 report 50116 "PLSR_Active Member 2"
+=======
+report 50114 "PLSR_Active Member 2"
+>>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
 {
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     DefaultLayout = RDLC;
+<<<<<<< HEAD
     RDLCLayout = './ReportLayouts/Rep76093_ActiveMember.rdl';
+=======
+    RDLCLayout = './ReportLayouts/Rep50114_ActiveMember.rdl';
+>>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
     dataset
     {
         dataitem(Integer; Integer)
@@ -37,6 +45,7 @@ report 50116 "PLSR_Active Member 2"
                 CompanyInforTB.Get();
 
                 if (FilterMemberName <> '') or (FilterPhoneNo <> '') or (FilterIDCard <> '') then begin
+<<<<<<< HEAD
                     Clear(MemberContactTB);
                     if FilterMemberName <> '' then begin
                         FilterMemberName := '*' + UpperCase(FilterMemberName) + '*';
@@ -48,6 +57,16 @@ report 50116 "PLSR_Active Member 2"
                         MemberContactTB.SetRange("PLSWS_ID Card No.", FilterIDCard);
                     if MemberContactTB.FindFirst() then
                         MemberSalesQry.SetRange(MemberAccountNo, MemberContactTB."Account No.");
+=======
+                    if FilterMemberName <> '' then begin
+                        FilterMemberName := '*' + UpperCase(FilterMemberName) + '*';
+                        MemberSalesQry.SetFilter(Search_Name, FilterMemberName);
+                    end;
+                    if FilterPhoneNo <> '' then
+                        MemberSalesQry.SetRange(Mobile_Phone_No_, FilterPhoneNo);
+                    if FilterIDCard <> '' then
+                        MemberSalesQry.SetRange(PLSWS_ID_Card_No_, FilterIDCard);
+>>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
                 end;
 
                 if FilterDate <> 0D then begin

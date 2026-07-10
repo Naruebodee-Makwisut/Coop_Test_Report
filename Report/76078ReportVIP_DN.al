@@ -2,7 +2,7 @@ report 50110 "Sales Rep by Tender Type"
 {
     Caption = 'POS Sales Report by Tender Type';
     DefaultLayout = RDLC;
-    RDLCLayout = './ReportLayouts/Rep50110_POSSalesReportByTenderType.rdl';
+    RDLCLayout = './ReportLayouts/Rep50110DN_POSSalesReportByTenderType.rdl';
     PreviewMode = PrintLayout;
 
     dataset
@@ -46,13 +46,13 @@ report 50110 "Sales Rep by Tender Type"
             { }
             column(Amount_Tendered_TransPayEntry; TempTransPayEntry."Amount Tendered")
             { }
-
+            // sum ตาม group
             column(StoreTotal; GetStoreTotalSafe(TempTransPayEntry."Store No."))
             { }
             column(TerminalTotal; GetTerminalTotalSafe(TempTransPayEntry."Store No." + '_' + TempTransPayEntry."POS Terminal No."))
             { }
             column(TenderTotal; GetTenderTotalSafe(TempTransPayEntry."Store No." + '_' + TempTransPayEntry."POS Terminal No." + '_' + TempTransPayEntry."Tender Type"))
-            { }
+            { } // sum ตาม group
             column(GrandTotal; GrandTotal)
             { }
 
@@ -141,9 +141,9 @@ report 50110 "Sales Rep by Tender Type"
 
                         // พักข้อมูลเลขบัตรสมาชิกที่โยงมาจากหัวบิล
                         KeyTextHeader := SalesTenderQry.Store_No_ + '_' + SalesTenderQry.POS_Terminal_No_ + '_' + Format(SalesTenderQry.Transaction_No_);
-                        if (SalesTenderQry.Member_Card_No_ <> '') and (not TmpMemberCard.ContainsKey(KeyTextHeader)) then 
+                        if (SalesTenderQry.Member_Card_No_ <> '') and (not TmpMemberCard.ContainsKey(KeyTextHeader)) then
                             TmpMemberCard.Add(KeyTextHeader, SalesTenderQry.Member_Card_No_);
-                        
+
                     end;
                     SalesTenderQry.Close();
                 end;

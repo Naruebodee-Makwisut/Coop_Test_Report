@@ -24,36 +24,36 @@ report 50105 "Store Stock Checking"
             column(ShowDate; ShowDate) { }
             column(ShowTime; ShowTime) { }
 
-            column(ItemNo; ItemTB."No. 2") { }
-            column(Description_Item; ItemTB.Description) { }
-            column(BaseUOM_Item; ItemTB."Base Unit of Measure") { }
-            column(Variant_Code; ItemTB."Vendor Item No.") { }
+            column(ItemNo; TempItemTB."No. 2") { }
+            column(Description_Item; TempItemTB.Description) { }
+            column(BaseUOM_Item; TempItemTB."Base Unit of Measure") { }
+            column(Variant_Code; TempItemTB."Vendor Item No.") { }
 
-            column(ItemInventoryQty; format(ItemTB."Unit Price", 0, '<Sign><Integer Thousand>')) { }
-            column(ItemSoldTodayQty; format(ItemTB."Unit Cost", 0, '<Sign><Integer Thousand>')) { }
-            column(ItemSoldNotPostedQty; format(ItemTB."Standard Cost", 0, '<Sign><Integer Thousand>')) { }
-            column(NetInventoryQty; format(ItemTB."Last Direct Cost", 0, '<Sign><Integer Thousand>')) { }
+            column(ItemInventoryQty; format(TempItemTB."Unit Price", 0, '<Sign><Integer Thousand>')) { }
+            column(ItemSoldTodayQty; format(TempItemTB."Unit Cost", 0, '<Sign><Integer Thousand>')) { }
+            column(ItemSoldNotPostedQty; format(TempItemTB."Standard Cost", 0, '<Sign><Integer Thousand>')) { }
+            column(NetInventoryQty; format(TempItemTB."Last Direct Cost", 0, '<Sign><Integer Thousand>')) { }
             column(ShowVariant; RetailSetup."PLSPOS_Show Var for Report VIP") { }
 
             trigger OnPreDataItem()
             begin
-                ItemTB.Reset();
-                ItemTB.SetCurrentKey("Search Description");
-                ItemTB.Ascending(true);
-                SetRange(Number, 1, ItemTB.Count());
-                if ItemTB.IsEmpty() then
+                TempItemTB.Reset();
+                TempItemTB.SetCurrentKey("Search Description");
+                TempItemTB.Ascending(true);
+                SetRange(Number, 1, TempItemTB.Count());
+                if TempItemTB.IsEmpty() then
                     CurrReport.Break();
             end;
 
             trigger OnAfterGetRecord()
             begin
                 if Number = 1 then begin
-                    if not ItemTB.FindSet() then
+                    if not TempItemTB.FindSet() then
                         CurrReport.Break();
-                end else begin
-                    if ItemTB.Next() = 0 then
+                end else
+                    if TempItemTB.Next() = 0 then
                         CurrReport.Break();
-                end;
+
             end;
         }
     }
@@ -133,7 +133,7 @@ report 50105 "Store Stock Checking"
 
     var
         LSVIPRepFucntion: Codeunit "PLSR_Report Function";
-        ItemTB: Record "Item" temporary;
+        TempItemTB: Record "Item" temporary;
         ComInfo: Record "Company Information";
         RetailSetup: Record "LSC Retail Setup";
         LocationFilter, ItemNoFilter, DivisionFilter, ItemCategoryFilter, ProductGroupFilter : Code[20];
@@ -146,8 +146,6 @@ report 50105 "Store Stock Checking"
         ItemVariant: Record "Item Variant";
         StoreTB: Record "LSC Store";
         ILEQuery: Query "PLSR_StoreStockILE_Q";
-        SalesQuery: Query "PLSR_StoreStockTSE_Q";
-        StatusQuery: Query "PLSR_StoreStockTSES_Q";
         EntryNo: Integer;
         StoreFilterString: Text;
     begin
@@ -169,8 +167,8 @@ report 50105 "Store Stock Checking"
         if StoreTB.Get(LocationFilter) then
             StoreFilterText := StoreTB."No." + ' : ' + StoreTB.Name;
 
-        ItemTB.Reset();
-        ItemTB.DeleteAll();
+        TempItemTB.Reset();
+        TempItemTB.DeleteAll();
         EntryNo := 0;
 
         StoreFilterString := '';
@@ -196,16 +194,16 @@ report 50105 "Store Stock Checking"
             if ItemRecord.FindSet() then
                 repeat
                     if RetailSetup."PLSPOS_Show Var for Report VIP" then begin
-                        FindOrCreateItemTB(ItemRecord."No.", '', ItemRecord.Description, ItemRecord."Base Unit of Measure", ItemTB, EntryNo, RetailSetup."PLSPOS_Show Var for Report VIP");
+                        FindOrCreateItemTB(ItemRecord."No.", '', ItemRecord.Description, ItemRecord."Base Unit of Measure", TempItemTB, EntryNo, RetailSetup."PLSPOS_Show Var for Report VIP");
                         ItemVariant.Reset();
                         ItemVariant.SetRange("Item No.", ItemRecord."No.");
                         if ItemVariant.FindSet() then
                             repeat
-                                FindOrCreateItemTB(ItemRecord."No.", ItemVariant.Code, ItemRecord.Description, ItemRecord."Base Unit of Measure", ItemTB, EntryNo, RetailSetup."PLSPOS_Show Var for Report VIP");
+                                FindOrCreateItemTB(ItemRecord."No.", ItemVariant.Code, ItemRecord.Description, ItemRecord."Base Unit of Measure", TempItemTB, EntryNo, RetailSetup."PLSPOS_Show Var for Report VIP");
                             until ItemVariant.Next() = 0;
-                    end else begin
-                        FindOrCreateItemTB(ItemRecord."No.", '', ItemRecord.Description, ItemRecord."Base Unit of Measure", ItemTB, EntryNo, RetailSetup."PLSPOS_Show Var for Report VIP");
-                    end;
+                    end else
+                        FindOrCreateItemTB(ItemRecord."No.", '', ItemRecord.Description, ItemRecord."Base Unit of Measure", TempItemTB, EntryNo, RetailSetup."PLSPOS_Show Var for Report VIP");
+
                 until ItemRecord.Next() = 0;
         end;
 
@@ -213,19 +211,19 @@ report 50105 "Store Stock Checking"
         Clear(ILEQuery);
         if ItemNoFilter <> '' then ILEQuery.SetRange(Item_No, ItemNoFilter);
         if LocationFilter <> '' then ILEQuery.SetRange(Location_Code, LocationFilter);
-        ILEQuery.SetRange(Posting_Date, 0D, Today - 1);
+        ILEQuery.SetRange(Posting_Date, 0D, Today); // --> ILEQuery.SetRange(Posting_Date, 0D, Today );
         if not ShowItemBlock then ILEQuery.SetRange(Is_Blocked, false);
         if DivisionFilter <> '' then ILEQuery.SetRange(Division_Code, DivisionFilter);
         if ItemCategoryFilter <> '' then ILEQuery.SetRange(Item_Category, ItemCategoryFilter);
         if ProductGroupFilter <> '' then ILEQuery.SetRange(Product_Group, ProductGroupFilter);
 
         if ILEQuery.Open() then begin
-            while ILEQuery.Read() do begin
-                if FindOrCreateItemTB(ILEQuery.Q_Item_No, ILEQuery.Q_Variant_Code, ILEQuery.Item_Desc, ILEQuery.Base_UOM, ItemTB, EntryNo, RetailSetup."PLSPOS_Show Var for Report VIP") then begin
-                    ItemTB."Unit Price" += ILEQuery.Sum_Remaining_Qty;
-                    ItemTB.Modify();
+            while ILEQuery.Read() do
+                if FindOrCreateItemTB(ILEQuery.Q_Item_No, ILEQuery.Q_Variant_Code, ILEQuery.Item_Desc, ILEQuery.Base_UOM, TempItemTB, EntryNo, RetailSetup."PLSPOS_Show Var for Report VIP") then begin
+                    TempItemTB."Unit Price" += ILEQuery.Sum_Remaining_Qty;
+                    TempItemTB.Modify();
+
                 end;
-            end;
             ILEQuery.Close();
         end;
 
@@ -233,26 +231,26 @@ report 50105 "Store Stock Checking"
         ProcessSalesAndStatusData(true, StoreFilterString, EntryNo);  // ยอดวันนี้
         ProcessSalesAndStatusData(false, StoreFilterString, EntryNo); // ยอดอดีต
         // ---  STEP 5: คำนวณยอดสุทธิใน Memory (ข้อมูลคลีนหมดจดแล้ว ไม่มีการยิง SQL GET อีกต่อไป!) ---
-        ItemTB.Reset();
-        if ItemTB.FindSet() then
+        TempItemTB.Reset();
+        if TempItemTB.FindSet() then
             repeat
-                ItemTB."Last Direct Cost" := ItemTB."Unit Price" + ItemTB."Unit Cost" + ItemTB."Standard Cost";
-                ItemTB.Modify();
-            until ItemTB.Next() = 0;
+                TempItemTB."Last Direct Cost" := TempItemTB."Unit Price" + TempItemTB."Unit Cost" + TempItemTB."Standard Cost";
+                TempItemTB.Modify();
+            until TempItemTB.Next() = 0;
 
         // --- STEP 6: กรองค่าศูนย์และค่าติดลบ ---
         if not ShowZeroFilter then begin
-            ItemTB.SetRange("Last Direct Cost", 0);
-            if not ItemTB.IsEmpty() then ItemTB.DeleteAll();
-            ItemTB.SetRange("Last Direct Cost");
+            TempItemTB.SetRange("Last Direct Cost", 0);
+            if not TempItemTB.IsEmpty() then TempItemTB.DeleteAll();
+            TempItemTB.SetRange("Last Direct Cost");
         end;
         if not ShowNegativeFilter then begin
-            ItemTB.SetFilter("Last Direct Cost", '<0');
-            if not ItemTB.IsEmpty() then ItemTB.DeleteAll();
-            ItemTB.SetRange("Last Direct Cost");
+            TempItemTB.SetFilter("Last Direct Cost", '<0');
+            if not TempItemTB.IsEmpty() then TempItemTB.DeleteAll();
+            TempItemTB.SetRange("Last Direct Cost");
         end;
 
-        ItemTB.Reset();
+        TempItemTB.Reset();
     end;
 
     local procedure ProcessSalesAndStatusData(IsToday: Boolean; StoreFilterStr: Text; var CurrentEntryNo: Integer)
@@ -275,15 +273,15 @@ report 50105 "Store Stock Checking"
         if ProductGroupFilter <> '' then SalesQuery.SetRange(Product_Group, ProductGroupFilter);
 
         if SalesQuery.Open() then begin
-            while SalesQuery.Read() do begin
-                if FindOrCreateItemTB(SalesQuery.Q_Item_No, SalesQuery.Q_Variant_Code, SalesQuery.Item_Desc, SalesQuery.Base_UOM, ItemTB, CurrentEntryNo, RetailSetup."PLSPOS_Show Var for Report VIP") then begin
+            while SalesQuery.Read() do
+                if FindOrCreateItemTB(SalesQuery.Q_Item_No, SalesQuery.Q_Variant_Code, SalesQuery.Item_Desc, SalesQuery.Base_UOM, TempItemTB, CurrentEntryNo, RetailSetup."PLSPOS_Show Var for Report VIP") then begin
                     if IsToday then
-                        ItemTB."Unit Cost" += SalesQuery.Sum_Quantity
+                        TempItemTB."Unit Cost" += SalesQuery.Sum_Quantity
                     else
-                        ItemTB."Standard Cost" += SalesQuery.Sum_Quantity;
-                    ItemTB.Modify();
+                        TempItemTB."Standard Cost" += SalesQuery.Sum_Quantity;
+                    TempItemTB.Modify();
                 end;
-            end;
+
             SalesQuery.Close();
         end;
 
@@ -301,20 +299,20 @@ report 50105 "Store Stock Checking"
         if ProductGroupFilter <> '' then StatusQuery.SetRange(Product_Group, ProductGroupFilter);
 
         if StatusQuery.Open() then begin
-            while StatusQuery.Read() do begin
-                if FindOrCreateItemTB(StatusQuery.Q_Item_No, StatusQuery.Q_Variant_Code, StatusQuery.Item_Desc, StatusQuery.Base_UOM, ItemTB, CurrentEntryNo, RetailSetup."PLSPOS_Show Var for Report VIP") then begin
+            while StatusQuery.Read() do
+                if FindOrCreateItemTB(StatusQuery.Q_Item_No, StatusQuery.Q_Variant_Code, StatusQuery.Item_Desc, StatusQuery.Base_UOM, TempItemTB, CurrentEntryNo, RetailSetup."PLSPOS_Show Var for Report VIP") then begin
                     if IsToday then
-                        ItemTB."Unit Cost" -= StatusQuery.Sum_Quantity
+                        TempItemTB."Unit Cost" -= StatusQuery.Sum_Quantity
                     else
-                        ItemTB."Standard Cost" -= StatusQuery.Sum_Quantity;
-                    ItemTB.Modify();
+                        TempItemTB."Standard Cost" -= StatusQuery.Sum_Quantity;
+                    TempItemTB.Modify();
                 end;
-            end;
+
             StatusQuery.Close();
         end;
     end;
     // แก้ไขฟังก์ชันให้รับชื่อและหน่วยนับมาหยอดเข้า Temporary Table ทันทีที่ถูกสร้าง
-    local procedure FindOrCreateItemTB(ItemNo: Code[20]; VariantCode: Code[20]; ItemDesc: Text[100]; BaseUOM: Code[10]; var ItemTB: Record Item temporary; var EntryNo: Integer; ShowVar: Boolean): Boolean
+    local procedure FindOrCreateItemTB(ItemNo: Code[20]; VariantCode: Code[20]; ItemDesc: Text[100]; BaseUOM: Code[10]; var TempInsItemTB: Record Item temporary; var EntryNo: Integer; ShowVar: Boolean): Boolean
     var
         SearchKey: Code[100];
     begin
@@ -322,28 +320,28 @@ report 50105 "Store Stock Checking"
             VariantCode := '';
 
         SearchKey := CopyStr(ItemNo + '|' + VariantCode, 1, 100);
-        ItemTB.Reset();
-        ItemTB.SetCurrentKey("Search Description");
-        ItemTB.SetRange("Search Description", SearchKey);
-        if ItemTB.FindFirst() then begin
+        TempInsItemTB.Reset();
+        TempInsItemTB.SetCurrentKey("Search Description");
+        TempInsItemTB.SetRange("Search Description", SearchKey);
+        if TempInsItemTB.FindFirst() then begin
             // กรณีมีความจำเป็นต้องอัปเดตข้อมูลรายละเอียดเพิ่มเติม
-            if (ItemTB.Description = '') and (ItemDesc <> '') then begin
-                ItemTB.Description := ItemDesc;
-                ItemTB."Base Unit of Measure" := BaseUOM;
-                ItemTB.Modify();
+            if (TempInsItemTB.Description = '') and (ItemDesc <> '') then begin
+                TempInsItemTB.Description := ItemDesc;
+                TempInsItemTB."Base Unit of Measure" := BaseUOM;
+                TempInsItemTB.Modify();
             end;
             exit(true);
         end;
 
         EntryNo += 1;
-        ItemTB.Init();
-        ItemTB."No." := Format(EntryNo);
-        ItemTB."No. 2" := ItemNo;
-        ItemTB."Vendor Item No." := VariantCode;
-        ItemTB."Search Description" := SearchKey;
-        ItemTB.Description := ItemDesc;
-        ItemTB."Base Unit of Measure" := BaseUOM;
-        ItemTB.Insert();
+        TempInsItemTB.Init();
+        TempInsItemTB."No." := Format(EntryNo);
+        TempInsItemTB."No. 2" := ItemNo;
+        TempInsItemTB."Vendor Item No." := VariantCode;
+        TempInsItemTB."Search Description" := SearchKey;
+        TempInsItemTB.Description := ItemDesc;
+        TempInsItemTB."Base Unit of Measure" := BaseUOM;
+        TempInsItemTB.Insert();
         exit(true);
     end;
     // C-AVPWDLSVIP 29/06/2025 > Improve Performance of VIP Report(76081) น้องอิง

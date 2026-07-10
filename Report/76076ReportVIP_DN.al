@@ -2,7 +2,7 @@ report 50102 "Sales Rep by Sale Staff"
 {
     Caption = 'POS Sales Report by Sale Staff_Test';
     DefaultLayout = RDLC;
-    RDLCLayout = './ReportLayouts/Rep50102_POSSalesReportByStaff.rdl';
+    RDLCLayout = './ReportLayouts/Rep50102DN_POSSalesReportByStaff.rdl';
     PreviewMode = PrintLayout;
 
     dataset

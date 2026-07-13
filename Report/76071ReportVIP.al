@@ -200,7 +200,7 @@ report 50107 "PLSR_Sales Report By ItemCate2"
                     TempTB.Insert();
                 end;
                 SalesQuery.Close();
-                TempTB.SetCurrentKey("Item Category Code", "Store No.", Date, "Item No.", "POS Terminal No.", "Transaction No.", "Line No.");
+                TempTB.SetCurrentKey("Store No.", "Item Category Code", "Item No.", Date);
                 if TempTB.IsEmpty() then
                     CurrReport.Break();
                 TransSale.SetRange(Number, 1, TempTB.Count());

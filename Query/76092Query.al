@@ -3,9 +3,18 @@ query 50044 "MemberSalesHistory Q"
 
     Caption = 'MemberSalesHistory';
     QueryType = Normal;
-    OrderBy = ascending(Member_Account_No_, Store_No_, Date, Entry_No_, Line_No_);
 
-    // AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76092) - น้องปอ
+    // ── FIX #1: OrderBy ──────────────────────────────────────────────────
+    // เดิมของโค้ด optimize: ascending(Member_Account_No_, Store_No_, Date, Entry_No_, Line_No_)
+    // ผิดจากต้นฉบับ เพราะ report ต้นฉบับ (76092) วนลูปแบบ nested:
+    //   Member Contact  sorting("Account No.", "Contact No.")
+    //     -> Member Sales Entry  sorting("Entry No.", "Line No.")  [link ผ่าน Contact No.]
+    // แปลว่าลำดับจริงคือ: กลุ่มตาม Contact (เรียง Account No. -> Contact No. ก่อน)
+    // แล้วภายในแต่ละ Contact ค่อยเรียงตาม Entry No. -> Line No.
+    // แก้ให้ตรงกับต้นฉบับ:
+    OrderBy = ascending(Account_No_, Member_Contact_No_, Entry_No_, Line_No_);
+
+    // AVPWDLSVIP 14/07/2026 > Improve Performance of VIP Report(76092) - น้องปอ
     elements
     {
         dataitem(MemberSalesEntry; "LSC Member Sales Entry")
@@ -27,10 +36,15 @@ query 50044 "MemberSalesHistory Q"
 
             // JOIN: LSC Member Contact — เพื่อให้ filter Search Name / Mobile / ID Card ได้
             // ใช้ InnerJoin เพราะต้องการเฉพาะ Sales Entry ที่มี Contact จริงๆ
+            // (นี่คือ intent เดียวกับ PrintOnlyIfDetail = true ของต้นฉบับ)
             dataitem(MemberContact; "LSC Member Contact")
             {
                 DataItemLink = "Contact No." = MemberSalesEntry."Member Contact No.";
                 SqlJoinType = InnerJoin;
+
+                // ── FIX #1 (ต่อ): เพิ่ม Account No. เพื่อใช้เป็น OrderBy หลัก ให้ตรงกับ
+                // DataItemTableView = sorting("Account No.", "Contact No.") ของ Member Contact ต้นฉบับ
+                column(Account_No_; "Account No.") { }
 
                 // filter fields ตรงกับ RequestFilterFields ของ dummy dataitem ใน Report
                 filter(SearchNameFilter; "Search Name") { }
@@ -72,6 +86,15 @@ query 50044 "MemberSalesHistory Q"
                             column(UOM_Price; "UOM Price") { }
                             column(Price; Price) { }
 
+                            // ── FIX #2: existence-detection column ──
+                            // ต้นฉบับใช้ TransSalesEntryTB.FindFirst() เพื่อรู้ว่า "มี record นี้อยู่จริงไหม"
+                            // แล้วถ้ามี ใช้ค่าจาก record นี้ "ทั้งชุด" (แม้บาง field จะเป็น 0/blank)
+                            // ไม่ fallback แยกทีละ field ไปที่ Sales Shipment Line
+                            // Query แบบ LeftOuterJoin ไม่มี concept "พบ/ไม่พบ record" ให้ report โดยตรง
+                            // จึงต้องอาศัย field ที่เป็นส่วนหนึ่งของ primary key (ไม่มีทาง blank/0 ถ้า record มีจริง)
+                            // เป็นตัวธงบอกว่า join เจอ record หรือไม่ (ถ้าไม่เจอ LeftOuterJoin จะคืนค่า default/0)
+                            column(TransSalesEntry_LineNo; "Line No.") { }
+
                             // JOIN: Sales Shipment Line — fallback UOM / QTY / Price
                             dataitem(SalesShipmentLine; "Sales Shipment Line")
                             {
@@ -84,6 +107,12 @@ query 50044 "MemberSalesHistory Q"
                                 column(Shipment_UOM; "Unit of Measure") { }
                                 column(Shipment_Quantity; Quantity) { }
                                 column(Shipment_Unit_Price; "Unit Price") { }
+
+                                // ── FIX #2 (ต่อ): existence-detection column สำหรับ Sales Shipment Line ──
+                                // ต้นฉบับเช็ค SalesShipmentLineTB.FindFirst() แยกต่างหาก ก่อนจะ assign
+                                // ค่า Shipment ทั้งชุด ถ้าไม่เจอ record นี้เลย ต้นฉบับปล่อยค่าเป็น blank/0
+                                // (ไม่ได้ assign อะไรเลย) - ต้อง mimic พฤติกรรมนี้ด้วย
+                                column(ShipmentLine_LineNo; "Line No.") { }
                             }
                         }
                     }
@@ -95,5 +124,5 @@ query 50044 "MemberSalesHistory Q"
     trigger OnBeforeOpen()
     begin
     end;
-    // C-AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76092) - น้องปอ
+    // C-AVPWDLSVIP 14/07/2026 > Improve Performance of VIP Report(76092) - น้องปอ
 }

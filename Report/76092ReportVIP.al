@@ -2,15 +2,14 @@ report 50104 "Member Sales History"
 {
     Caption = 'Member Sales History';
     DefaultLayout = RDLC;
-    RDLCLayout = './ReportLayouts/Rep50104_MemberSalesHistory.rdl';
+    RDLCLayout = './ReportLayouts/Rep76092_MemberSalesHistory.rdl';
     PreviewMode = PrintLayout;
 
-    // AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76092) - น้องปอ
+    // AVPWDLSVIP 14/07/2026 > Improve Performance of VIP Report(76092) - น้องปอ
     dataset
     {
-        // ── Dummy dataitem 1: รับ RequestFilterFields สำหรับ Member Contact ──
-        // ทำหน้าที่แค่เก็บ filter ที่ user กรอกใน Request Page
-        // ไม่ได้วน loop จริง (Break() ใน OnPreDataItem)
+        // Dummy dataitem: ใช้แค่รับ RequestFilterFields จาก request page
+        // ไม่ loop จริง (Break ทันทีใน OnPreDataItem) ค่า filter จะถูกอ่านไปส่งต่อ Query ทีหลัง
         dataitem(MemberContactFilter; "LSC Member Contact")
         {
             RequestFilterFields = "Search Name", "Mobile Phone No.", "PLSWS_ID Card No.";
@@ -21,20 +20,18 @@ report 50104 "Member Sales History"
             end;
         }
 
-        // ── Main dataitem: ใช้ Integer วน loop อ่านจาก Query ──
-        // แทนที่ nested dataitem เดิมที่ต้อง FindFirst() ทีละ record
+        // Main dataitem: ใช้ Integer วน loop อ่านทีละแถวจาก Query (แทน nested dataitem + FindFirst แบบเดิม)
         dataitem(Integer; Integer)
         {
             DataItemTableView = sorting(Number) where(Number = filter('1..'));
 
-            // Header columns
             column(ShowVariant; not RetailSetup."PLSPOS_Show Var for Report VIP") { }
             column(Name_CompanyInforTB; CompanyInfo.Name) { }
             column(DateHeader; DateHeader) { }
             column(CurrDate; Format(CurrDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>')) { }
             column(CurrTime; Format(CurrTime)) { }
 
-            // Data columns — อ่านค่าจาก Current* variables ที่ fill จาก Query
+            // อ่านตรงจาก Query
             column(Member_Account_No_; MemberSalesHistoryQ.Member_Account_No_) { }
             column(Description_MemberAcc; MemberSalesHistoryQ.Member_Account_Description) { }
             column(Store_No_; MemberSalesHistoryQ.Store_No_) { }
@@ -44,6 +41,7 @@ report 50104 "Member Sales History"
             column(Item_No_; MemberSalesHistoryQ.Item_No_) { }
             column(Description; MemberSalesHistoryQ.Description) { }
             column(Item_Variant_Code; MemberSalesHistoryQ.Item_Variant_Code) { }
+            // UOM/Qty/Price ไม่ได้อ่านตรงจาก Query เพราะต้องผ่าน fallback logic ก่อน (ดู OnAfterGetRecord)
             column(UOM_TransSale; CurrentUOM) { }
             column(QTYTranSale; CurrentQty) { }
             column(PriceTranSale; CurrentPrice) { }
@@ -51,17 +49,24 @@ report 50104 "Member Sales History"
 
             trigger OnPreDataItem()
             begin
-                // ── Setup header info ──
                 CompanyInfo.Get();
                 RetailSetup.Get();
 
+                // เคลียร์ทุกครั้งก่อน assign ใหม่ กัน state ค้างจากรอบรันก่อนหน้า
+                Clear(CurrDate);
+                Clear(CurrTime);
                 CurrDate := Today;
                 CurrTime := Time;
 
-                // ── Build date filter string และ header text ──
                 Clear(DateFilter);
                 Clear(DateHeader);
 
+                // เคลียร์ state ของ dedup logic (ดูเหตุผลที่ OnAfterGetRecord ด้านล่าง)
+                Clear(LastEntryNo);
+                Clear(LastLineNo);
+                Clear(HasLastRead);
+
+                // สร้าง date filter + header text ตามโหมดที่เลือกใน request page
                 if ChoosePeriod then begin
                     if (FromDate <> 0D) and (ToDate <> 0D) then begin
                         DateHeader := 'ประจำงวดวันที่ ' + Format(FromDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + ' ถึง ' + Format(ToDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
@@ -73,9 +78,7 @@ report 50104 "Member Sales History"
                         MemberSalesHistoryQ.SetFilter(DateFilter, '%1', FDate);
                     end;
 
-                // ── ส่ง filter Member Contact จาก RequestFilterFields ไปที่ Query ──
-                // ส่ง filter ของแต่ละ field ตรงๆ ไปที่ Query แทนการ resolve เป็น Contact No.
-                // เพราะการสะสม pipe string อาจเกิน Text limit เมื่อมี Contact เยอะ
+                // ส่ง filter จาก request page (MemberContactFilter) เข้า Query ตรงๆ
                 if MemberContactFilter.GetFilter("Search Name") <> '' then
                     MemberSalesHistoryQ.SetFilter(SearchNameFilter, MemberContactFilter.GetFilter("Search Name"));
                 if MemberContactFilter.GetFilter("Mobile Phone No.") <> '' then
@@ -83,44 +86,55 @@ report 50104 "Member Sales History"
                 if MemberContactFilter.GetFilter("PLSWS_ID Card No.") <> '' then
                     MemberSalesHistoryQ.SetFilter(IDCardNoFilter, MemberContactFilter.GetFilter("PLSWS_ID Card No."));
 
-                // ── เปิด Query — SQL จะ JOIN ทุกตารางในครั้งเดียว ──
                 MemberSalesHistoryQ.Open();
             end;
 
             trigger OnAfterGetRecord()
             begin
-                // อ่าน record ถัดไปจาก Query
-                // ถ้าหมดแล้วให้ Break ออกจาก loop
-                if not MemberSalesHistoryQ.Read() then
-                    CurrReport.Break();
+                // อ่านแถวถัดไปจาก Query แล้วข้ามแถวที่ (Entry No., Line No.) ซ้ำกับแถวก่อนหน้า
+                // เหตุผล: MemberSalesEntry เป็น driving table ที่ unique อยู่แล้ว แต่ join ชั้นล่าง
+                // (TransactionHeader/TransSalesEntry/SalesShipmentLine) เป็น LeftOuterJoin ต่อกันหลายชั้น
+                // ถ้าคีย์ join ไม่ unique จริง จะได้แถวคูณออกมาสำหรับ sales entry เดียวกัน
+                // การข้ามแถวซ้ำแบบนี้ = เลือกแถวแรกที่เจอ ใกล้เคียงพฤติกรรม FindFirst() ของต้นฉบับ 76092
+                repeat
+                    if not MemberSalesHistoryQ.Read() then
+                        CurrReport.Break();
+                until (not HasLastRead) or
+                      (MemberSalesHistoryQ.Entry_No_ <> LastEntryNo) or
+                      (MemberSalesHistoryQ.Line_No_ <> LastLineNo);
+
+                HasLastRead := true;
+                LastEntryNo := MemberSalesHistoryQ.Entry_No_;
+                LastLineNo := MemberSalesHistoryQ.Line_No_;
 
                 Clear(CurrentQty);
                 Clear(CurrentPrice);
                 Clear(CurrentUOM);
 
-                // ── ตรรกะ UOM / QTY / Price เดิม แต่อ่านจาก Query แทน FindFirst() ──
-                // Priority 1: Trans. Sales Entry (JOIN อยู่แล้วใน Query)
-                if MemberSalesHistoryQ.UOM_Quantity <> 0 then
-                    CurrentQty := MemberSalesHistoryQ.UOM_Quantity * -1
-                else
-                    if MemberSalesHistoryQ.Quantity <> 0 then
-                        CurrentQty := MemberSalesHistoryQ.Quantity * -1
+                // Fallback logic ตรงกับต้นฉบับ 76092:
+                // ถ้า TransSalesEntry มี record จริง (เช็คจาก Line No. ซึ่งเป็นส่วนหนึ่งของ PK ไม่มีทาง 0/blank)
+                // ให้ใช้ค่า UOM/Qty/Price จาก TransSalesEntry "ทั้งชุด" แม้บาง field จะเป็น 0 ก็ตาม
+                // ไม่ fallback แยกทีละ field ไปที่ Sales Shipment Line
+                if MemberSalesHistoryQ.TransSalesEntry_LineNo <> 0 then begin
+                    CurrentUOM := MemberSalesHistoryQ.UOM_TransSale;
+
+                    if MemberSalesHistoryQ.UOM_Quantity <> 0 then
+                        CurrentQty := MemberSalesHistoryQ.UOM_Quantity * -1
                     else
-                        // Priority 2: Sales Shipment Line (fallback JOIN ใน Query)
+                        CurrentQty := MemberSalesHistoryQ.Quantity * -1;
+
+                    if MemberSalesHistoryQ.UOM_Price <> 0 then
+                        CurrentPrice := MemberSalesHistoryQ.UOM_Price
+                    else
+                        CurrentPrice := MemberSalesHistoryQ.Price;
+                end else
+                    // ไม่เจอ TransSalesEntry เลย -> fallback ไป Sales Shipment Line ทั้งชุด (ถ้ามี)
+                    if MemberSalesHistoryQ.ShipmentLine_LineNo <> 0 then begin
+                        CurrentUOM := MemberSalesHistoryQ.Shipment_UOM;
                         CurrentQty := MemberSalesHistoryQ.Shipment_Quantity;
-
-                if MemberSalesHistoryQ.UOM_Price <> 0 then
-                    CurrentPrice := MemberSalesHistoryQ.UOM_Price
-                else
-                    if MemberSalesHistoryQ.Price <> 0 then
-                        CurrentPrice := MemberSalesHistoryQ.Price
-                    else
                         CurrentPrice := MemberSalesHistoryQ.Shipment_Unit_Price;
-
-                if MemberSalesHistoryQ.UOM_TransSale <> '' then
-                    CurrentUOM := MemberSalesHistoryQ.UOM_TransSale
-                else
-                    CurrentUOM := MemberSalesHistoryQ.Shipment_UOM;
+                    end;
+                // ไม่เจอทั้งคู่ -> ปล่อย CurrentUOM/CurrentQty/CurrentPrice เป็นค่า Clear (blank/0) เหมือนต้นฉบับ
             end;
         }
     }
@@ -131,6 +145,7 @@ report 50104 "Member Sales History"
         {
             area(Content)
             {
+                // Period vs At Date: สอง checkbox นี้ mutual exclusive กันเอง ผ่าน OnValidate ของแต่ละตัว
                 group("Filter")
                 {
                     field("Period"; ChoosePeriod)
@@ -193,6 +208,7 @@ report 50104 "Member Sales History"
 
         trigger OnOpenPage()
         begin
+            // ค่าเริ่มต้น: โหมด At Date วันนี้
             FDate := Today;
             ChoosePeriod := false;
             ChooseAtDate := true;
@@ -202,34 +218,29 @@ report 50104 "Member Sales History"
     var
         CompanyInfo: Record "Company Information";
         RetailSetup: Record "LSC Retail Setup";
-        MemberSalesHistoryQ: Query "MemberSalesHistory Q";  // Query ใหม่ที่ join ทุกตาราง
+        MemberSalesHistoryQ: Query "MemberSalesHistory Q";
 
-        // Request Page variables
+        // Request page: ตัวเลือกช่วงวันที่จากผู้ใช้
         FromDate: Date;
         ToDate: Date;
         FDate: Date;
         ChoosePeriod: Boolean;
         ChooseAtDate: Boolean;
 
-        // Header display variables
+        // Header ของรายงาน
         DateHeader: Text[50];
         DateFilter: Text[50];
         CurrDate: Date;
         CurrTime: Time;
 
-        // Current record variables (fill จาก Query ใน OnAfterGetRecord)
-        CurrentMemberAccountNo: Code[20];
-        CurrentMemberAccountDesc: Text[100];
-        CurrentStoreNo: Code[20];
-        CurrentDocumentNo: Code[20];
-        CurrentDate: Date;
-        CurrentSaleIsReturnSale: Boolean;
-        CurrentItemNo: Code[20];
-        CurrentDescription: Text[100];
-        CurrentItemVariantCode: Code[20];
-        CurrentDiscountAmount: Decimal;
+        // ค่าที่ผ่าน fallback logic แล้ว ใช้แสดงผลจริงใน column UOM/Qty/Price
         CurrentUOM: Text[50];
         CurrentQty: Decimal;
         CurrentPrice: Decimal;
-    // C-AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76092) - น้องปอ
+
+        // State สำหรับกันแถวซ้ำจาก LeftOuterJoin ใน Query (ดูรายละเอียดที่ OnAfterGetRecord)
+        LastEntryNo: Integer;
+        LastLineNo: Integer;
+        HasLastRead: Boolean;
 }
+//C-AVPWDLSVIP 14/07/2026 > Improve Performance of VIP Report(76092) - น้องปอ

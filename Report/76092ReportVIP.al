@@ -2,7 +2,7 @@ report 50104 "Member Sales History"
 {
     Caption = 'Member Sales History';
     DefaultLayout = RDLC;
-    RDLCLayout = './ReportLayouts/Rep76092_MemberSalesHistory.rdl';
+    RDLCLayout = './ReportLayouts/Rep50104_MemberSalesHistory.rdl';
     PreviewMode = PrintLayout;
 
     // AVPWDLSVIP 14/07/2026 > Improve Performance of VIP Report(76092) - น้องปอ

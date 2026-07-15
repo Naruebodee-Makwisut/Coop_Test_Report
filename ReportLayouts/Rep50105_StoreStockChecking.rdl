@@ -890,7 +890,24 @@ Today</Value>
                   <RepeatOnNewPage>true</RepeatOnNewPage>
                 </TablixMember>
                 <TablixMember>
+<<<<<<< HEAD
+                  <Group Name="Item_No">
+                    <GroupExpressions>
+                      <GroupExpression>=Fields!ItemNo.Value</GroupExpression>
+                      <GroupExpression>=Fields!Variant_Code.Value</GroupExpression>
+                    </GroupExpressions>
+                  </Group>
+                  <SortExpressions>
+                    <SortExpression>
+                      <Value>=Fields!ItemNo.Value</Value>
+                    </SortExpression>
+                    <SortExpression>
+                      <Value>=Fields!Variant_Code.Value</Value>
+                    </SortExpression>
+                  </SortExpressions>
+=======
                   <Group Name="Item_No" />
+>>>>>>> origin/1-test
                 </TablixMember>
               </TablixMembers>
             </TablixRowHierarchy>

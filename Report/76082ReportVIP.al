@@ -522,5 +522,10 @@ report 50112 "PLSR_Store_Sales_VAT"
                 Addr[5] := StoreTB."PLSLC_Address 5";
             end;
     end;
+<<<<<<< HEAD
+
+    // C-AVPWDLSVIP 36/06/2026 > Improve Performance of VIP Report(76082) - น้องปอ
+=======
     // AVPWDLSVIP 30/06/2026 > Improve Performance of VIP Report(76082) - น้องปอ
+>>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
 }

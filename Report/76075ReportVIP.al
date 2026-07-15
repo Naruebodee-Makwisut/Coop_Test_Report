@@ -4,194 +4,93 @@ report 50109 "Sales_Report_By_Terminal"
     DefaultLayout = RDLC;
     RDLCLayout = './ReportLayouts/Rep50109_POSSalesReportByTerminal.rdl';
     PreviewMode = PrintLayout;
+    DataAccessIntent = ReadOnly;
 
-    // AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76075) - น้องปอ
+    // AVPWDLSVIP 03/07/2026 > Improve Performance of VIP Report(76075) - น้องปอ
     dataset
     {
-        dataitem(TransSale; "LSC Trans. Sales Entry")
+        dataitem(Integer; Integer)
         {
-            DataItemTableView = sorting("Store No.", "POS Terminal No.", "Transaction No.", "Line No.");
+            DataItemTableView = sorting(Number);
 
-            column(Variant_Code; "Variant Code") { }
-            column(Name_ComInfo; ComInfo.Name) { }
-            column(ShowDate; ShowDate) { }
-            column(ShowTime; ShowTime) { }
-            column(PeriodDate; PeriodDate) { }
-            column(ReportFilterText; ReportFilterText) { }
-            column(Store_No_TransSale; TransSale."Store No.") { }
-            column(POS_Terminal_No_TransSale; TransSale."POS Terminal No.") { }
-            column(Receipt_No_TransSale; TransSale."Receipt No.") { }
-            column(Date_TransSale; format(TransSale.Date, 0, '<Closing><Day,2>/<Month,2>/<Year4>')) { }
-            column(TransType; TransType) { }
-            column(CancelDocNo; CancelDocNo) { }
-            column(RefundDocNo; RefundDocNo) { }
-            column(RefRefund; TransHeaderTB."PLSPOS_Ref. Refund Receipt No.") { }
-            column(Item_No_TransSale; TransSale."Item No.") { }
-            column(Item_Name_ItemTB; ItemTB.Description + ' ' + ItemTB."Description 2") { }
-            column(Contact_No_MemberContact; MemberShipCardTB."Card No.") { }
-            column(Name_MemberContact; MemberContactTB.Name + ' ' + MemberContactTB."Name 2") { }
-            column(Unit_of_Measure_TransSale; TransSale."Unit of Measure") { }
-            column(Qty; Qty) { }
-            column(BaseQty; BaseQty) { }
-            column(UnitPrice; UnitPrice) { }
-            column(Amount; UnitPrice * Qty) { }
-            column(Discount_Amount_TransSale; TransSale."Discount Amount") { }
-            column(TotalAmt; (UnitPrice * Qty) - TransSale."Discount Amount") { }
-            column(ShowVariant; not RettailSetup."PLSPOS_Show Var for Report VIP") { }
-            column(TransHeaderTB_Time; format(TransHeaderTB.Time)) { }
+            column(Variant_Code; VariantCodeList.Get(Number))
+            { }
+            column(Name_ComInfo; ComInfo.Name)
+            { }
+            column(ShowDate; ShowDate)
+            { }
+            column(ShowTime; ShowTime)
+            { }
+            column(PeriodDate; PeriodDate)
+            { }
+            column(ReportFilterText; ReportFilterText)
+            { }
+            column(Store_No_TransSale; StoreNoList.Get(Number))
+            { }
+            column(POS_Terminal_No_TransSale; POSTerminalNoList.Get(Number))
+            { }
+            column(Receipt_No_TransSale; ReceiptNoList.Get(Number))
+            { }
+            column(Date_TransSale; DateTextList.Get(Number))
+            { }
+            column(TransType; TransTypeList.Get(Number))
+            { }
+            column(CancelDocNo; CancelDocNoList.Get(Number))
+            { }
+            column(RefundDocNo; RefundDocNoList.Get(Number))
+            { }
+            column(RefRefund; RefRefundList.Get(Number))
+            { }
+            column(Item_No_TransSale; ItemNoList.Get(Number))
+            { }
+            column(Item_Name_ItemTB; ItemDescList.Get(Number))
+            { }
+            column(Contact_No_MemberContact; MemberCardNoList.Get(Number))
+            { }
+            column(Name_MemberContact; MemberContactNameList.Get(Number))
+            { }
+            column(Unit_of_Measure_TransSale; UOMList.Get(Number))
+            { }
+            column(Qty; QtyList.Get(Number))
+            { }
+            column(BaseQty; BaseQtyList.Get(Number))
+            { }
+            column(UnitPrice; UnitPriceList.Get(Number))
+            { }
+            column(Amount; AmountList.Get(Number))
+            { }
+            column(Discount_Amount_TransSale; DiscountAmountList.Get(Number))
+            { }
+            column(TotalAmt; TotalAmtList.Get(Number))
+            { }
+            column(ShowVariant; ShowVariantFlag)
+            { }
+            column(TransHeaderTB_Time; HeaderTimeList.Get(Number))
+            { }
 
             trigger OnPreDataItem()
             begin
-                // โหลดเฉพาะ field ที่ใช้จริง
-                SetLoadFields(
-                    "Store No.", "POS Terminal No.", "Transaction No.", "Line No.",
-                    "Item No.", "Variant Code", "Receipt No.", Date,
-                    "Unit of Measure", "UOM Quantity", "UOM Price",
-                    Quantity, Price, "Discount Amount", "Return No Sale"
-                );
+                RettailSetup.Get();
+                ShowVariantFlag := not RettailSetup."PLSPOS_Show Var for Report VIP";
 
-                if RefundFilter = RefundFilter::Yes then
-                    TransSale.SetRange("Return No Sale", true)
-                else
-                    if RefundFilter = RefundFilter::No then
-                        TransSale.SetRange("Return No Sale", false);
-
-                IF Choose1Filter THEN BEGIN
-                    DateFilter := FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + '..'
-                                  + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
-                    PeriodDate := 'ประจำงวดวันที่ ' + FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>')
-                                  + ' ถึง ' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
-                END ELSE
-                    IF Choose2Filter THEN BEGIN
-                        DateFilter := FORMAT(FDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
+                IF Choose1Filter THEN
+                    PeriodDate := 'ประจำงวดวันที่ ' + FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + ' ถึง ' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>')
+                ELSE
+                    IF Choose2Filter THEN
                         PeriodDate := 'ประจำงวดวันที่ ' + FORMAT(FDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
-                    END;
 
-                IF DateFilter <> '' THEN
-                    TransSale.SETFILTER(Date, DateFilter);
-                IF StoreFilter <> '' THEN
-                    TransSale.SETFILTER("Store No.", StoreFilter);
-                IF ItemNoFilter <> '' THEN
-                    TransSale.SETFILTER("Item No.", ItemNoFilter);
-                IF POSTerminalFilter <> '' THEN
-                    TransSale.SETFILTER("POS Terminal No.", POSTerminalFilter);
-
-                IF StoreFilter <> '' THEN
+                IF (StoreFilter <> '') THEN
                     ReportFilterText += 'Store No : ' + FORMAT(StoreFilter + ' ');
-                IF ItemNoFilter <> '' THEN
+                IF (ItemNoFilter <> '') THEN
                     ReportFilterText += ' Item No: ' + FORMAT(ItemNoFilter + ' ');
-                IF POSTerminalFilter <> '' THEN
+                IF (POSTerminalFilter <> '') THEN
                     ReportFilterText += ' POS Terminal No. : ' + FORMAT(POSTerminalFilter + ' ');
 
-                RettailSetup.Get();
+                PrecomputeReportLines();
 
-                // Reset cache
-                Clear(LastStoreNo);
-                Clear(LastItemNo);
-                Clear(LastRefundReceiptNo);
-                Clear(LastMemberCardNo);
-                Clear(ReceiptNo);
+                Integer.SetRange(Number, 1, VariantCodeList.Count);
             end;
 
-            trigger OnAfterGetRecord()
-            begin
-                Clear(RefundDocNo);
-                Clear(CancelDocNo);
-                Clear(TransType);
-
-                // ── Cache StoreTB ──
-                if TransSale."Store No." <> LastStoreNo then begin
-                    Clear(StoreTB);
-                    StoreTB.SetLoadFields("No.");
-                    if StoreTB.Get(TransSale."Store No.") then;
-                    LastStoreNo := TransSale."Store No.";
-                end;
-
-                // ── Cache ItemTB ──
-                if TransSale."Item No." <> LastItemNo then begin
-                    Clear(ItemTB);
-                    ItemTB.SetLoadFields("No.", Description, "Description 2");
-                    if ItemTB.Get(TransSale."Item No.") then;
-                    LastItemNo := TransSale."Item No.";
-                end;
-
-                // ── Cache TransHeaderTB ── (เดิมมีอยู่แล้ว เพิ่ม SetLoadFields)
-                if ReceiptNo <> TransSale."Receipt No." then begin
-                    ReceiptNo := TransSale."Receipt No.";
-                    Clear(TransHeaderTB);
-                    TransHeaderTB.SetCurrentKey("Store No.", "POS Terminal No.", "Transaction No.");
-                    TransHeaderTB.SetRange("Store No.", TransSale."Store No.");
-                    TransHeaderTB.SetRange("POS Terminal No.", TransSale."POS Terminal No.");
-                    TransHeaderTB.SetRange("Transaction No.", TransSale."Transaction No.");
-                    TransHeaderTB.SetLoadFields(
-                        "Transaction Type", "Sale Is Return Sale",
-                        "Retrieved from Receipt No.", "Refund Receipt No.",
-                        "Member Card No.", Time,
-                        "PLSPOS_Ref. Refund Receipt No."
-                    );
-                    if TransHeaderTB.FindFirst() then;
-                end;
-
-                TransType := Format(TransHeaderTB."Transaction Type");
-                if TransSale."Return No Sale" then
-                    TransType := 'Refund';
-                if TransHeaderTB."Sale Is Return Sale" then
-                    RefundDocNo := 'Refund Manual';
-                if TransHeaderTB."Retrieved from Receipt No." <> '' then
-                    RefundDocNo := TransHeaderTB."Retrieved from Receipt No.";
-                if TransHeaderTB."Refund Receipt No." <> '' then
-                    CancelDocNo := TransHeaderTB."Refund Receipt No.";
-
-                // ── Cache TransHTb (void check) ──
-                // Cache ด้วย Refund Receipt No. เพราะซ้ำถ้าหลาย line ในบิลเดียวกัน
-                if CancelDocNo <> '' then begin
-                    if CancelDocNo <> LastRefundReceiptNo then begin
-                        Clear(TransHTb);
-                        TransHTb.SetCurrentKey("Receipt No.");
-                        TransHTb.SetRange("Receipt No.", CancelDocNo);
-                        TransHTb.SetLoadFields("Receipt No.", "Entry Status");
-                        LastRefundReceiptIsVoided := false;
-                        if TransHTb.FindFirst() then
-                            if TransHTb."Entry Status" = TransHTb."Entry Status"::Voided then
-                                LastRefundReceiptIsVoided := true;
-                        LastRefundReceiptNo := CancelDocNo;
-                    end;
-                    if LastRefundReceiptIsVoided then
-                        CancelDocNo := '';
-                end;
-
-                // ── Cache MemberShipCard + MemberContact ──
-                // Cache ด้วย Member Card No. เพราะหลาย line ในบิลเดียวกันใช้ Card เดียว
-                if TransHeaderTB."Member Card No." <> LastMemberCardNo then begin
-                    Clear(MemberShipCardTB);
-                    Clear(MemberContactTB);
-                    if TransHeaderTB."Member Card No." <> '' then begin
-                        MemberShipCardTB.SetLoadFields("Card No.", "Account No.", "Contact No.");
-                        if MemberShipCardTB.Get(TransHeaderTB."Member Card No.") then begin
-                            MemberContactTB.SetLoadFields(Name, "Name 2");
-                            if MemberContactTB.Get(MemberShipCardTB."Account No.", MemberShipCardTB."Contact No.") then;
-                        end;
-                    end;
-                    LastMemberCardNo := TransHeaderTB."Member Card No.";
-                end;
-
-                // QTY / Price
-                Clear(Qty);
-                Clear(BaseQty);
-                Clear(UnitPrice);
-
-                if TransSale."UOM Quantity" <> 0 then
-                    Qty := -TransSale."UOM Quantity"
-                else
-                    Qty := -TransSale.Quantity;
-
-                if TransSale."UOM Price" <> 0 then
-                    UnitPrice := TransSale."UOM Price"
-                else
-                    UnitPrice := TransSale.Price;
-
-                BaseQty := -TransSale.Quantity;
-            end;
         }
     }
 
@@ -260,6 +159,7 @@ report 50109 "Sales_Report_By_Terminal"
                                 Editable = Choose1Filter;
                                 Caption = 'Start Date';
                             }
+
                             field("End Date"; TodateFilter)
                             {
                                 ApplicationArea = All;
@@ -295,7 +195,6 @@ report 50109 "Sales_Report_By_Terminal"
                 }
             }
         }
-
         trigger OnOpenPage()
         begin
             FDateFilter := Today;
@@ -312,45 +211,218 @@ report 50109 "Sales_Report_By_Terminal"
         ShowTime := LSVIPRepFunction.AVTimeFormat(Time);
     end;
 
+    local procedure PrecomputeReportLines()
+    var
+        ItemDescCache: Dictionary of [Code[20], Text[100]];
+        MemberContactNameCache: Dictionary of [Code[20], Text[100]];
+        RefundVoidedCache: Dictionary of [Code[20], Boolean];
+        DateTextCache: Dictionary of [Date, Text[50]];
+        TimeTextCache: Dictionary of [Time, Text[50]];
+        LocalMemberShipCardTB: Record "LSC Membership Card";
+        DateFilterText: Text[100];
+        LocalTransType: Text[50];
+        LocalCancelDocNo: Text[30];
+        LocalRefundDocNo: Text[30];
+        LocalItemDesc: Text[100];
+        LocalMemberContactName: Text[100];
+        LocalDateText: Text[50];
+        LocalTimeText: Text[50];
+        LocalQty: Decimal;
+        LocalBaseQty: Decimal;
+        LocalUnitPrice: Decimal;
+        LocalAmount: Decimal;
+    begin
+        Clear(VariantCodeList);
+        Clear(StoreNoList);
+        Clear(POSTerminalNoList);
+        Clear(ReceiptNoList);
+        Clear(DateTextList);
+        Clear(UOMList);
+        Clear(ItemNoList);
+        Clear(ItemDescList);
+        Clear(MemberCardNoList);
+        Clear(MemberContactNameList);
+        Clear(QtyList);
+        Clear(BaseQtyList);
+        Clear(UnitPriceList);
+        Clear(AmountList);
+        Clear(TotalAmtList);
+        Clear(DiscountAmountList);
+        Clear(TransTypeList);
+        Clear(CancelDocNoList);
+        Clear(RefundDocNoList);
+        Clear(RefRefundList);
+        Clear(HeaderTimeList);
+
+        ItemTB.SetLoadFields(Description, "Description 2");
+        MemberContactTB.SetLoadFields(Name, "Name 2");
+        TransHTb.SetLoadFields("Entry Status");
+
+        IF Choose1Filter THEN
+            DateFilterText := FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + '..' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>')
+        ELSE
+            IF Choose2Filter THEN
+                DateFilterText := FORMAT(FDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
+
+        IF DateFilterText <> '' THEN
+            POSSaleQuery.SetFilter(EntryDate, DateFilterText);
+        IF StoreFilter <> '' THEN
+            POSSaleQuery.SetFilter(StoreNo, StoreFilter);
+        IF ItemNoFilter <> '' THEN
+            POSSaleQuery.SetFilter(ItemNo, ItemNoFilter);
+        IF POSTerminalFilter <> '' THEN
+            POSSaleQuery.SetFilter(POSTerminalNo, POSTerminalFilter);
+        if RefundFilter = RefundFilter::Yes then
+            POSSaleQuery.SetFilter(ReturnNoSale, '%1', true)
+        else
+            if RefundFilter = RefundFilter::No then
+                POSSaleQuery.SetFilter(ReturnNoSale, '%1', false);
+
+        POSSaleQuery.Open();
+        while POSSaleQuery.Read() do begin
+            // TransType / CancelDocNo / RefundDocNo - straight off the
+            // query's Header* columns, no TempTransHeader.Get() needed.
+            LocalTransType := Format(POSSaleQuery.HeaderTransactionType);
+            if POSSaleQuery.ReturnNoSale then
+                LocalTransType := 'Refund';
+
+            Clear(LocalRefundDocNo);
+            Clear(LocalCancelDocNo);
+            if POSSaleQuery.HeaderSaleIsReturnSale then
+                LocalRefundDocNo := 'Refund Manual';
+            if POSSaleQuery.HeaderRetrievedFromReceiptNo <> '' then
+                LocalRefundDocNo := POSSaleQuery.HeaderRetrievedFromReceiptNo;
+            if POSSaleQuery.HeaderRefundReceiptNo <> '' then
+                LocalCancelDocNo := POSSaleQuery.HeaderRefundReceiptNo;
+
+            // Skip void-all refund receipts - cached per refund receipt no.
+            if LocalCancelDocNo <> '' then begin
+                if not RefundVoidedCache.ContainsKey(POSSaleQuery.HeaderRefundReceiptNo) then begin
+                    Clear(TransHTb);
+                    if TransHTb.Get(POSSaleQuery.HeaderRefundReceiptNo) then
+                        RefundVoidedCache.Add(POSSaleQuery.HeaderRefundReceiptNo, TransHTb."Entry Status" = TransHTb."Entry Status"::Voided)
+                    else
+                        RefundVoidedCache.Add(POSSaleQuery.HeaderRefundReceiptNo, false);
+                end;
+                if RefundVoidedCache.Get(POSSaleQuery.HeaderRefundReceiptNo) then
+                    LocalCancelDocNo := '';
+            end;
+
+            // Item description - cached per Item No.
+            if not ItemDescCache.ContainsKey(POSSaleQuery.ItemNo) then begin
+                if ItemTB.Get(POSSaleQuery.ItemNo) then
+                    ItemDescCache.Add(POSSaleQuery.ItemNo, ItemTB.Description + ' ' + ItemTB."Description 2")
+                else
+                    ItemDescCache.Add(POSSaleQuery.ItemNo, '');
+            end;
+            LocalItemDesc := ItemDescCache.Get(POSSaleQuery.ItemNo);
+
+            LocalMemberContactName := '';
+            if POSSaleQuery.HeaderMemberCardNo <> '' then begin
+                if not MemberContactNameCache.ContainsKey(POSSaleQuery.HeaderMemberCardNo) then begin
+                    Clear(LocalMemberShipCardTB);
+                    if LocalMemberShipCardTB.Get(POSSaleQuery.HeaderMemberCardNo) then;
+                    if MemberContactTB.Get(LocalMemberShipCardTB."Account No.", LocalMemberShipCardTB."Contact No.") then
+                        MemberContactNameCache.Add(POSSaleQuery.HeaderMemberCardNo, MemberContactTB.Name + ' ' + MemberContactTB."Name 2")
+                    else
+                        MemberContactNameCache.Add(POSSaleQuery.HeaderMemberCardNo, '');
+                end;
+                LocalMemberContactName := MemberContactNameCache.Get(POSSaleQuery.HeaderMemberCardNo);
+            end;
+
+            // Qty / BaseQty / UnitPrice
+            if POSSaleQuery.UOMQuantity <> 0 then
+                LocalQty := -POSSaleQuery.UOMQuantity
+            else
+                LocalQty := -POSSaleQuery.Quantity;
+            if POSSaleQuery.UOMPrice <> 0 then
+                LocalUnitPrice := POSSaleQuery.UOMPrice
+            else
+                LocalUnitPrice := POSSaleQuery.Price;
+            LocalBaseQty := -POSSaleQuery.Quantity;
+            LocalAmount := LocalUnitPrice * LocalQty;
+
+            // Date/Time text - cached per distinct Date/Time value,
+            // since many sale lines share the same receipt date and
+            // the same transaction time.
+            if not DateTextCache.ContainsKey(POSSaleQuery.EntryDate) then
+                DateTextCache.Add(POSSaleQuery.EntryDate, Format(POSSaleQuery.EntryDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>'));
+            LocalDateText := DateTextCache.Get(POSSaleQuery.EntryDate);
+
+            if not TimeTextCache.ContainsKey(POSSaleQuery.HeaderTime) then
+                TimeTextCache.Add(POSSaleQuery.HeaderTime, Format(POSSaleQuery.HeaderTime));
+            LocalTimeText := TimeTextCache.Get(POSSaleQuery.HeaderTime);
+
+            VariantCodeList.Add(POSSaleQuery.VariantCode);
+            StoreNoList.Add(POSSaleQuery.StoreNo);
+            POSTerminalNoList.Add(POSSaleQuery.POSTerminalNo);
+            ReceiptNoList.Add(POSSaleQuery.ReceiptNo);
+            DateTextList.Add(LocalDateText);
+            UOMList.Add(POSSaleQuery.UnitOfMeasure);
+            ItemNoList.Add(POSSaleQuery.ItemNo);
+            ItemDescList.Add(LocalItemDesc);
+            MemberCardNoList.Add(POSSaleQuery.HeaderMemberCardNo);
+            MemberContactNameList.Add(LocalMemberContactName);
+            QtyList.Add(LocalQty);
+            BaseQtyList.Add(LocalBaseQty);
+            UnitPriceList.Add(LocalUnitPrice);
+            AmountList.Add(LocalAmount);
+            DiscountAmountList.Add(POSSaleQuery.DiscountAmount);
+            TotalAmtList.Add(LocalAmount - POSSaleQuery.DiscountAmount);
+            TransTypeList.Add(LocalTransType);
+            CancelDocNoList.Add(LocalCancelDocNo);
+            RefundDocNoList.Add(LocalRefundDocNo);
+            RefRefundList.Add(POSSaleQuery.HeaderRefRefundReceiptNo);
+            HeaderTimeList.Add(LocalTimeText);
+        end;
+        POSSaleQuery.Close();
+    end;
+
     var
         LSVIPRepFunction: Codeunit "PLSR_Report Function";
         ComInfo: Record "Company Information";
         ItemTB: Record Item;
-        StoreTB: Record "LSC Store";
         POSTerminalTB: Record "LSC POS Terminal";
-        TransHeaderTB: Record "LSC Transaction Header";
         MemberContactTB: Record "LSC Member Contact";
-        MemberShipCardTB: Record "LSC Membership Card";
         RettailSetup: Record "LSC Retail Setup";
         TransHTb: Record "LSC Transaction Header";
+        POSSaleQuery: Query "POSSaleByTerm_Q";
 
-        // Cache keys
-        LastStoreNo: Code[20];
-        LastItemNo: Code[20];
-        LastMemberCardNo: Code[20];
-        LastRefundReceiptNo: Text[30];
-        LastRefundReceiptIsVoided: Boolean;
+        VariantCodeList: List of [Code[10]];
+        StoreNoList: List of [Code[20]];
+        POSTerminalNoList: List of [Code[20]];
+        ReceiptNoList: List of [Code[20]];
+        DateTextList: List of [Text[50]];
+        UOMList: List of [Code[10]];
+        ItemNoList: List of [Code[20]];
+        ItemDescList: List of [Text[100]];
+        MemberCardNoList: List of [Code[20]];
+        MemberContactNameList: List of [Text[100]];
+        QtyList: List of [Decimal];
+        BaseQtyList: List of [Decimal];
+        UnitPriceList: List of [Decimal];
+        AmountList: List of [Decimal];
+        TotalAmtList: List of [Decimal];
+        DiscountAmountList: List of [Decimal];
+        TransTypeList: List of [Text[50]];
+        CancelDocNoList: List of [Text[30]];
+        RefundDocNoList: List of [Text[30]];
+        RefRefundList: List of [Text[30]];
+        HeaderTimeList: List of [Text[50]];
 
-        ReceiptNo: Code[20];
         ShowTime: Text[50];
         ShowDate: Text[50];
-        DateFilter: Text[100];
-        TransType: Text[50];
         StoreFilter: Code[20];
         ItemNoFilter: Code[20];
         POSTerminalFilter: Code[20];
-        CancelDocNo: Text[30];
-        RefundDocNo: Text[30];
         PeriodDate: Text[100];
         ReportFilterText: Text[250];
         FromDateFilter: Date;
         TodateFilter: Date;
         FDateFilter: Date;
-        Qty: Decimal;
-        BaseQty: Decimal;
-        UnitPrice: Decimal;
         Choose1Filter: Boolean;
         Choose2Filter: Boolean;
+        ShowVariantFlag: Boolean;
         RefundFilter: Option " ","Yes","No";
-    // C-AVPWDLSVIP 26/06/2025 > Improve Performance of VIP Report(76075) - น้องปอ
+    // C-AVPWDLSVIP 03/07/2026 > Improve Performance of VIP Report(76075) - น้องปอ
 }

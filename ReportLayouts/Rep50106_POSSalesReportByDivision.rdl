@@ -11,7 +11,11 @@
       <am:Name>MSRB</am:Name>
       <am:Version>15.1.30001.02</am:Version>
     </am:UpdatedBy>
+<<<<<<< HEAD
+    <am:LastModifiedTimestamp>2026-07-09T04:29:46.9366161Z</am:LastModifiedTimestamp>
+=======
     <am:LastModifiedTimestamp>2026-07-03T04:53:03.3119966Z</am:LastModifiedTimestamp>
+>>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
   </am:AuthoringMetadata>
   <AutoRefresh>0</AutoRefresh>
   <DataSources>
@@ -2007,7 +2011,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!TotalAmt.Value)</Value>
+                                  <Value>=Fields!ItemTotal_TotalAmount.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -2675,7 +2679,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!TotalAmt.Value)</Value>
+                                  <Value>=Fields!DivTotal_TotalAmount.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -3415,6 +3419,7 @@
                     </TablixCell>
                     <TablixCell>
                       <CellContents>
+                        <rd:Selected>true</rd:Selected>
                         <Textbox Name="Textbox145">
                           <rd:DefaultName>Textbox77</rd:DefaultName>
                           <KeepTogether>true</KeepTogether>
@@ -3422,7 +3427,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Sum(Fields!TotalAmt.Value)</Value>
+                                  <Value>=Fields!GrandTotal_TotalAmount.Value</Value>
                                   <Style>
                                     <FontFamily>Browallia New</FontFamily>
                                     <FontSize>12pt</FontSize>
@@ -3939,6 +3944,15 @@ End Function
         <Field Name="ItemTotal_DiscountFormat">
           <DataField>ItemTotal_DiscountFormat</DataField>
         </Field>
+<<<<<<< HEAD
+        <Field Name="ItemTotal_TotalAmount">
+          <DataField>ItemTotal_TotalAmount</DataField>
+        </Field>
+        <Field Name="ItemTotal_TotalAmountFormat">
+          <DataField>ItemTotal_TotalAmountFormat</DataField>
+        </Field>
+=======
+>>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
         <Field Name="DivTotal_Qty">
           <DataField>DivTotal_Qty</DataField>
         </Field>
@@ -3957,6 +3971,15 @@ End Function
         <Field Name="DivTotal_DiscountFormat">
           <DataField>DivTotal_DiscountFormat</DataField>
         </Field>
+<<<<<<< HEAD
+        <Field Name="DivTotal_TotalAmount">
+          <DataField>DivTotal_TotalAmount</DataField>
+        </Field>
+        <Field Name="DivTotal_TotalAmountFormat">
+          <DataField>DivTotal_TotalAmountFormat</DataField>
+        </Field>
+=======
+>>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
         <Field Name="GrandTotal_Qty">
           <DataField>GrandTotal_Qty</DataField>
         </Field>
@@ -3975,6 +3998,15 @@ End Function
         <Field Name="GrandTotal_DiscountFormat">
           <DataField>GrandTotal_DiscountFormat</DataField>
         </Field>
+<<<<<<< HEAD
+        <Field Name="GrandTotal_TotalAmount">
+          <DataField>GrandTotal_TotalAmount</DataField>
+        </Field>
+        <Field Name="GrandTotal_TotalAmountFormat">
+          <DataField>GrandTotal_TotalAmountFormat</DataField>
+        </Field>
+=======
+>>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
       </Fields>
       <Query>
         <DataSourceName>DataSource</DataSourceName>

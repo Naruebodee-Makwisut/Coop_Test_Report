@@ -2,7 +2,7 @@ query 50049 "PLSR_SalesReportByItemCateQ"
 {
     Caption = 'POS Sales Report By Item Category Query';
     QueryType = Normal;
-
+    OrderBy = ascending(Store_No, Item_Category_Code, Item_No, Date, POS_Terminal_No, Transaction_No, Line_No);
     elements
     {
         dataitem(TransSale; "LSC Trans. Sales Entry")

@@ -199,7 +199,6 @@ report 50111 "TEST_Sales Rep by Special Gr"
                                 Caption = 'Date';
                                 ToolTip = 'Specifies the Date to filter the report.';
                             }
-
                         }
                     }
                 }
@@ -216,7 +215,6 @@ report 50111 "TEST_Sales Rep by Special Gr"
             Clear(TodateFilter);
             Clear(StoreFilter);
         end;
-
     }
 
     trigger OnPreReport()
@@ -230,11 +228,8 @@ report 50111 "TEST_Sales Rep by Special Gr"
         ComInfo: Record "Company Information";
         TempItemSum: Record Item temporary;
         // TransSales: Record "LSC Trans. Sales Entry";
-
         LSVIPRepFunction: Codeunit "PLSR_Report Function";
-
         POSSalesSumQry: Query "TEST_POS Sales Sum Query";
-
         Choose1Filter: Boolean;
         Choose2Filter: Boolean;
         ShowZeroFilter: Boolean;

@@ -6,7 +6,7 @@ report 50112 "PLSR_Store_Sales_VAT"
     PreviewMode = PrintLayout;
 
     // AVPWDLSVIP 30/06/2026 > Improve Performance of VIP Report(76082) - น้องปอ
-      dataset
+    dataset
     {
         dataitem(TransHeader; "LSC Transaction Header")
         {
@@ -34,7 +34,6 @@ report 50112 "PLSR_Store_Sales_VAT"
 
                 TransHeader.SetCurrentKey("Store No.", "POS Terminal No.", Date);
 
-                clear(OldStoreNo);
                 clear(OldBranch);
                 clear(OldPOSNo);
                 clear(OldTransDate);
@@ -240,9 +239,7 @@ report 50112 "PLSR_Store_Sales_VAT"
             column(GroupVATAmt; TempTransactionHeaderTemp."No. of Items")
             { }
             column(sum; sum)
-            {
-
-            }
+            { }
 
 
             trigger OnPreDataItem()
@@ -381,7 +378,6 @@ report 50112 "PLSR_Store_Sales_VAT"
         PeriodDate: Text;
         StoreFilter: Code[20];
         FullVATNo: Code[20];
-        OldStoreNo: Code[20];
         OldBranch: Text[50];
         OldPOSNo: Code[20];
         VATRegsNo: array[13] of Text[1];
@@ -395,9 +391,6 @@ report 50112 "PLSR_Store_Sales_VAT"
         FDateFilter: Date;
         Running: Integer;
         GroupRunning: Integer;
-        SumNetAmt: Decimal;
-        SumGrossAmt: Decimal;
-        SumVATAmt: Decimal;
         GroupNetAmt: Decimal;
         GroupGrossAmt: Decimal;
         GroupVATAmt: Decimal;
@@ -430,40 +423,6 @@ report 50112 "PLSR_Store_Sales_VAT"
                 else
                     BranchNo := 'สาขาที่ : ' + StoreTB."PLSLC_Branch No.";
     end;
-
-
-
-
-    local procedure AVCalSumAmountByStore(var TempTransH: Record "LSC Transaction Header" temporary; pStoreBranch: text[50])
-    var
-        TransHeadTB: Record "LSC Transaction Header";
-        Store: Record "LSC Store";
-    begin
-        clear(SumNetAmt);
-        clear(SumGrossAmt);
-        clear(SumVATAmt);
-        clear(Store);
-        Store.SetCurrentKey("No.", "PLSLC_Branch No.");
-        if StoreFilter <> '' then
-            Store.SetFilter("No.", StoreFilter);
-        Store.SetRange("PLSLC_Branch No.", pStoreBranch);
-        if Store.FindSet() then
-            repeat
-                clear(TransHeadTB);
-                TransHeadTB.COPYFILTERS(TempTransH);
-                TransHeadTB.SETRANGE("Store No.", Store."No.");
-                IF TransHeadTB.FindSet() THEN BEGIN
-                    TransHeadTB.SetRange("Store No.", Store."No.");
-                    TransHeadTB.CALCSUMS("Net Amount", "Gross Amount");
-                    SumNetAmt += TransHeadTB."Net Amount" * -1;
-                    SumGrossAmt += TransHeadTB."Gross Amount" * -1;
-                    SumVATAmt += ROUND(((TransHeadTB."Gross Amount" * -1) - (TransHeadTB."Net Amount" * -1)), 0.01, '=');
-                END;
-            until Store.Next() = 0;
-
-
-    end;
-
 
     local procedure AVGetFirstLastReceiptNo(StoreNo: Code[10]; POSTerminalNo: Code[10]; TransDate: Date): Text
     var

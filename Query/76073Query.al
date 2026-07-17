@@ -1,6 +1,7 @@
 query 50053 "TEST_POS Sales Sum Query"
 {
     QueryType = Normal;
+    OrderBy = ascending(Item_No_);
 
     elements
     {
@@ -8,18 +9,9 @@ query 50053 "TEST_POS Sales Sum Query"
         {
             filter(Date_Filter; "Date") { }
             filter(Store_Filter; "Store No.") { }
-
-            column(Item_No_; "Item No.")
-            {
-            }
-            column(Sum_Quantity; Quantity)
-            {
-                Method = Sum;
-            }
-            column(Sum_Amount; "Total Rounded Amt.")
-            {
-                Method = Sum;
-            }
+            column(Item_No_; "Item No.") { }
+            column(Sum_Quantity; Quantity) { Method = Sum; }
+            column(Sum_Amount; "Total Rounded Amt.") { Method = Sum; }
         }
     }
 }

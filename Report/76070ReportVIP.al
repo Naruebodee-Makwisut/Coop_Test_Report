@@ -1,4 +1,4 @@
-report 50106 "PLSR_Sales Report By Division2"
+report 50048 "PLSR_Sales Report By Division2"
 {
     Caption = 'POS Sales Report By Division';
     DefaultLayout = RDLC;
@@ -26,26 +26,16 @@ report 50106 "PLSR_Sales Report By Division2"
             column(Division_TransSale; LSCTB."Posting Exception Key") { }
             column(Receipt_No_TransSale; LSCTB."Receipt No.") { }
             column(Date_TransSale; Format(LSCTB.Date, 0, '<Closing><Day,2>/<Month,2>/<Year4>')) { }
-<<<<<<< HEAD
             column(TransType; TransType) { }
             column(Item_No_TransSale; LSCTB."Item No.") { }
             column(Item_Name_ItemTB; ItemName) { }
-=======
-            column(TransType; LSCTB."POS Line Description") { }
-            column(Item_No_TransSale; LSCTB."Item No.") { }
-            column(Item_Name_ItemTB; LSCTB."Item Description") { }
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
             column(Qty; LSCTB.Quantity) { }
             column(Unit_of_Measure_TransSale; LSCTB."Unit of Measure") { }
             column(BaseQty; LSCTB."UOM Quantity") { }
             column(UnitPrice; LSCTB.Price) { }
             column(Amount; LSCTB.Price * LSCTB.Quantity) { }
             column(Discount_Amount_TransSale; LSCTB."Discount Amount") { }
-<<<<<<< HEAD
             column(TotalAmt; LSCTB."Net Amount") { }
-=======
-            column(TotalAmt; (LSCTB.Price * LSCTB.Quantity) - LSCTB."Discount Amount") { }
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
             column(ShowVariant; not RettailSetup."PLSPOS_Show Var for Report VIP") { }
 
             // ==========================================
@@ -55,57 +45,37 @@ report 50106 "PLSR_Sales Report By Division2"
             column(ItemTotal_BaseQty; ItemTotal_BaseQty) { }
             column(ItemTotal_Amount; ItemTotal_Amount) { }
             column(ItemTotal_Discount; ItemTotal_Discount) { }
-<<<<<<< HEAD
             column(ItemTotal_TotalAmount; ItemTotal_TotalAmount) { }
-=======
-
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
             // ==========================================
             // 3. คอลัมน์รวมระดับกลุ่มแผนก (Division Group Totals)
             // ==========================================
             column(DivTotal_Qty; DivTotal_Qty) { }
             column(DivTotal_Amount; DivTotal_Amount) { }
             column(DivTotal_Discount; DivTotal_Discount) { }
-<<<<<<< HEAD
             column(DivTotal_TotalAmount; DivTotal_TotalAmount) { }
-=======
-
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
             // ==========================================
             // 4. คอลัมน์ยอดรวมสุทธิท้ายรายงาน (Grand Totals)
             // ==========================================
             column(GrandTotal_Qty; GrandTotal_Qty) { }
             column(GrandTotal_Amount; GrandTotal_Amount) { }
             column(GrandTotal_Discount; GrandTotal_Discount) { }
-<<<<<<< HEAD
             column(GrandTotal_TotalAmount; GrandTotal_TotalAmount) { }
-=======
-
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
             trigger OnPreDataItem()
             var
                 ItemKey: Text;
                 DivKey: Text;
                 CalcAmount: Decimal;
-<<<<<<< HEAD
                 Qty: Decimal;
                 BaseQty: Decimal;
                 UnitPrice: Decimal;
-=======
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
             begin
                 LSCTB.Reset();
                 LSCTB.DeleteAll();
 
-<<<<<<< HEAD
-=======
-                // เคลียร์ค่าในกล่อง Dictionary ทั้งหมด
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
                 Clear(DictItemQty);
                 Clear(DictItemBaseQty);
                 Clear(DictItemAmt);
                 Clear(DictItemDisc);
-<<<<<<< HEAD
                 Clear(DictItemTotalAmt);
                 Clear(DictDivTotalAmt);
                 Clear(DictDivQty);
@@ -115,22 +85,11 @@ report 50106 "PLSR_Sales Report By Division2"
                 Clear(ItemName);
                 Clear(TransType);
                 Clear(DictTransType);
-=======
-                Clear(DictDivQty);
-                Clear(DictDivAmt);
-                Clear(DictDivDisc);
-
-                Clear(TransType);
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
                 // เคลียร์ค่า Grand Total ท้ายรายงาน
                 GrandTotal_Qty := 0;
                 GrandTotal_Amount := 0;
                 GrandTotal_Discount := 0;
-<<<<<<< HEAD
                 GrandTotal_TotalAmount := 0;
-=======
-
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
                 RettailSetup.Get();
 
                 ReportFilterText := '';
@@ -160,7 +119,6 @@ report 50106 "PLSR_Sales Report By Division2"
                 PosSalesQry.Open();
 
                 while PosSalesQry.Read() do begin
-<<<<<<< HEAD
 
                     ItemKey := PosSalesQry.Store_No + '_' + PosSalesQry.LSC_Division_Code + '_' + PosSalesQry.Item_No;
                     DivKey := PosSalesQry.Store_No + '_' + PosSalesQry.LSC_Division_Code;
@@ -218,42 +176,6 @@ report 50106 "PLSR_Sales Report By Division2"
                     GrandTotal_Amount += (UnitPrice * Qty);
                     GrandTotal_Discount += PosSalesQry.Discount_Amount;
                     GrandTotal_TotalAmount += (UnitPrice * Qty) - PosSalesQry.Discount_Amount;
-=======
-                    // สร้างคีย์แยกกลุ่ม (แผนก + รหัสสินค้า)
-                    ItemKey := PosSalesQry.Division_Code + '_' + PosSalesQry.Item_No;
-                    DivKey := PosSalesQry.Division_Code;
-                    CalcAmount := PosSalesQry.Price * PosSalesQry.Quantity;
-
-                    // 1. บวกสะสมระดับรายสินค้า (Item Group)
-                    if DictItemQty.ContainsKey(ItemKey) then begin
-                        DictItemQty.Set(ItemKey, DictItemQty.Get(ItemKey) + PosSalesQry.Quantity);
-                        DictItemBaseQty.Set(ItemKey, DictItemBaseQty.Get(ItemKey) + PosSalesQry.UOM_Quantity);
-                        DictItemAmt.Set(ItemKey, DictItemAmt.Get(ItemKey) + CalcAmount);
-                        DictItemDisc.Set(ItemKey, DictItemDisc.Get(ItemKey) + PosSalesQry.Discount_Amount);
-                    end else begin
-                        DictItemQty.Add(ItemKey, PosSalesQry.Quantity);
-                        DictItemBaseQty.Add(ItemKey, PosSalesQry.UOM_Quantity);
-                        DictItemAmt.Add(ItemKey, CalcAmount);
-                        DictItemDisc.Add(ItemKey, PosSalesQry.Discount_Amount);
-                    end;
-
-                    // 2. บวกสะสมระดับรายแผนก (Division Group)
-                    if DictDivQty.ContainsKey(DivKey) then begin
-                        DictDivQty.Set(DivKey, DictDivQty.Get(DivKey) + PosSalesQry.Quantity);
-                        DictDivAmt.Set(DivKey, DictDivAmt.Get(DivKey) + CalcAmount);
-                        DictDivDisc.Set(DivKey, DictDivDisc.Get(DivKey) + PosSalesQry.Discount_Amount);
-                    end else begin
-                        DictDivQty.Add(DivKey, PosSalesQry.Quantity);
-                        DictDivAmt.Add(DivKey, CalcAmount);
-                        DictDivDisc.Add(DivKey, PosSalesQry.Discount_Amount);
-                    end;
-
-                    // 3. บวกสะสมยอดรวมสุทธิท้ายรายงาน (Grand Totals) 
-                    GrandTotal_Qty += PosSalesQry.Quantity;
-                    GrandTotal_Amount += CalcAmount;
-                    GrandTotal_Discount += PosSalesQry.Discount_Amount;
-
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
                     LSCTB.Init();
                     LSCTB."Store No." := PosSalesQry.Store_No;
                     LSCTB."POS Terminal No." := PosSalesQry.POS_Terminal_No;
@@ -263,7 +185,6 @@ report 50106 "PLSR_Sales Report By Division2"
                     LSCTB."Receipt No." := PosSalesQry.Receipt_No;
                     LSCTB.Date := PosSalesQry.Date;
                     LSCTB."Item No." := PosSalesQry.Item_No;
-<<<<<<< HEAD
                     LSCTB."Division Code" := PosSalesQry.LSC_Division_Code;
                     LSCTB."Posting Exception Key" := PosSalesQry.LSC_Division_Code + ' - ' + PosSalesQry.Division_Description;
                     LSCTB.Quantity := Qty;
@@ -276,24 +197,6 @@ report 50106 "PLSR_Sales Report By Division2"
                 end;
                 PosSalesQry.Close();
                 LSCTB.SetCurrentKey("Store No.", "Division Code", "Item No.", "POS Terminal No.", "Transaction No.", "Line No.");
-=======
-                    LSCTB."Item Description" := PosSalesQry.Item_Description + ' ' + PosSalesQry.Item_Description_2;
-                    LSCTB."Division Code" := PosSalesQry.Division_Code;
-                    LSCTB."Posting Exception Key" := PosSalesQry.Division_Code + ' - ' + PosSalesQry.Division_Description;
-                    LSCTB.Quantity := PosSalesQry.Quantity;
-                    LSCTB.Price := PosSalesQry.Price;
-                    LSCTB."Discount Amount" := PosSalesQry.Discount_Amount;
-                    LSCTB."Unit of Measure" := PosSalesQry.Unit_of_Measure;
-                    LSCTB."UOM Quantity" := PosSalesQry.UOM_Quantity;
-                    TransType := Format(PosSalesQry.Transaction_Type);
-                    if PosSalesQry.Return_No_Sale then
-                        TransType := 'Refund';
-                    LSCTB."POS Line Description" := TransType;
-                    LSCTB.Insert();
-                end;
-                PosSalesQry.Close();
-
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
                 TransSale.SetRange(Number, 1, LSCTB.Count());
             end;
 
@@ -310,13 +213,8 @@ report 50106 "PLSR_Sales Report By Division2"
                         CurrReport.Break();
                 end;
 
-<<<<<<< HEAD
                 ItemKey := LSCTB."Store No." + '_' + LSCTB."Division Code" + '_' + LSCTB."Item No.";
                 DivKey := LSCTB."Store No." + '_' + LSCTB."Division Code";
-=======
-                ItemKey := LSCTB."Division Code" + '_' + LSCTB."Item No.";
-                DivKey := LSCTB."Division Code";
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
 
                 // ดึงยอดรวมกลุ่มสินค้า (Item Group) ออกมาใส่คอลัมน์
                 if DictItemQty.ContainsKey(ItemKey) then begin
@@ -324,19 +222,13 @@ report 50106 "PLSR_Sales Report By Division2"
                     ItemTotal_BaseQty := DictItemBaseQty.Get(ItemKey);
                     ItemTotal_Amount := DictItemAmt.Get(ItemKey);
                     ItemTotal_Discount := DictItemDisc.Get(ItemKey);
-<<<<<<< HEAD
                     ItemTotal_TotalAmount := DictItemTotalAmt.Get(ItemKey);
-=======
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
                 end else begin
                     ItemTotal_Qty := 0;
                     ItemTotal_BaseQty := 0;
                     ItemTotal_Amount := 0;
                     ItemTotal_Discount := 0;
-<<<<<<< HEAD
                     ItemTotal_TotalAmount := 0;
-=======
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
                 end;
 
                 // ดึงยอดรวมกลุ่มแผนก (Division Group) ออกมาใส่คอลัมน์
@@ -344,15 +236,11 @@ report 50106 "PLSR_Sales Report By Division2"
                     DivTotal_Qty := DictDivQty.Get(DivKey);
                     DivTotal_Amount := DictDivAmt.Get(DivKey);
                     DivTotal_Discount := DictDivDisc.Get(DivKey);
-<<<<<<< HEAD
                     DivTotal_TotalAmount := DictDivTotalAmt.Get(DivKey);
-=======
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
                 end else begin
                     DivTotal_Qty := 0;
                     DivTotal_Amount := 0;
                     DivTotal_Discount := 0;
-<<<<<<< HEAD
                     DivTotal_TotalAmount := 0;
                 end;
 
@@ -366,9 +254,6 @@ report 50106 "PLSR_Sales Report By Division2"
                     TransType := DictTransType.Get(LineKey)
                 else
                     TransType := '';
-=======
-                end;
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
             end;
         }
     }
@@ -496,16 +381,11 @@ report 50106 "PLSR_Sales Report By Division2"
         FDateFilter: Date;
         Choose1Filter: Boolean;
         Choose2Filter: Boolean;
-<<<<<<< HEAD
         ItemName: Text[150];
-=======
-
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
         DictItemQty: Dictionary of [Text, Decimal];
         DictItemBaseQty: Dictionary of [Text, Decimal];
         DictItemAmt: Dictionary of [Text, Decimal];
         DictItemDisc: Dictionary of [Text, Decimal];
-<<<<<<< HEAD
         DictItemTotalAmt: Dictionary of [Text, Decimal];
         DictItemName: Dictionary of [Code[20], Text[150]];
         DictDivQty: Dictionary of [Text, Decimal];
@@ -515,17 +395,10 @@ report 50106 "PLSR_Sales Report By Division2"
         DictTransType: Dictionary of [Text, Text];
         LineKey: Text;
         TempTransType: Text[50];
-=======
-        DictDivQty: Dictionary of [Text, Decimal];
-        DictDivAmt: Dictionary of [Text, Decimal];
-        DictDivDisc: Dictionary of [Text, Decimal];
-
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
         ItemTotal_Qty: Decimal;
         ItemTotal_BaseQty: Decimal;
         ItemTotal_Amount: Decimal;
         ItemTotal_Discount: Decimal;
-<<<<<<< HEAD
         ItemTotal_TotalAmount: Decimal;
         DivTotal_Qty: Decimal;
         DivTotal_Amount: Decimal;
@@ -535,12 +408,4 @@ report 50106 "PLSR_Sales Report By Division2"
         GrandTotal_Amount: Decimal;
         GrandTotal_Discount: Decimal;
         GrandTotal_TotalAmount: Decimal;
-=======
-        DivTotal_Qty: Decimal;
-        DivTotal_Amount: Decimal;
-        DivTotal_Discount: Decimal;
-        GrandTotal_Qty: Decimal;
-        GrandTotal_Amount: Decimal;
-        GrandTotal_Discount: Decimal;
->>>>>>> 86fc5bd8419c66e46c63d768502f437bd6b59ca7
 }

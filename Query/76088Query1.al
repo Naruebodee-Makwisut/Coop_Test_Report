@@ -2,7 +2,7 @@ query 50050 "PLSR_Q_DiscEntrySalesItem"
 {
     QueryType = Normal;
     Caption = 'Discount/Coupon Entry Sales Item (Query)';
-    OrderBy = ascending(Store_No), ascending(POS_Terminal_No), ascending(Transaction_No), ascending(Line_No);
+    OrderBy = ascending(Store_No), ascending(POS_Terminal_No), ascending(Transaction_No), ascending(Line_No), ascending(Offer_Type), ascending(Offer_No);
 
     // AVPWDLSVIP 01/07/2026 > Improve Performance of VIP Report(76088) - น้องปอ
     elements

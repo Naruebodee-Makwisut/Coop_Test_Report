@@ -1,17 +1,9 @@
-<<<<<<< HEAD
-report 50116 "PLSR_Active Member 2"
-=======
 report 50114 "PLSR_Active Member 2"
->>>>>>> 82046be983b4f2a85c27b400a85f2f7140766f3e
 {
     UsageCategory = ReportsAndAnalysis;
     ApplicationArea = All;
     DefaultLayout = RDLC;
-<<<<<<< HEAD
-    RDLCLayout = './ReportLayouts/Rep76093_ActiveMember.rdl';
-=======
     RDLCLayout = './ReportLayouts/Rep50114_ActiveMember.rdl';
->>>>>>> 82046be983b4f2a85c27b400a85f2f7140766f3e
     dataset
     {
         dataitem(Integer; Integer)
@@ -22,10 +14,10 @@ report 50114 "PLSR_Active Member 2"
             column("Date"; format(Today, 0, '<Closing><Day,2>/<Month,2>/<Year4>')) { }
             column("Time"; format(Time)) { }
             column(Member_Club; TempInsTransactionHeaderTemp."Staff ID") { }
-            column(Member_Scheme; TempInsTransactionHeaderTemp."Customer No.") { }
+            column(Member_Scheme; MemberContactTB."Scheme Code") { }
             column(Member_Account; TempInsTransactionHeaderTemp."Infocode Disc. Group") { }
             column(Member_Card; TempInsTransactionHeaderTemp."Member Card No.") { }
-            column(MemberName; TempInsTransactionHeaderTemp.Comment) { }
+            column(MemberName; MemberContactTB.Name) { }
             column(CountBill_3; TempInsTransactionHeaderTemp."No. of Invoices") { }
             column(CountBill_6; TempInsTransactionHeaderTemp.Counter) { }
             column(CountBill_9; TempInsTransactionHeaderTemp."Safe Entry No.") { }
@@ -36,28 +28,33 @@ report 50114 "PLSR_Active Member 2"
             column(GrossAmt_9; TempInsTransactionHeaderTemp."Gross Amount") { }
             column(GrossAmt_12; TempInsTransactionHeaderTemp.Payment) { }
             column(GrossAmt_24; TempInsTransactionHeaderTemp."Discount Amount") { }
+
             trigger OnPreDataItem()
             var
                 MemberSalesQry: Query "PLSR_Active Member Q";
                 IsFirstRecord: Boolean;
-                OldClub, OldScheme, OldContactNo, OldCardNo : Code[30]; OldName: Text[100];
+                OldClub, OldScheme, OldContactNo, OldCardNo : Code[30];
+                OldName: Text[100];
+                OldDocumentNo, CurrDocumentNo : Code[20];
             begin
                 CompanyInforTB.Get();
 
+                Clear(IsFirstRecord);
+                Clear(OldAccount);
+                Clear(OldClub);
+                Clear(OldScheme);
+                Clear(OldContactNo);
+                Clear(OldCardNo);
+                Clear(OldName);
+                Clear(OldDocumentNo);
+                Clear(CurrDocumentNo);
+                Clear(Month_3);
+                Clear(Month_6);
+                Clear(Month_9);
+                Clear(Month_12);
+                Clear(Month_24);
+
                 if (FilterMemberName <> '') or (FilterPhoneNo <> '') or (FilterIDCard <> '') then begin
-<<<<<<< HEAD
-                    Clear(MemberContactTB);
-                    if FilterMemberName <> '' then begin
-                        FilterMemberName := '*' + UpperCase(FilterMemberName) + '*';
-                        MemberContactTB.SetFilter("Search Name", FilterMemberName);
-                    end;
-                    if FilterPhoneNo <> '' then
-                        MemberContactTB.SetRange("Mobile Phone No.", FilterPhoneNo);
-                    if FilterIDCard <> '' then
-                        MemberContactTB.SetRange("PLSWS_ID Card No.", FilterIDCard);
-                    if MemberContactTB.FindFirst() then
-                        MemberSalesQry.SetRange(MemberAccountNo, MemberContactTB."Account No.");
-=======
                     if FilterMemberName <> '' then begin
                         FilterMemberName := '*' + UpperCase(FilterMemberName) + '*';
                         MemberSalesQry.SetFilter(Search_Name, FilterMemberName);
@@ -66,7 +63,6 @@ report 50114 "PLSR_Active Member 2"
                         MemberSalesQry.SetRange(Mobile_Phone_No_, FilterPhoneNo);
                     if FilterIDCard <> '' then
                         MemberSalesQry.SetRange(PLSWS_ID_Card_No_, FilterIDCard);
->>>>>>> 82046be983b4f2a85c27b400a85f2f7140766f3e
                 end;
 
                 if FilterDate <> 0D then begin
@@ -76,7 +72,7 @@ report 50114 "PLSR_Active Member 2"
                     Month_12 := CalcDate('<-12M>', FilterDate);
                     Month_24 := CalcDate('<-24M>', FilterDate);
 
-                    MemberSalesQry.SetRange(EntryDate, Month_24, FilterDate);
+                    MemberSalesQry.SetFilter(EntryDate, '..%1', FilterDate);
                 end;
 
                 EntryNo := 0;
@@ -91,7 +87,14 @@ report 50114 "PLSR_Active Member 2"
                     if (not IsFirstRecord) and (OldAccount <> MemberSalesQry.MemberAccountNo) then begin
                         InsertToTempTable(OldAccount, OldClub, OldScheme, OldContactNo, OldCardNo, OldName);
                         ClearTotals();
+                        Clear(OldDocumentNo);
                     end;
+
+                    Clear(OldClub);
+                    Clear(OldScheme);
+                    Clear(OldContactNo);
+                    Clear(OldCardNo);
+                    Clear(OldName);
 
                     IsFirstRecord := false;
                     OldAccount := MemberSalesQry.MemberAccountNo;
@@ -101,22 +104,31 @@ report 50114 "PLSR_Active Member 2"
                     OldCardNo := MemberSalesQry.MemberCardNo;
                     OldName := MemberSalesQry.MemberName;
 
-                    if (MemberSalesQry.EntryDate >= Month_3) then begin
+                    CurrDocumentNo := MemberSalesQry.DocumentNo;
+
+                    if (MemberSalesQry.EntryDate >= Month_3) and (MemberSalesQry.EntryDate < FilterDate) then begin
                         GrossAmt_3 += MemberSalesQry.SumGrossAmount;
-                        CountBill_3 += 1;
-                    end else if (MemberSalesQry.EntryDate >= Month_6) then begin
+                        if CurrDocumentNo <> OldDocumentNo then
+                            CountBill_3 += 1;
+                    end else if (MemberSalesQry.EntryDate >= Month_6) and (MemberSalesQry.EntryDate < Month_3) then begin
                         GrossAmt_6 += MemberSalesQry.SumGrossAmount;
-                        CountBill_6 += 1;
-                    end else if (MemberSalesQry.EntryDate >= Month_9) then begin
+                        if CurrDocumentNo <> OldDocumentNo then
+                            CountBill_6 += 1;
+                    end else if (MemberSalesQry.EntryDate >= Month_9) and (MemberSalesQry.EntryDate < Month_6) then begin
                         GrossAmt_9 += MemberSalesQry.SumGrossAmount;
-                        CountBill_9 += 1;
-                    end else if (MemberSalesQry.EntryDate >= Month_12) then begin
+                        if CurrDocumentNo <> OldDocumentNo then
+                            CountBill_9 += 1;
+                    end else if (MemberSalesQry.EntryDate >= Month_12) and (MemberSalesQry.EntryDate < Month_9) then begin
                         GrossAmt_12 += MemberSalesQry.SumGrossAmount;
-                        CountBill_12 += 1;
-                    end else if (MemberSalesQry.EntryDate >= Month_24) then begin
+                        if CurrDocumentNo <> OldDocumentNo then
+                            CountBill_12 += 1;
+                    end else if (MemberSalesQry.EntryDate >= Month_24) and (MemberSalesQry.EntryDate < Month_12) then begin
                         GrossAmt_24 += MemberSalesQry.SumGrossAmount;
-                        CountBill_24 += 1;
+                        if CurrDocumentNo <> OldDocumentNo then
+                            CountBill_24 += 1;
                     end;
+
+                    OldDocumentNo := CurrDocumentNo;
                 end;
 
                 if not IsFirstRecord then
@@ -140,11 +152,12 @@ report 50114 "PLSR_Active Member 2"
                     if TempInsTransactionHeaderTemp.Next() = 0 then
                         CurrReport.Break();
                 end;
+
+                Clear(MemberContactTB);
+                if MemberContactTB.Get(TempInsTransactionHeaderTemp."Infocode Disc. Group", TempInsTransactionHeaderTemp."Manager ID") then;
             end;
         }
     }
-
-
 
     requestpage
     {
@@ -176,7 +189,6 @@ report 50114 "PLSR_Active Member 2"
                             ApplicationArea = All;
                             Caption = 'ID Card No.';
                         }
-
                     }
                 }
             }

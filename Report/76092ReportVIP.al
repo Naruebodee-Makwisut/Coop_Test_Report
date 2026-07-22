@@ -96,17 +96,6 @@ report 50104 "Member Sales History"
             var
                 FoundNewRow: Boolean;
             begin
-                // อ่านแถวถัดไปจาก Query แล้วข้ามแถวที่ (Entry No., Line No.) ซ้ำกับแถวก่อนหน้า
-                // เหตุผล: MemberSalesEntry เป็น driving table ที่ unique อยู่แล้ว แต่ join ชั้นล่าง
-                // (TransactionHeader/TransSalesEntry/SalesShipmentLine) เป็น LeftOuterJoin ต่อกันหลายชั้น
-                // ถ้าคีย์ join ไม่ unique จริง จะได้แถวคูณออกมาสำหรับ sales entry เดียวกัน
-                // การข้ามแถวซ้ำแบบนี้ = เลือกแถวแรกที่เจอ ใกล้เคียงพฤติกรรม FindFirst() ของต้นฉบับ 76092
-                //
-                // ใช้ while + exit แทน repeat...until เพราะ CurrReport.Break() ไม่ได้หยุดโค้ดทันที
-                // (แค่ตั้ง flag ให้ engine หยุด loop หลัง trigger จบ) ถ้าใช้ repeat...until แล้วปล่อยให้
-                // โค้ดไหลไปเช็คเงื่อนไขต่อหลัง Read() fail จะเจอ Entry_No_/Line_No_ ค้างค่าจากแถวสุดท้าย
-                // ที่อ่านสำเร็จ (เท่ากับ Last* พอดี) ทำให้เงื่อนไข until เป็น false วนซ้ำไม่จบ (infinite loop)
-                // ต้อง exit ออกจาก trigger ทันทีเมื่อ Read() fail เพื่อตัดปัญหานี้
                 FoundNewRow := false;
                 while not FoundNewRow do begin
                     if not MemberSalesHistoryQ.Read() then begin

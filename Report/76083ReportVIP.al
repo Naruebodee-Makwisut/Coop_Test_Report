@@ -156,13 +156,18 @@ report 50113 "TEST_Sale VAT by Rec_Test"
             begin
                 if Number > 1 then
                     if TempTransHeader.Next() = 0 then
-                        CurrReport.Break(); // ถ้าหมดข้อมูลในคลังแล้ว ให้สั่งหลุดลูป Integer ทันที
+                        CurrReport.Break();
 
                 Clear(FullVATNo);
                 Clear(AddrText);
+                Clear(VATAmount);
+                Clear(TransType);
+
                 TempStore.Reset();
-                TempTransHeader.Reset();
+                Clear(TempStore);
                 TempPOSTerminal.Reset();
+                Clear(TempPOSTerminal);
+                TempTransHeader.Reset();
 
                 if TempStore.Get(TempTransHeader."Store No.") then begin
                     if TempStore."PLSLC_Show Full Vat At HQ" then begin
@@ -183,15 +188,11 @@ report 50113 "TEST_Sale VAT by Rec_Test"
                     Clear(RunningNum);
                 end;
                 RunningNum += 1;
-                // Clear(VATBussTB);
-                // if VATBussTB.Get(StoreTB."Store VAT Bus. Post. Gr.") then;
 
-                Clear(VATAmount);
                 VATAmount := Round((-TempTransHeader."Gross Amount") - (-TempTransHeader."Net Amount"), 0.01, '=');
 
                 if TempPOSTerminal.Get(TempTransHeader."POS Terminal No.") then;
 
-                Clear(TransType);
                 if (TempTransHeader."Sale Is Return Sale") then begin
                     TransType := 'Refund';
                     FullVATNo := TempTransHeader."PLSLC_Refund Full VAT No.";
@@ -309,12 +310,10 @@ report 50113 "TEST_Sale VAT by Rec_Test"
     var
         // Record
         ComInfo: Record "Company Information";
-        POSTerminalTB: Record "LSC POS Terminal";
         // StoreTB: Record "LSC Store";
         TempPOSTerminal: Record "LSC POS Terminal" temporary;
         TempStore: Record "LSC Store" temporary;
         TempTransHeader: Record "LSC Transaction Header" temporary;
-        // VATBussTB: Record "VAT Business Posting Group";
 
         LSVIPRepFunction: Codeunit "PLSR_Report Function";
 

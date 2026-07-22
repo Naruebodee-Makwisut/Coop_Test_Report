@@ -183,13 +183,13 @@ report 50118 "100 Top Spender"
         FilterEndDate: Date;
         FilterTopSpender: Integer;
         Running: Integer;
-        OldAccountNo: Text[50];
-        CurrAccountNo: Text[50];
-        NextAccountNo: Text[50];
-        CopyMemberSalesEntryTB: Record "LSC Member Sales Entry";
+        // OldAccountNo: Text[50];
+        // CurrAccountNo: Text[50];
+        // NextAccountNo: Text[50];
+        // CopyMemberSalesEntryTB: Record "LSC Member Sales Entry";
         FilterMemberSalesEntryTB: Record "LSC Member Sales Entry";
         TempInsMemberSalesEntryTemp: Record "LSC Member Sales Entry" temporary;
-        SumTotalSpent: Decimal;
+        // SumTotalSpent: Decimal;
         EntryNo: Integer;
         MemberAccountTB: Record "LSC Member Account";
         MemberContactTB: Record "LSC Member Contact";

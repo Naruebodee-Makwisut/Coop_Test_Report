@@ -307,7 +307,6 @@ report 50101 "Sales Report By ProdGroup"
         TmpTransSaleEntry: Record "LSC Trans. Sales Entry" temporary;
         TmpItemFullName: Dictionary of [Integer, Text];
         TmpProdGroupDesc: Dictionary of [Integer, Text];
-        TmpQtyTotal: Dictionary of [Text, Decimal];
         RowSeq: Integer;
 
         ShowTime: Text[50];

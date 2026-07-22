@@ -101,7 +101,6 @@ report 50107 "PLSR_Sales Report By ItemCate2"
                 Clear(DictCateDisc);
                 Clear(DictCateName);
                 Clear(DictItemName);
-                Clear(ItemName);
                 Clear(TransType);
 
                 GrandTotal_Qty := 0;

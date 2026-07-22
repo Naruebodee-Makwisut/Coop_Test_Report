@@ -21,7 +21,9 @@ query 50056 "PLSR_Active Member Q"
             }
             dataitem(LSC_Member_Contact; "LSC Member Contact")
             {
-                DataItemLink = "Account No." = MemberSalesEntry."Member Account No.";
+                DataItemLink = "Account No." = MemberSalesEntry."Member Account No.",
+                   "Contact No." = MemberSalesEntry."Member Contact No.";
+                SqlJoinType = InnerJoin;
                 filter(Search_Name; "Search Name") { }
                 filter(Mobile_Phone_No_; "Mobile Phone No.") { }
                 filter(PLSWS_ID_Card_No_; "PLSWS_ID Card No.") { }

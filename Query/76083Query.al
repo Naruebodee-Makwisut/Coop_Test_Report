@@ -34,7 +34,6 @@ query 50054 "TEST_Store Sales VAT Query"
             {
                 DataItemLink = "No." = TransHeader."Store No.";
                 SqlJoinType = LeftOuterJoin;
-
                 column(PLSLC_Branch_No_; "PLSLC_Branch No.") { }
                 column(PLSLC_Show_Full_Vat_At_HQ; "PLSLC_Show Full Vat At HQ") { }
                 column(Store_Address; Address) { }
@@ -48,7 +47,6 @@ query 50054 "TEST_Store Sales VAT Query"
                 {
                     DataItemLink = "No." = TransHeader."POS Terminal No.";
                     SqlJoinType = LeftOuterJoin;
-
                     column(PLSLC_POS_No_; "PLSLC_POS No.") { }
                 }
             }

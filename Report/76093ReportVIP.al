@@ -14,23 +14,23 @@ report 50114 "PLSR_Active Member 2"
             column(Name_CompanyInforTB; CompanyInforTB.Name) { }
             column("Date"; format(Today, 0, '<Closing><Day,2>/<Month,2>/<Year4>')) { }
             column("Time"; format(Time)) { }
-            column(Member_Club; TempInsTransactionHeaderTemp."Staff ID") { }
-            column(Member_Scheme; TempInsTransactionHeaderTemp."Customer No.") { }
-            column(Member_Account; TempInsTransactionHeaderTemp."Infocode Disc. Group") { }
-            column(Member_Card; TempInsTransactionHeaderTemp."Member Card No.") { }
-            column(MemberName; TempInsTransactionHeaderTemp.Comment) { }
-            column(CountBill_3; TempInsTransactionHeaderTemp."No. of Invoices") { }
-            column(CountBill_6; TempInsTransactionHeaderTemp.Counter) { }
-            column(CountBill_9; TempInsTransactionHeaderTemp."Safe Entry No.") { }
-            column(CountBill_12; TempInsTransactionHeaderTemp."Table No.") { }
-            column(CountBill_24; TempInsTransactionHeaderTemp."Split Number") { }
-            column(GrossAmt_3; TempInsTransactionHeaderTemp."Net Amount") { }
-            column(GrossAmt_6; TempInsTransactionHeaderTemp."Cost Amount") { }
-            column(GrossAmt_9; TempInsTransactionHeaderTemp."Gross Amount") { }
-            column(GrossAmt_12; TempInsTransactionHeaderTemp.Payment) { }
-            column(GrossAmt_24; TempInsTransactionHeaderTemp."Discount Amount") { }
-            column(TotalBill; TempInsTransactionHeaderTemp.Rounded) { }
-            column(TotalGrossAmt; TempInsTransactionHeaderTemp."Total Discount") { }
+            column(Member_Club; TempTransactionHeader."Staff ID") { }
+            column(Member_Scheme; TempTransactionHeader."Customer No.") { }
+            column(Member_Account; TempTransactionHeader."Infocode Disc. Group") { }
+            column(Member_Card; TempTransactionHeader."Member Card No.") { }
+            column(MemberName; TempTransactionHeader.Comment) { }
+            column(CountBill_3; TempTransactionHeader."No. of Invoices") { }
+            column(CountBill_6; TempTransactionHeader.Counter) { }
+            column(CountBill_9; TempTransactionHeader."Safe Entry No.") { }
+            column(CountBill_12; TempTransactionHeader."Table No.") { }
+            column(CountBill_24; TempTransactionHeader."Split Number") { }
+            column(GrossAmt_3; TempTransactionHeader."Net Amount") { }
+            column(GrossAmt_6; TempTransactionHeader."Cost Amount") { }
+            column(GrossAmt_9; TempTransactionHeader."Gross Amount") { }
+            column(GrossAmt_12; TempTransactionHeader.Payment) { }
+            column(GrossAmt_24; TempTransactionHeader."Discount Amount") { }
+            column(TotalBill; TempTransactionHeader.Rounded) { }
+            column(TotalGrossAmt; TempTransactionHeader."Total Discount") { }
             trigger OnPreDataItem()
             var
                 MemberSalesQry: Query "PLSR_Active Member Q";
@@ -65,8 +65,8 @@ report 50114 "PLSR_Active Member 2"
                 end;
 
                 EntryNo := 0;
-                TempInsTransactionHeaderTemp.Reset();
-                TempInsTransactionHeaderTemp.DeleteAll();
+                TempTransactionHeader.Reset();
+                TempTransactionHeader.DeleteAll();
 
                 IsFirstRecord := true;
                 ClearTotals();
@@ -109,20 +109,20 @@ report 50114 "PLSR_Active Member 2"
 
                 MemberSalesQry.Close();
 
-                TempInsTransactionHeaderTemp.Reset();
-                SetRange(Number, 1, TempInsTransactionHeaderTemp.Count);
+                TempTransactionHeader.Reset();
+                SetRange(Number, 1, TempTransactionHeader.Count);
 
-                if TempInsTransactionHeaderTemp.IsEmpty() then
+                if TempTransactionHeader.IsEmpty() then
                     CurrReport.Break();
             end;
 
             trigger OnAfterGetRecord()
             begin
                 if Number = 1 then begin
-                    if not TempInsTransactionHeaderTemp.FindSet() then
+                    if not TempTransactionHeader.FindSet() then
                         CurrReport.Break();
                 end else begin
-                    if TempInsTransactionHeaderTemp.Next() = 0 then
+                    if TempTransactionHeader.Next() = 0 then
                         CurrReport.Break();
                 end;
             end;
@@ -190,41 +190,42 @@ report 50114 "PLSR_Active Member 2"
     local procedure InsertToTempTable(MemberAccount: Text[50]; Club: Code[30]; Scheme: Code[30]; ContactNo: Code[30]; CardNo: Code[30]; Name: Text[100])
     begin
         EntryNo += 1;
-        TempInsTransactionHeaderTemp.Init();
-        TempInsTransactionHeaderTemp."Transaction No." := EntryNo;
+        TempTransactionHeader.Init();
+        TempTransactionHeader."Transaction No." := EntryNo;
 
-        TempInsTransactionHeaderTemp."Staff ID" := Club;
-        TempInsTransactionHeaderTemp."Customer No." := Scheme;
-        TempInsTransactionHeaderTemp."Infocode Disc. Group" := MemberAccount;
-        TempInsTransactionHeaderTemp."Manager ID" := ContactNo;
-        TempInsTransactionHeaderTemp."Member Card No." := CardNo;
-        TempInsTransactionHeaderTemp.Comment := Name;
+        TempTransactionHeader."Staff ID" := Club;
+        TempTransactionHeader."Customer No." := Scheme;
+        TempTransactionHeader."Infocode Disc. Group" := MemberAccount;
+        TempTransactionHeader."Manager ID" := ContactNo;
+        TempTransactionHeader."Member Card No." := CardNo;
+        TempTransactionHeader.Comment := Name;
 
-        TempInsTransactionHeaderTemp."No. of Invoices" := CountBill_3;
-        TempInsTransactionHeaderTemp.Counter := CountBill_6;
-        TempInsTransactionHeaderTemp."Safe Entry No." := CountBill_9;
-        TempInsTransactionHeaderTemp."Table No." := CountBill_12;
-        TempInsTransactionHeaderTemp."Split Number" := CountBill_24;
+        TempTransactionHeader."No. of Invoices" := CountBill_3;
+        TempTransactionHeader.Counter := CountBill_6;
+        TempTransactionHeader."Safe Entry No." := CountBill_9;
+        TempTransactionHeader."Table No." := CountBill_12;
+        TempTransactionHeader."Split Number" := CountBill_24;
 
-        TempInsTransactionHeaderTemp."Net Amount" := GrossAmt_3 * -1;
-        TempInsTransactionHeaderTemp."Cost Amount" := GrossAmt_6 * -1;
-        TempInsTransactionHeaderTemp."Gross Amount" := GrossAmt_9 * -1;
-        TempInsTransactionHeaderTemp.Payment := GrossAmt_12 * -1;
-        TempInsTransactionHeaderTemp."Discount Amount" := GrossAmt_24 * -1;
+        TempTransactionHeader."Net Amount" := GrossAmt_3 * -1;
+        TempTransactionHeader."Cost Amount" := GrossAmt_6 * -1;
+        TempTransactionHeader."Gross Amount" := GrossAmt_9 * -1;
+        TempTransactionHeader.Payment := GrossAmt_12 * -1;
+        TempTransactionHeader."Discount Amount" := GrossAmt_24 * -1;
 
-        TempInsTransactionHeaderTemp.Rounded := CountBill_3 + CountBill_6 + CountBill_9 + CountBill_12 + CountBill_24;
-        TempInsTransactionHeaderTemp."Total Discount" := (GrossAmt_3 + GrossAmt_6 + GrossAmt_9 + GrossAmt_12 + GrossAmt_24) * -1;
+        TempTransactionHeader.Rounded := CountBill_3 + CountBill_6 + CountBill_9 + CountBill_12 + CountBill_24;
+        TempTransactionHeader."Total Discount" := (GrossAmt_3 + GrossAmt_6 + GrossAmt_9 + GrossAmt_12 + GrossAmt_24) * -1;
 
-        TempInsTransactionHeaderTemp.Insert();
+        TempTransactionHeader.Insert();
     end;
 
     var
+        MemberContactTB: Record "LSC Member Contact";
+        CompanyInforTB: Record "Company Information";
+        TempTransactionHeader: Record "LSC Transaction Header" temporary;
         FilterDate: Date;
         FilterMemberName: Text;
         FilterPhoneNo: Text[20];
         FilterIDCard: Text[30];
-        MemberContactTB: Record "LSC Member Contact";
-        CompanyInforTB: Record "Company Information";
         Month_3: Date;
         Month_6: Date;
         Month_9: Date;
@@ -242,5 +243,4 @@ report 50114 "PLSR_Active Member 2"
         GrossAmt_24: Decimal;
         OldAccount: Text[50];
         EntryNo: Integer;
-        TempInsTransactionHeaderTemp: Record "LSC Transaction Header" temporary;
 }

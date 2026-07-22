@@ -74,6 +74,7 @@ report 50113 "TEST_Sale VAT by Rec_Test"
                 Clear(OldStoreNo);
                 Clear(PeriodDate);
                 Clear(DateFilter);
+                Clear(StoreVATQry);
                 IF Choose1Filter THEN BEGIN
                     DateFilter := FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + '..' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                     PeriodDate := 'ประจำงวดวันที่ ' + FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + ' ถึง ' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
@@ -83,8 +84,12 @@ report 50113 "TEST_Sale VAT by Rec_Test"
                         DateFilter := FORMAT(FDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                         PeriodDate := 'ประจำงวดวันที่ ' + FORMAT(FDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
                     END;
-                if StoreFilter <> '' then
+                StoreVATQry.SetFilter(Date_Filter, DateFilter);
+                if StoreFilter <> '' then begin
+                    Clear(ReportFilterText);
+                    StoreVATQry.SetRange(Store_Filter, StoreFilter);
                     ReportFilterText := 'Store No.: ' + StoreFilter;
+                end;
 
                 TempTransHeader.Reset();
                 TempTransHeader.DeleteAll();
@@ -92,14 +97,8 @@ report 50113 "TEST_Sale VAT by Rec_Test"
                 TempStore.DeleteAll();
                 TempPOSTerminal.Reset();
                 TempPOSTerminal.DeleteAll();
-
                 StoreVATQry.SetFilter(Receipt_No_Filter, '<>%1', '');
                 StoreVATQry.SetFilter(Entry_Status_Filter, '<>%1', StoreVATQry.Entry_Status_Filter::Voided);
-
-                if DateFilter <> '' then
-                    StoreVATQry.SetFilter(Date_Filter, DateFilter);
-                if StoreFilter <> '' then
-                    StoreVATQry.SetRange(Store_Filter, StoreFilter);
 
                 if StoreVATQry.Open() then begin
                     while StoreVATQry.Read() do begin
@@ -149,7 +148,6 @@ report 50113 "TEST_Sale VAT by Rec_Test"
                     CurrReport.Break()
                 else
                     TempTransHeader.FindSet();
-
             end;
 
             trigger OnAfterGetRecord()
@@ -183,6 +181,8 @@ report 50113 "TEST_Sale VAT by Rec_Test"
                     Clear(RunningNum);
                 end;
                 RunningNum += 1;
+
+                //not use
                 // Clear(VATBussTB);
                 // if VATBussTB.Get(StoreTB."Store VAT Bus. Post. Gr.") then;
 
@@ -303,43 +303,33 @@ report 50113 "TEST_Sale VAT by Rec_Test"
         Clear(ComInfo);
         ComInfo.Get();
         ShowDate := FORMAT(Today, 0, '<Closing><Day,2>/<Month,2>/<Year4>');
+        Clear(LSVIPRepFunction);
         ShowTime := LSVIPRepFunction.AVTimeFormat(Time);
     end;
 
     var
-        // Record
         ComInfo: Record "Company Information";
-        POSTerminalTB: Record "LSC POS Terminal";
-        // StoreTB: Record "LSC Store";
         TempPOSTerminal: Record "LSC POS Terminal" temporary;
         TempStore: Record "LSC Store" temporary;
         TempTransHeader: Record "LSC Transaction Header" temporary;
-        // VATBussTB: Record "VAT Business Posting Group";
-
+        VATBussTB: Record "VAT Business Posting Group";
+        StoreTB: Record "LSC Store";
         LSVIPRepFunction: Codeunit "PLSR_Report Function";
-
         StoreVATQry: Query "TEST_Store Sales VAT Query";
-
         Choose1Filter: Boolean;
         Choose2Filter: Boolean;
-
         FDateFilter: Date;
         FromDateFilter: Date;
         TodateFilter: Date;
-
         VATAmount: Decimal;
-
         RunningNum: Integer;
-
         AddrText: array[5] of Text[100];
-
         DateFilter: Text[100];
         PeriodDate: Text[150];
         ReportFilterText: Text[250];
         ShowDate: Text[50];
         ShowTime: Text[50];
         TransType: Text[50];
-
         FullVATNo: Code[20];
         OldStoreNo: Code[20];
         StoreFilter: Code[20];

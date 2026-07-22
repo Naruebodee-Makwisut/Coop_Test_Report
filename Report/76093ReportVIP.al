@@ -14,10 +14,10 @@ report 50114 "PLSR_Active Member 2"
             column("Date"; format(Today, 0, '<Closing><Day,2>/<Month,2>/<Year4>')) { }
             column("Time"; format(Time)) { }
             column(Member_Club; TempInsTransactionHeaderTemp."Staff ID") { }
-            column(Member_Scheme; MemberContactTB."Scheme Code") { }
+            column(Member_Scheme; TempInsTransactionHeaderTemp."Customer No.") { }
             column(Member_Account; TempInsTransactionHeaderTemp."Infocode Disc. Group") { }
             column(Member_Card; TempInsTransactionHeaderTemp."Member Card No.") { }
-            column(MemberName; MemberContactTB.Name) { }
+            column(MemberName; TempInsTransactionHeaderTemp.Comment) { }
             column(CountBill_3; TempInsTransactionHeaderTemp."No. of Invoices") { }
             column(CountBill_6; TempInsTransactionHeaderTemp.Counter) { }
             column(CountBill_9; TempInsTransactionHeaderTemp."Safe Entry No.") { }

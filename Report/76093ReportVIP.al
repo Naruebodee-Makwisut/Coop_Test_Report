@@ -35,9 +35,16 @@ report 50114 "PLSR_Active Member 2"
             var
                 MemberSalesQry: Query "PLSR_Active Member Q";
                 IsFirstRecord: Boolean;
-                OldClub, OldScheme, OldContactNo, OldCardNo : Code[30]; OldName: Text[100];
+                OldAccount, OldClub, OldScheme, OldContactNo : text[50]; OldCardNo, OldName : Text[100];
             begin
                 CompanyInforTB.Get();
+
+                Clear(MemberSalesQry);
+                Clear(Month_3);
+                Clear(Month_6);
+                Clear(Month_9);
+                Clear(Month_12);
+                Clear(Month_24);
 
                 if (FilterMemberName <> '') or (FilterPhoneNo <> '') or (FilterIDCard <> '') then begin
                     Clear(MemberContactTB);
@@ -52,7 +59,6 @@ report 50114 "PLSR_Active Member 2"
                     if MemberContactTB.FindFirst() then
                         MemberSalesQry.SetRange(MemberAccountNo, MemberContactTB."Account No.");
                 end;
-
 
                 if FilterDate <> 0D then begin
                     Month_3 := CalcDate('<-3M>', FilterDate);
@@ -86,19 +92,19 @@ report 50114 "PLSR_Active Member 2"
                     OldCardNo := MemberSalesQry.MemberCardNo;
                     OldName := MemberSalesQry.MemberName;
 
-                    if (MemberSalesQry.EntryDate >= Month_3) then begin
+                    if (MemberSalesQry.EntryDate >= Month_3) and (MemberSalesQry.EntryDate < FilterDate) then begin
                         GrossAmt_3 += MemberSalesQry.SumGrossAmount;
                         CountBill_3 += 1;
-                    end else if (MemberSalesQry.EntryDate >= Month_6) then begin
+                    end else if (MemberSalesQry.EntryDate >= Month_6) and (MemberSalesQry.EntryDate < Month_3) then begin
                         GrossAmt_6 += MemberSalesQry.SumGrossAmount;
                         CountBill_6 += 1;
-                    end else if (MemberSalesQry.EntryDate >= Month_9) then begin
+                    end else if (MemberSalesQry.EntryDate >= Month_9) and (MemberSalesQry.EntryDate < Month_6) then begin
                         GrossAmt_9 += MemberSalesQry.SumGrossAmount;
                         CountBill_9 += 1;
-                    end else if (MemberSalesQry.EntryDate >= Month_12) then begin
+                    end else if (MemberSalesQry.EntryDate >= Month_12) and (MemberSalesQry.EntryDate < Month_9) then begin
                         GrossAmt_12 += MemberSalesQry.SumGrossAmount;
                         CountBill_12 += 1;
-                    end else if (MemberSalesQry.EntryDate >= Month_24) then begin
+                    end else if (MemberSalesQry.EntryDate >= Month_24) and (MemberSalesQry.EntryDate < Month_12) then begin
                         GrossAmt_24 += MemberSalesQry.SumGrossAmount;
                         CountBill_24 += 1;
                     end;
@@ -187,7 +193,7 @@ report 50114 "PLSR_Active Member 2"
         Clear(GrossAmt_24);
     end;
 
-    local procedure InsertToTempTable(MemberAccount: Text[50]; Club: Code[30]; Scheme: Code[30]; ContactNo: Code[30]; CardNo: Code[30]; Name: Text[100])
+    local procedure InsertToTempTable(MemberAccount: Text[50]; Club: Text[50]; Scheme: Text[50]; ContactNo: Text[50]; CardNo: Text[100]; Name: Text[100])
     begin
         EntryNo += 1;
         TempInsTransactionHeaderTemp.Init();
@@ -240,7 +246,6 @@ report 50114 "PLSR_Active Member 2"
         GrossAmt_9: Decimal;
         GrossAmt_12: Decimal;
         GrossAmt_24: Decimal;
-        OldAccount: Text[50];
         EntryNo: Integer;
         TempInsTransactionHeaderTemp: Record "LSC Transaction Header" temporary;
 }

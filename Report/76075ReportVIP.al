@@ -73,6 +73,8 @@ report 50109 "Sales_Report_By_Terminal"
                 RettailSetup.Get();
                 ShowVariantFlag := not RettailSetup."PLSPOS_Show Var for Report VIP";
 
+                Clear(ReportFilterText);
+
                 IF Choose1Filter THEN
                     PeriodDate := 'ประจำงวดวันที่ ' + FORMAT(FromDateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>') + ' ถึง ' + FORMAT(TodateFilter, 0, '<Closing><Day,2>/<Month,2>/<Year4>')
                 ELSE
@@ -280,8 +282,6 @@ report 50109 "Sales_Report_By_Terminal"
 
         POSSaleQuery.Open();
         while POSSaleQuery.Read() do begin
-            // TransType / CancelDocNo / RefundDocNo - straight off the
-            // query's Header* columns, no TempTransHeader.Get() needed.
             LocalTransType := Format(POSSaleQuery.HeaderTransactionType);
             if POSSaleQuery.ReturnNoSale then
                 LocalTransType := 'Refund';
@@ -295,11 +295,11 @@ report 50109 "Sales_Report_By_Terminal"
             if POSSaleQuery.HeaderRefundReceiptNo <> '' then
                 LocalCancelDocNo := POSSaleQuery.HeaderRefundReceiptNo;
 
-            // Skip void-all refund receipts - cached per refund receipt no.
             if LocalCancelDocNo <> '' then begin
                 if not RefundVoidedCache.ContainsKey(POSSaleQuery.HeaderRefundReceiptNo) then begin
-                    Clear(TransHTb);
-                    if TransHTb.Get(POSSaleQuery.HeaderRefundReceiptNo) then
+                    TransHTb.SetCurrentKey("Receipt No.");
+                    TransHTb.SetRange("Receipt No.", POSSaleQuery.HeaderRefundReceiptNo);
+                    if TransHTb.FindFirst() then
                         RefundVoidedCache.Add(POSSaleQuery.HeaderRefundReceiptNo, TransHTb."Entry Status" = TransHTb."Entry Status"::Voided)
                     else
                         RefundVoidedCache.Add(POSSaleQuery.HeaderRefundReceiptNo, false);
@@ -308,7 +308,6 @@ report 50109 "Sales_Report_By_Terminal"
                     LocalCancelDocNo := '';
             end;
 
-            // Item description - cached per Item No.
             if not ItemDescCache.ContainsKey(POSSaleQuery.ItemNo) then begin
                 if ItemTB.Get(POSSaleQuery.ItemNo) then
                     ItemDescCache.Add(POSSaleQuery.ItemNo, ItemTB.Description + ' ' + ItemTB."Description 2")
@@ -330,7 +329,6 @@ report 50109 "Sales_Report_By_Terminal"
                 LocalMemberContactName := MemberContactNameCache.Get(POSSaleQuery.HeaderMemberCardNo);
             end;
 
-            // Qty / BaseQty / UnitPrice
             if POSSaleQuery.UOMQuantity <> 0 then
                 LocalQty := -POSSaleQuery.UOMQuantity
             else
@@ -342,9 +340,6 @@ report 50109 "Sales_Report_By_Terminal"
             LocalBaseQty := -POSSaleQuery.Quantity;
             LocalAmount := LocalUnitPrice * LocalQty;
 
-            // Date/Time text - cached per distinct Date/Time value,
-            // since many sale lines share the same receipt date and
-            // the same transaction time.
             if not DateTextCache.ContainsKey(POSSaleQuery.EntryDate) then
                 DateTextCache.Add(POSSaleQuery.EntryDate, Format(POSSaleQuery.EntryDate, 0, '<Closing><Day,2>/<Month,2>/<Year4>'));
             LocalDateText := DateTextCache.Get(POSSaleQuery.EntryDate);

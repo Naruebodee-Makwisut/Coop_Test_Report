@@ -1,6 +1,7 @@
 query 50057 "POSSaleByTerm_Q"
 {
     QueryType = Normal;
+    OrderBy = ascending(StoreNo, POSTerminalNo, TransactionNo, LineNo);
 
     // AVPWDLSVIP 03/07/2026 > Improve Performance of VIP Report(76075) - น้องปอ
     elements
